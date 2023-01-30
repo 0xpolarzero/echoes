@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Header from '@/config';
 import Layout from '@/components/dom/Layout';
@@ -12,6 +12,7 @@ export default function App({ Component, pageProps = { title: 'index' } }) {
   return (
     <>
       <Header title={pageProps.title} />
+
       <Layout ref={ref}>
         <Component {...pageProps} />
         {/* The canvas can either be in front of the dom or behind. If it is in front it can overlay contents.

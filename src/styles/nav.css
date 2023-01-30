@@ -1,0 +1,40 @@
+.nav {
+  font-family: 'Source Code Pro', monospace, var(--font-main);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0.8em 1.2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  z-index: 10;
+}
+
+.nav a,
+.nav svg {
+  color: #fff;
+  text-decoration: none;
+  opacity: 0.8;
+  cursor: pointer;
+
+  transition: opacity 0.2s ease;
+}
+
+.nav a:hover,
+.nav svg:hover {
+  opacity: 1;
+  color: #fff;
+}
+
+.nav .title {
+  font-size: 1.4em;
+  font-weight: 400;
+}
+
+.nav .links {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+}

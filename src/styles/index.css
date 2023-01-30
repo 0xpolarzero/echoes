@@ -1,20 +1,37 @@
 @import url('https://rsms.me/inter/inter.css');
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+@import './nav.css';
 @import './instructions.css';
 
 :root {
   --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* Themes */
+  color-scheme: light dark;
+  --text-dark: rgba(255, 255, 255, 0.87);
+  /* --background-dark: radial-gradient(
+    circle at bottom center,
+    #212121 0%,
+    #101010 80%
+  ); */
+  --background-dark: #101010;
+  --text-light: rgba(0, 0, 0, 0.87);
+  /* --background-light: radial-gradient(
+    circle at bottom center,
+    #f9f9f9 0%,
+    #e9e9e9 80%
+  ); */
+  --background-light: #e9e9e9;
+  /* warmer: */
+  /* --background-light: #e0e0e0; */
 }
 
 * {
@@ -33,15 +50,19 @@ body,
 }
 
 .container {
-  color: #fff;
-  background-color: #101010;
-  background: radial-gradient(circle at bottom center, #212121 0%, #101010 80%);
+  color: var(--text-dark);
+  background: var(--background-dark);
   font-family: 'Inter var', sans-serif;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.container.light {
+  color: var(--text-light);
+  background: var(--background-light);
 }
 
 a {
@@ -53,6 +74,10 @@ a:hover {
   color: #535bf2;
 }
 
+.container.light a:hover {
+  color: #747bff;
+}
+
 h1 {
   /* font-size: 3.2em; */
   line-height: 1.1;
@@ -61,6 +86,7 @@ h1 {
 }
 
 button {
+  color: inherit;
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -74,20 +100,10 @@ button {
 button:hover {
   border-color: #646cff;
 }
+.container.light button {
+  background-color: #f9f9f9;
+}
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
 }
