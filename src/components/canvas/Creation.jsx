@@ -43,17 +43,22 @@ export default function Creation({ route, ...props }) {
       uColorA: new THREE.Uniform(new THREE.Vector3(...traits.color.colorA)),
       uColorB: new THREE.Uniform(new THREE.Vector3(...traits.color.colorB)),
     }),
-    [traits.color.colorA, traits.color.colorB],
+    [],
   );
 
   useCursor(hovered);
   useFrame((state, delta) => {
+    // Time
     const t = state.clock.getElapsedTime();
-    // mesh.current.rotation.y = t / 2 + Math.sin(t * 2) / 10;
-    // mesh.current.rotation.x = t / 2 + Math.sin(t * 2) / 10;
-    // mesh.current.rotation.z = t / 2 + Math.sin(t * 2) / 10;
-
     mesh.current.material.uniforms.uTime.value = t;
+
+    // Colors
+    mesh.current.material.uniforms.uColorA.value = new THREE.Vector3(
+      ...traits.color.colorA,
+    );
+    mesh.current.material.uniforms.uColorB.value = new THREE.Vector3(
+      ...traits.color.colorB,
+    );
   });
 
   return (
