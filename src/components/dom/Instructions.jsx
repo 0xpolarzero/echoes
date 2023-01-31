@@ -13,7 +13,7 @@ export default function Instructions({ children }) {
   const last = options.length - 1;
 
   useEffect(() => {
-    optionsElem.current.style.transform = `translateY(-${current * 100}%)`;
+    optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
   }, [current]);
 
   return (
@@ -44,7 +44,7 @@ const Section = ({ option, count }) => {
   const [hovered, hover] = useState('');
 
   return (
-    <div className='section' style={{ top: `${count * 100}%` }}>
+    <div className='section' style={{ top: `${count * 200}%` }}>
       <h1>_{option.type}</h1>
       <div className={`option-picker ${option.type}`}>
         {option.values.map((value, index) => {
