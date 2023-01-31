@@ -10,7 +10,7 @@ void main() {
   vec3 color = mix(uColorA, uColorB, vDistance * 0.5);
   color = mix(vec3(0.0), color, strength);
 
-  gl_FragColor = vec4(color, strength);
+  gl_FragColor = vec4(color, strength * 2.0);
 }
 `;
 
