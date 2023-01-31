@@ -59,11 +59,15 @@ export default function Creation({ route, ...props }) {
     mesh.current.material.uniforms.uColorB.value = new THREE.Vector3(
       ...traits.color.colorB,
     );
+
+    // Make sure the orb is always at the center of the left side of the screen
+    mesh.current.position.x = -1.5 * (window.innerWidth / window.innerHeight);
   });
 
   return (
     <points
       ref={mesh}
+      position={[-2, 0, 0]}
       {...props}
       // onClick={() => router.push(route)}
       onPointerOver={() => hover(true)}

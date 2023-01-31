@@ -18,26 +18,7 @@ export default function Page(props) {
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
 // Find the position needed so it is at the center of the left side of the screen
-Page.canvas = (props) => {
-  const [screenWidth, setScreenWidth] = useState(0);
-  const [position, setPosition] = useState([-3, 0, 0]);
-
-  useEffect(() => {
-    const handleResize = () => setScreenWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  useEffect(() => {
-    let left = -screenWidth / 400 + 1;
-    if (left > -2) left = -2;
-
-    setPosition([left, 0, 0]);
-  }, [screenWidth]);
-
-  return <Creation route='/blob' position={position} />;
-};
+Page.canvas = (props) => <Creation route='/blob' />;
 
 export async function getStaticProps() {
   return { props: { title: 'Index' } };
