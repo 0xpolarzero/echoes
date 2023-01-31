@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Divider } from 'antd';
 import { CiLight, CiDark } from 'react-icons/ci';
-import hooks from '@/hooks';
+import stores from '@/stores';
 
-const Nav = ({ setLocalTheme }) => {
-  const { theme, updateTheme } = hooks.useTheme();
+const Nav = () => {
+  const { theme, updateTheme } = stores.useTheme();
+
+  // Put _ before active page
 
   return (
     <header className='nav'>
@@ -18,15 +20,9 @@ const Nav = ({ setLocalTheme }) => {
         <Link href='/'>my orbs</Link>
         <Divider type='vertical' />
         {theme === 'dark' ? (
-          <CiDark
-            size={20}
-            onClick={() => updateTheme('light', setLocalTheme)}
-          />
+          <CiDark size={20} onClick={() => updateTheme('light')} />
         ) : (
-          <CiLight
-            size={20}
-            onClick={() => updateTheme('dark', setLocalTheme)}
-          />
+          <CiLight size={20} onClick={() => updateTheme('dark')} />
         )}
       </div>
     </header>

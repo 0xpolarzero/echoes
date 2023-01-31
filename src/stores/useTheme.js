@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { create } from 'zustand';
 
 const lightProperties = [
   { '--text-main': 'rgba(0, 0, 0, 0.8)' },
@@ -20,11 +20,11 @@ const darkProperties = [
   { '--button-border': 'rgba(255, 255, 255, 0.1)' },
 ];
 
-const useTheme = () => {
-  const [theme, setTheme] = useState('dark');
-  const setLocalRef = useRef(null);
+export default create((set, get) => ({
+  theme: 'dark',
+  updateTheme: (newTheme) => {
+    const { setLight, setDark } = get();
 
-  const updateTheme = (newTheme, setLocal) => {
     const themeString =
       typeof newTheme === 'string'
         ? newTheme
@@ -33,36 +33,27 @@ const useTheme = () => {
         : 'dark';
     let newBg = typeof newTheme === 'string' ? null : newTheme.hex;
 
-    setTheme(themeString);
+    set({ theme: themeString });
     themeString === 'light' ? setLight() : setDark();
     if (newBg)
       document.documentElement.style.setProperty('--background-main', newBg);
+  },
 
-    // document.documentElement.setAttribute('data-theme', newTheme);
-
-    if (setLocal) setLocalRef.current = setLocal;
-    if (setLocalRef.current) setLocal(newTheme);
-  };
-
-  const setLight = () => {
+  setLight: () => {
     lightProperties.forEach((property) => {
       const key = Object.keys(property)[0];
       const value = Object.values(property)[0];
 
       document.documentElement.style.setProperty(key, value);
     });
-  };
+  },
 
-  const setDark = () => {
+  setDark: () => {
     darkProperties.forEach((property) => {
       const key = Object.keys(property)[0];
       const value = Object.values(property)[0];
 
       document.documentElement.style.setProperty(key, value);
     });
-  };
-
-  return { theme, updateTheme };
-};
-
-export default useTheme;
+  },
+}));

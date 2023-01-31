@@ -7,7 +7,6 @@ import * as THREE from 'three';
 import orbVertexShader from './shaders/orb/vertexShader';
 import orbFragmentShader from './shaders/orb/fragmentShader';
 import stores from '@/stores';
-import hooks from '@/hooks';
 
 const Entity = ({ route, ...props }) => {
   const router = useRouter();
@@ -111,11 +110,9 @@ const Orb = ({ radius }) => {
 
 const Background = ({ radius }) => {
   const { traits } = stores.useTraits();
-  const { updateTheme } = hooks.useTheme();
-  const color = `rgba(${traits.background.rgb}, 0.9)`;
+  const { updateTheme } = stores.useTheme();
 
   useEffect(() => {
-    // document.querySelector('.container').style.background = color;
     updateTheme(traits.background);
   }, [traits.background.rgb]);
 

@@ -1,12 +1,17 @@
-import { useRef, forwardRef, useImperativeHandle, useState } from 'react';
+import {
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useEffect,
+} from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
-import hooks from '@/hooks';
 import Nav from '@/components/dom/Nav';
+import stores from '@/stores';
 
 const Layout = forwardRef(({ children, ...props }, ref) => {
   const localRef = useRef();
-  const { theme } = hooks.useTheme();
-  const [localTheme, setLocalTheme] = useState(theme);
+  const { theme } = stores.useTheme();
 
   useImperativeHandle(ref, () => localRef.current);
 
@@ -15,11 +20,11 @@ const Layout = forwardRef(({ children, ...props }, ref) => {
       <ConfigProvider
         theme={{
           algorithm:
-            localTheme === 'dark'
+            theme === 'dark'
               ? antdTheme.darkAlgorithm
               : antdTheme.defaultAlgorithm,
         }}>
-        <Nav setLocalTheme={setLocalTheme} />
+        <Nav />
         {children}
       </ConfigProvider>
     </div>
