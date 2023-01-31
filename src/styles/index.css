@@ -107,7 +107,7 @@ button {
   font-family: inherit;
   background-color: var(--background-button);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s ease;
 }
 button:hover {
   border-color: var(--text-link);

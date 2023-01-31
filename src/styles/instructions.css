@@ -15,6 +15,49 @@
 }
 
 /* 
+ * Options
+ */
+.options {
+  transition: all 0.3s ease;
+}
+
+/* 
+ * Controls
+ */
+.controls.prev {
+  grid-area: controls-prev;
+}
+
+.controls.next {
+  grid-area: controls-next;
+}
+
+button.controls {
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.25s ease;
+}
+button.controls:hover {
+  border: none;
+}
+button.controls.hidden {
+  opacity: 0;
+}
+
+button.controls svg {
+  transition: all 0.25s ease;
+}
+button.controls.prev:hover svg {
+  transform: translateY(-0.5rem);
+}
+button.controls.next:hover svg {
+  transform: translateY(0.5rem);
+}
+
+/* 
  * Section
  */
 .section {
@@ -42,46 +85,15 @@
   box-shadow: 0 4px 30px var(--button-shadow);
   backdrop-filter: blur(1.2px);
   -webkit-backdrop-filter: blur(1.2px);
-  border: 1px solid var(--button-border);
+  /* border: 1px solid var(--button-border); */
+  border: none;
 }
 
 .option-picker button:hover {
-  border: 1px solid var(--button-border);
+  /* border: 1px solid var(--button-border); */
+  border: none;
 }
 
 .option-picker button.selected {
   color: #fff;
-}
-
-/* 
- * Controls
- */
-.controls.prev {
-  grid-area: controls-prev;
-}
-
-.controls.next {
-  grid-area: controls-next;
-}
-
-button.controls {
-  background: transparent;
-  border: none;
-
-  cursor: pointer;
-  z-index: 1;
-  transition: all 0.25s ease;
-}
-button.controls:hover {
-  border: none;
-}
-
-button.controls svg {
-  transition: all 0.25s ease;
-}
-button.controls.prev:hover svg {
-  transform: translateY(-0.5rem);
-}
-button.controls.next:hover svg {
-  transform: translateY(0.5rem);
 }
