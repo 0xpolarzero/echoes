@@ -1,4 +1,23 @@
 .instructions {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template:
+    'controls-prev' auto
+    'options' 1fr
+    'controls-next' auto;
+  padding: 4rem 0 1rem 0;
+}
+
+.instructions .option {
+  grid-area: options;
+}
+
+/* 
+ * Section
+ */
+.section {
   font-family: 'Source Code Pro', monospace, var(--font-main);
   position: absolute;
   top: 0;
@@ -12,24 +31,57 @@
   gap: 1rem;
 }
 
-.color-picker {
+.option-picker {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 1rem;
   width: 100%;
 }
 
-.color-picker button {
+.option-picker button {
   box-shadow: 0 4px 30px var(--button-shadow);
   backdrop-filter: blur(1.2px);
   -webkit-backdrop-filter: blur(1.2px);
   border: 1px solid var(--button-border);
 }
 
-.color-picker button:hover {
+.option-picker button:hover {
   border: 1px solid var(--button-border);
 }
 
-.color-picker button.selected {
+.option-picker button.selected {
   color: #fff;
+}
+
+/* 
+ * Controls
+ */
+.controls.prev {
+  grid-area: controls-prev;
+}
+
+.controls.next {
+  grid-area: controls-next;
+}
+
+button.controls {
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.25s ease;
+}
+button.controls:hover {
+  border: none;
+}
+
+button.controls svg {
+  transition: all 0.25s ease;
+}
+button.controls.prev:hover svg {
+  transform: translateY(-0.5rem);
+}
+button.controls.next:hover svg {
+  transform: translateY(0.5rem);
 }

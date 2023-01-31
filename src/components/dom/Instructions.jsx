@@ -1,57 +1,70 @@
 import { useEffect, useState } from 'react';
+import {
+  MdOutlineKeyboardArrowUp,
+  MdOutlineKeyboardArrowDown,
+} from 'react-icons/md';
 import stores from '@/stores';
+import { getGradient } from '@/systems/utils';
 
 export default function Instructions({ children }) {
-  const { traits, options, setTrait } = stores.useTraits();
-  const colorOptions = options.find((option) => option.type === 'color').values;
-
-  const [hovered, hover] = useState('');
-
-  useEffect(() => {
-    console.log(traits);
-  }, [traits]);
+  const { options } = stores.useTraits();
+  const [current, setCurrent] = useState(0);
+  const last = options.length - 1;
 
   return (
     <div className='instructions'>
-      <h1>_color</h1>
-      <div className='color-picker'>
-        {colorOptions.map((color, index) => {
-          const selected = traits.color === color;
+      <div className='options'>
+        {options.map((option, index) => {
+          return <Section key={index} option={option} />;
+        })}
+      </div>
+
+      <button
+        className='controls prev'
+        onClick={() => setCurrent(current === 0 ? 0 : current - 1)}>
+        <MdOutlineKeyboardArrowUp size={20} />
+      </button>
+
+      <button
+        className='controls next'
+        onClick={() => setCurrent(current === last ? last : current + 1)}>
+        <MdOutlineKeyboardArrowDown size={20} />
+      </button>
+    </div>
+  );
+}
+
+const Section = ({ option }) => {
+  const { traits, setTrait } = stores.useTraits();
+  const [hovered, hover] = useState('');
+
+  return (
+    <div className='section'>
+      <h1>_{option.type}</h1>
+      <div className={`option-picker ${option.type}`}>
+        {option.values.map((value, index) => {
+          const selected = traits[option.type] === value;
+
           return (
             <button
               key={index}
-              className={`color-option-${index} ${selected ? 'selected' : ''}`}
-              onPointerEnter={() => hover(color.name)}
+              className={`option-${index} ${selected ? 'selected' : ''}`}
+              onPointerEnter={() => hover(value)}
               onPointerLeave={() => hover('')}
               style={{
-                background: getGradient(
-                  color,
-                  selected ? true : hovered === color.name,
-                ).gradient,
+                background:
+                  option.type === 'color'
+                    ? getGradient(value, selected ? true : hovered === value)
+                        .gradient
+                    : '',
                 textTransform: 'lowercase',
               }}
-              onClick={() => setTrait('color', color)}>
-              {color.name.replace(', ', ' - ')}
+              onClick={() => setTrait(option.type, value)}>
+              {value.name.replace(', ', ' - ')}
             </button>
           );
         })}
       </div>
     </div>
   );
-}
-
-const getGradient = ({ colorA, colorB }, hovered) => {
-  const colorAFormatted = `rgba(${colorA[0] * 100}, ${colorA[1] * 100}, ${
-    colorA[2] * 100
-  }, ${hovered ? 0.4 : 0.1})`;
-  const colorBFormatted = `rgba(${colorB[0] * 100}, ${colorB[1] * 100}, ${
-    colorB[2] * 100
-  }, ${hovered ? 0.4 : 0.1})`;
-
-  return {
-    gradient: `linear-gradient(90deg, ${colorAFormatted} 0%, ${colorBFormatted} 100%)`,
-    shadow: `0 4px 30px rgba(${colorA[0] * 100}, ${colorA[1] * 100}, ${
-      colorA[2] * 100
-    }, ${hovered ? 0.4 : 0.1})`,
-  };
 };
