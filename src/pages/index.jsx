@@ -6,7 +6,7 @@ import Instructions from '@/components/dom/Instructions';
 // WARNING ! errors might get obfuscated by using dynamic import.
 // If something goes wrong go back to a static import to show the error.
 // https://github.com/pmndrs/react-three-next/issues/49
-const Creation = dynamic(() => import('@/components/canvas/Creation'), {
+const Entity = dynamic(() => import('@/components/canvas/Entity'), {
   ssr: false,
 });
 
@@ -18,7 +18,7 @@ export default function Page(props) {
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
 // Find the position needed so it is at the center of the left side of the screen
-Page.canvas = (props) => <Creation route='/blob' />;
+Page.canvas = (props) => <Entity route='/blob' />;
 
 export async function getStaticProps() {
   return { props: { title: 'Index' } };
