@@ -5,14 +5,7 @@ import { CiLight, CiDark } from 'react-icons/ci';
 import hooks from '@/hooks';
 
 const Nav = ({ setLocalTheme }) => {
-  const { theme, setTheme } = hooks.useTheme();
-
-  useEffect(() => {
-    // layoutRef.current.classList.remove(theme === 'dark' ? 'light' : 'dark');
-    // layoutRef.current.classList.add(theme);
-    document.documentElement.setAttribute('data-theme', theme);
-    setLocalTheme(theme);
-  }, [theme]);
+  const { theme, updateTheme } = hooks.useTheme();
 
   return (
     <header className='nav'>
@@ -25,9 +18,15 @@ const Nav = ({ setLocalTheme }) => {
         <Link href='/'>my orbs</Link>
         <Divider type='vertical' />
         {theme === 'dark' ? (
-          <CiDark size={20} onClick={() => setTheme('light')} />
+          <CiDark
+            size={20}
+            onClick={() => updateTheme('light', setLocalTheme)}
+          />
         ) : (
-          <CiLight size={20} onClick={() => setTheme('dark')} />
+          <CiLight
+            size={20}
+            onClick={() => updateTheme('dark', setLocalTheme)}
+          />
         )}
       </div>
     </header>
