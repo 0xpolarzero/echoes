@@ -4,8 +4,14 @@ import { Divider } from 'antd';
 import { CiLight, CiDark } from 'react-icons/ci';
 import hooks from '@/hooks';
 
-const Nav = () => {
+const Nav = ({ layoutRef, setLocalTheme }) => {
   const { theme, setTheme } = hooks.useTheme();
+
+  useEffect(() => {
+    layoutRef.current.classList.remove(theme === 'dark' ? 'light' : 'dark');
+    layoutRef.current.classList.add(theme);
+    setLocalTheme(theme);
+  }, [theme]);
 
   return (
     <header className='nav'>
