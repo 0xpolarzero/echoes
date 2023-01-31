@@ -1,32 +1,37 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   MdOutlineKeyboardArrowUp,
   MdOutlineKeyboardArrowDown,
 } from 'react-icons/md';
 import stores from '@/stores';
-import { getGradient } from '@/systems/utils';
+import { getBackground, getGradient } from '@/systems/utils';
 
 export default function Instructions({ children }) {
+  const optionsElem = useRef();
   const { options } = stores.useTraits();
   const [current, setCurrent] = useState(0);
   const last = options.length - 1;
 
+  useEffect(() => {
+    optionsElem.current.style.transform = `translateY(-${current * 100}%)`;
+  }, [current]);
+
   return (
     <div className='instructions'>
-      <div className='options'>
+      <div ref={optionsElem} className='options'>
         {options.map((option, index) => {
-          return <Section key={index} option={option} />;
+          return <Section key={index} option={option} count={index} />;
         })}
       </div>
 
       <button
-        className='controls prev'
+        className={`controls prev ${current === 0 ? 'hidden' : ''}`}
         onClick={() => setCurrent(current === 0 ? 0 : current - 1)}>
         <MdOutlineKeyboardArrowUp size={20} />
       </button>
 
       <button
-        className='controls next'
+        className={`controls next ${current === last ? 'hidden' : ''}`}
         onClick={() => setCurrent(current === last ? last : current + 1)}>
         <MdOutlineKeyboardArrowDown size={20} />
       </button>
@@ -34,12 +39,12 @@ export default function Instructions({ children }) {
   );
 }
 
-const Section = ({ option }) => {
+const Section = ({ option, count }) => {
   const { traits, setTrait } = stores.useTraits();
   const [hovered, hover] = useState('');
 
   return (
-    <div className='section'>
+    <div className='section' style={{ top: `${count * 100}%` }}>
       <h1>_{option.type}</h1>
       <div className={`option-picker ${option.type}`}>
         {option.values.map((value, index) => {
@@ -54,8 +59,13 @@ const Section = ({ option }) => {
               style={{
                 background:
                   option.type === 'color'
-                    ? getGradient(value, selected ? true : hovered === value)
-                        .gradient
+                    ? getGradient(
+                        value.rgb,
+                        selected ? true : hovered === value,
+                      ).gradient
+                    : option.type === 'background'
+                    ? getBackground(value, selected ? true : hovered === value)
+                        .background
                     : '',
                 textTransform: 'lowercase',
               }}
