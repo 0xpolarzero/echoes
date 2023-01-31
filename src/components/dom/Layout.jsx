@@ -11,7 +11,7 @@ const Layout = forwardRef(({ children, ...props }, ref) => {
   useImperativeHandle(ref, () => localRef.current);
 
   return (
-    <div {...props} ref={localRef} className={`container ${theme}`}>
+    <div {...props} ref={localRef} className='container'>
       <ConfigProvider
         theme={{
           algorithm:
@@ -19,7 +19,7 @@ const Layout = forwardRef(({ children, ...props }, ref) => {
               ? antdTheme.darkAlgorithm
               : antdTheme.defaultAlgorithm,
         }}>
-        <Nav layoutRef={localRef} setLocalTheme={setLocalTheme} />
+        <Nav setLocalTheme={setLocalTheme} />
         {children}
       </ConfigProvider>
     </div>

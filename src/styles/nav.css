@@ -14,18 +14,16 @@
 
 .nav a,
 .nav svg {
-  color: #fff;
+  color: var(--text-main);
   text-decoration: none;
-  opacity: 0.8;
   cursor: pointer;
 
-  transition: opacity 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .nav a:hover,
 .nav svg:hover {
-  opacity: 1;
-  color: #fff;
+  color: var(--text-main-full);
 }
 
 .nav .title {
