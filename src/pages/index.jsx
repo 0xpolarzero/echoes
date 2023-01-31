@@ -17,9 +17,8 @@ export default function Page(props) {
 
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
-// Find the position needed so it is at the center of the left side of the screen
 Page.canvas = (props) => <Entity route='/blob' />;
 
 export async function getStaticProps() {
-  return { props: { title: 'Index' } };
+  return { props: { title: 'orbs' } };
 }
