@@ -4,11 +4,11 @@ import { useFrame } from '@react-three/fiber';
 import { useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 
-import vertexShader from './shaders/vertexShader';
-import fragmentShader from './shaders/fragmentShader';
+import orbVertexShader from './shaders/orb/vertexShader';
+import orbFragmentShader from './shaders/orb/fragmentShader';
 import stores from '@/stores';
 
-export default function Creation({ route, ...props }) {
+const Entity = ({ route, ...props }) => {
   const router = useRouter();
   const mesh = useRef(null);
   const [hovered, hover] = useState(false);
@@ -40,8 +40,12 @@ export default function Creation({ route, ...props }) {
       uTime: {
         value: 0,
       },
-      uColorA: new THREE.Uniform(new THREE.Vector3(...traits.color.colorA)),
-      uColorB: new THREE.Uniform(new THREE.Vector3(...traits.color.colorB)),
+      uColorA: new THREE.Uniform(
+        new THREE.Vector3(...traits.color.vec3.colorA),
+      ),
+      uColorB: new THREE.Uniform(
+        new THREE.Vector3(...traits.color.vec3.colorB),
+      ),
     }),
     [],
   );
@@ -54,10 +58,10 @@ export default function Creation({ route, ...props }) {
 
     // Colors
     mesh.current.material.uniforms.uColorA.value = new THREE.Vector3(
-      ...traits.color.colorA,
+      ...traits.color.vec3.colorA,
     );
     mesh.current.material.uniforms.uColorB.value = new THREE.Vector3(
-      ...traits.color.colorB,
+      ...traits.color.vec3.colorB,
     );
 
     // Make sure the orb is always at the center of the left side of the screen
@@ -83,10 +87,12 @@ export default function Creation({ route, ...props }) {
       <shaderMaterial
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        fragmentShader={fragmentShader}
-        vertexShader={vertexShader}
+        vertexShader={orbVertexShader}
+        fragmentShader={orbFragmentShader}
         uniforms={uniforms}
       />
     </points>
   );
-}
+};
+
+export default Entity;
