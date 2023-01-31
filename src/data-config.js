@@ -15,8 +15,32 @@ export const traits = [
           colorB: '248, 179, 115',
         },
       },
+
       {
-        name: 'Rose Horizon, Azure Skies',
+        name: 'Velvet Nightfall, Verdant Whisper',
+        vec3: {
+          colorA: [0.93, 0.8, 0.95],
+          colorB: [0.58, 0.92, 0.67],
+        },
+        rgb: {
+          colorA: '237, 204, 241',
+          colorB: '148, 235, 170',
+        },
+      },
+      {
+        name: 'Blushing Petals, Serene Waves',
+        vec3: {
+          colorA: [0.97, 0.87, 0.89],
+          colorB: [0.65, 0.86, 0.97],
+        },
+        rgb: {
+          colorA: '248, 221, 227',
+          colorB: '166, 220, 247',
+        },
+      },
+
+      {
+        name: 'Sunset Symphony, Azure Skies',
         vec3: {
           colorA: [0.71, 0.49, 0.9],
           colorB: [0.17, 0.51, 0.95],
@@ -27,7 +51,7 @@ export const traits = [
         },
       },
       {
-        name: 'Mauve Twilight, Silver Fog',
+        name: 'Celestial Haze, Ethereal Fog',
         vec3: {
           colorA: [0.78, 0.38, 0.8],
           colorB: [0.53, 0.53, 0.53],
@@ -78,39 +102,45 @@ export const traits = [
     values: [
       {
         name: 'Midnight Mystery',
-        color: [0.06, 0.06, 0.06],
+        short: 'midnight',
+        light: false,
         hex: '#101010',
         rgb: '16, 16, 16',
       },
       {
-        name: 'Golden Sunshine',
-        color: [0.97, 0.86, 0.43],
-        hex: '#F7DC6F',
-        rgb: '247, 220, 111',
+        name: 'Dark Charcoal',
+        short: 'charcoal',
+        light: false,
+        hex: '#333333',
+        rgb: '51, 51, 51',
       },
       {
-        name: 'Lush Meadow',
-        color: [0.84, 0.96, 0.89],
-        hex: '#D5F5E3',
-        rgb: '213, 245, 227',
+        name: 'Deep Space',
+        short: 'space',
+        light: false,
+        hex: '#1C2331',
+        rgb: '28, 35, 49',
       },
       {
-        name: 'Blushing Rose',
-        color: [0.94, 0.58, 0.54],
-        hex: '#F1948A',
-        rgb: '241, 148, 138',
+        name: 'Celestial Silver',
+        short: 'silver',
+        light: true,
+        hex: '#E5E5E5',
+        rgb: '229, 229, 229',
       },
       {
-        name: 'Regal Lilac',
-        color: [0.73, 0.56, 0.8],
-        hex: '#BB8FCE',
-        rgb: '187, 143, 206',
+        name: 'Ethereal Glow',
+        short: 'glow',
+        light: true,
+        hex: '#B2CCD6',
+        rgb: '178, 204, 214',
       },
       {
-        name: 'Clear Skies',
-        color: [0.52, 0.76, 0.91],
-        hex: '#85C1E9',
-        rgb: '133, 193, 233',
+        name: 'Dreamy Cloud',
+        short: 'cloud',
+        light: true,
+        hex: '#B7CCE2',
+        rgb: '183, 204, 226',
       },
     ],
   },
