@@ -104,15 +104,16 @@ const Orb = ({ radius }) => {
     mesh.current.material.uniforms.uTime.value = t;
 
     // Modifications based on audio
-    // Modify size in vertex to uSize
-    // Maybe find a way for speed
-    // other ideas: radius that would stretch, also color brightness
+    // ? Modify size in vertex to uSize
+    // ? Maybe find a way for speed
+    // ? other ideas: radius that would stretch, also color brightness
     const analyserData = getAnalyserData();
+    // Modify scale based on the gain
     mesh.current.material.uniforms.uGain.value =
       1 + analyserData?.gain * 10 || 1;
-    // The frequency is 0-20000, map it to 1-2 where 1 is 0 and 2 is 10000
+    // Modify brightness based on the frequency
     mesh.current.material.uniforms.uBrighten.value =
-      1 + analyserData?.frequency * 0.0001 || 1;
+      1 + analyserData?.frequency / 20000 || 1;
   });
 
   return (
