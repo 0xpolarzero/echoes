@@ -12,7 +12,7 @@ const Entity = dynamic(() => import('@/components/canvas/Entity'), {
 
 // Dom components go here
 export default function Page(props) {
-  return <Instructions>Instructions</Instructions>;
+  return <Instructions />;
 }
 
 // Canvas components go here
