@@ -24,7 +24,7 @@ const Entity = ({ route, ...props }) => {
   return (
     <>
       <group ref={group} position={[-2, 0, 0]} {...props}>
-        <Background radius={radius} />
+        <Background />
         <Orb radius={radius} />
       </group>
     </>
@@ -104,16 +104,18 @@ const Orb = ({ radius }) => {
     mesh.current.material.uniforms.uTime.value = t;
 
     // Modifications based on audio
-    // ? Modify size in vertex to uSize
     // ? Maybe find a way for speed
-    // ? other ideas: radius that would stretch, also color brightness
+    // ? other ideas: radius that would stretch
     const analyserData = getAnalyserData();
+    const gainMultiplier = 1 + analyserData?.gain * 5 || 1;
+    const freqMultiplier = 1 + analyserData?.frequency / 20000 || 1;
+    const speedMultiplier = gainMultiplier * freqMultiplier;
     // Modify scale based on the gain
-    mesh.current.material.uniforms.uGain.value =
-      1 + analyserData?.gain * 10 || 1;
+    mesh.current.material.uniforms.uGain.value = gainMultiplier;
+    // as well as the speed
+    // mesh.current.material.uniforms.uSpeed.value = speedMultiplier;
     // Modify brightness based on the frequency
-    mesh.current.material.uniforms.uBrighten.value =
-      1 + analyserData?.frequency / 20000 || 1;
+    mesh.current.material.uniforms.uBrighten.value = freqMultiplier;
   });
 
   return (
@@ -140,7 +142,7 @@ const Orb = ({ radius }) => {
   );
 };
 
-const Background = ({ radius }) => {
+const Background = () => {
   const { traits } = stores.useTraits();
   const { updateTheme } = stores.useTheme();
 
@@ -149,24 +151,6 @@ const Background = ({ radius }) => {
   }, [traits.background.rgb]);
 
   return null;
-  // <Html center prepend>
-  //   <div
-  //     style={{
-  //       position: 'absolute',
-  //       width: radius * 200,
-  //       height: radius * 200,
-  //       top: '50%',
-  //       left: '50%',
-  //       transform: 'translate(-50%, -50%)',
-  //       borderRadius: '50%',
-
-  //       // Fade out the border
-  //       // it shoud be filled on the inside, but fade out on the outside
-  //       // same but with a custom color
-  //       background: `radial-gradient(circle at 50% 50%, ${color} 0%, rgba(var(--background-main-rgb), 0) 100%)`,
-  //     }}
-  //   />
-  // </Html>
 };
 
 export default Entity;
