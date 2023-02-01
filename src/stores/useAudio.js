@@ -5,17 +5,20 @@ import config from '@/data-config';
 const audio = config.find((c) => c.type === 'atmosphere');
 
 export default create((set, get) => ({
+  audioContext: null,
   sources: [],
+  analyser: null,
   started: false,
-  analysers: [],
-  setStarted: (started) => set({ started }),
+  suspended: true,
 
   /*
    * Audio
    */
   init: () => {
-    const { sources, started, setStarted, createAnalysers } = get();
+    const { sources, started, createAnalyser } = get();
     if (started) return;
+
+    const audioContext = new AudioContext();
 
     sources.forEach((ref, index) => {
       // Only play the first one
@@ -25,12 +28,12 @@ export default create((set, get) => ({
       }
     });
 
-    setStarted(true);
-    createAnalysers(sources);
+    set({ audioContext, started: true, suspended: false });
+    createAnalyser();
   },
 
   update: () => {
-    const { sources, started } = get();
+    const { sources, started, createAnalyser } = get();
     const { traits } = useTraits.getState();
     if (!started) return;
 
@@ -43,44 +46,56 @@ export default create((set, get) => ({
         ref.current.volume = 0;
       }
     });
+
+    createAnalyser();
+  },
+
+  toggleMute: () => {
+    const { audioContext } = get();
+
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+      set({ suspended: false });
+    } else {
+      audioContext.suspend();
+      set({ suspended: true });
+    }
   },
 
   /*
    * Analyser
    */
-  createAnalysers: () => {
-    const { sources, analysers } = get();
-    const audioContext = new AudioContext();
+  createAnalyser: () => {
+    const { audioContext, sources } = get();
+    const { traits } = useTraits.getState();
+    const index = audio.values.findIndex((v) => v === traits.atmosphere);
 
-    sources.forEach((ref, index) => {
-      const source = audioContext.createMediaElementSource(ref.current);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 64;
+    const source = audioContext.createMediaElementSource(
+      sources[index].current,
+    );
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 1024;
 
-      source.connect(analyser);
-      analyser.connect(audioContext.destination);
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
 
-      analysers[index] = analyser;
-    });
+    set({ analyser });
   },
 
-  getAnalyser: (index) => {
-    const { analysers } = get();
-    if (!analysers[index]) return null;
+  getAnalyserData: () => {
+    const { audioContext, analyser } = get();
+    if (!analyser) return null;
 
-    const analyser = analysers[index];
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+    // Get the gain
+    const gain = data.reduce((a, b) => a + b) / data.length;
+    // Find the main frequency
+    const mainFrequencyIndex = data.indexOf(Math.max(...data));
+    const mainFrequencyInHz =
+      (mainFrequencyIndex * (audioContext.sampleRate / 2)) /
+      analyser.frequencyBinCount;
 
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-    analyser.getByteFrequencyData(frequencyData);
-
-    // Find the highest frequency
-    const highestFrequency = frequencyData.reduce((prev, curr) =>
-      prev > curr ? prev : curr,
-    );
-
-    // Get the overall gain
-    const overallGain = frequencyData.reduce((prev, curr) => prev + curr, 0);
-
-    return { frequency: highestFrequency, gain: overallGain / 255 };
+    return { frequency: mainFrequencyInHz, gain: gain / 255 };
   },
 }));
