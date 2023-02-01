@@ -182,4 +182,44 @@ export const traits = [
       },
     ],
   },
+  {
+    type: 'atmosphere',
+    label: 'Atmosphere',
+    path: '@/assets/audio/',
+    extension: '.mp3',
+    values: [
+      {
+        name: 'Shapeshift',
+        identifier: 'celestial_orbs_sfx-001',
+      },
+      {
+        name: 'Sky Currents',
+        identifier: 'celestial_orbs_sfx-002',
+      },
+      {
+        name: 'Crystal Ripples',
+        identifier: 'celestial_orbs_sfx-003',
+      },
+      {
+        name: 'Arctic Mirage',
+        identifier: 'celestial_orbs_sfx-004',
+      },
+      {
+        name: 'Void Whispers',
+        identifier: 'celestial_orbs_sfx-005',
+      },
+      {
+        name: 'Dream Drifts',
+        identifier: 'celestial_orbs_sfx-006',
+      },
+      {
+        name: 'City Seraph',
+        identifier: 'celestial_orbs_sfx-007',
+      },
+      {
+        name: 'Abyss',
+        identifier: 'celestial_orbs_sfx-008',
+      },
+    ],
+  },
 ];
