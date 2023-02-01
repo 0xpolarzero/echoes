@@ -4,8 +4,8 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 
-import orbVertexShader from './shaders/orb/vertexShader';
-import orbFragmentShader from './shaders/orb/fragmentShader';
+import vertexShaders from './shaders/orb/vertexShaders';
+import fragmentShader from './shaders/orb/fragmentShader';
 import stores from '@/stores';
 
 const Entity = ({ route, ...props }) => {
@@ -70,6 +70,7 @@ const Orb = ({ radius }) => {
     [],
   );
 
+  let vertex;
   useFrame((state, delta) => {
     // Time
     const t = state.clock.getElapsedTime();
@@ -82,6 +83,15 @@ const Orb = ({ radius }) => {
     mesh.current.material.uniforms.uColorB.value = new THREE.Vector3(
       ...traits.color.vec3.colorB,
     );
+
+    // Vertex shader
+    mesh.current.material.vertexShader =
+      vertexShaders[traits.pattern.identifier];
+    if (mesh.current.material.vertexShader !== vertex) {
+      // Force update if it's been changed
+      mesh.current.material.needsUpdate = true;
+      vertex = vertexShaders[traits.pattern.identifier];
+    }
   });
 
   return (
@@ -100,8 +110,8 @@ const Orb = ({ radius }) => {
       <shaderMaterial
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        vertexShader={orbVertexShader}
-        fragmentShader={orbFragmentShader}
+        vertexShader={vertexShaders[traits.pattern.identifier]}
+        fragmentShader={fragmentShader}
         uniforms={uniforms}
       />
     </points>

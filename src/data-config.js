@@ -144,4 +144,42 @@ export const traits = [
       },
     ],
   },
+  {
+    type: 'pattern',
+    label: 'Pattern',
+    values: [
+      {
+        name: 'Whirling Vortices',
+        identifier: 'whirlingVortices',
+      },
+      {
+        name: 'Radiant Blossom',
+        identifier: 'radiantBlossom',
+      },
+      {
+        name: 'Dancing Fireflies',
+        identifier: 'dancingFireflies',
+      },
+      {
+        name: 'Celestial Swirl',
+        identifier: 'celestialSwirl',
+      },
+      {
+        name: 'Spiraling Nebula',
+        identifier: 'spiralingNebula',
+      },
+      {
+        name: 'Celestial Waltz',
+        identifier: 'celestialWaltz',
+      },
+      {
+        name: 'Glowing Orbs',
+        identifier: 'glowingOrbs',
+      },
+      {
+        name: 'Radiant Sun',
+        identifier: 'radiantSun',
+      },
+    ],
+  },
 ];

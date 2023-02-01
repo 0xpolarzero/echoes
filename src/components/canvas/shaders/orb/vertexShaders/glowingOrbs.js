@@ -1,0 +1,27 @@
+const vertexShader = /* glsl */ `
+uniform float uTime;
+
+varying float vDistance;
+
+void main() {
+float radius = 2.0;
+float distanceFactor = pow(radius - distance(position, vec3(0.0)), 2.0);
+float size = distanceFactor * 10.0 + 10.0;
+
+vec3 particlePosition = position + vec3(cos(uTime + distanceFactor * 3.0), sin(uTime + distanceFactor * 5.0), cos(uTime + distanceFactor * 7.0)) * distanceFactor * 0.3;
+
+vDistance = distanceFactor;
+
+vec4 modelPosition = modelMatrix * vec4(particlePosition, 1.0);
+vec4 viewPosition = viewMatrix * modelPosition;
+vec4 projectedPosition = projectionMatrix * viewPosition;
+
+gl_Position = projectedPosition;
+
+gl_PointSize = size;
+gl_PointSize *= (1.0 / - viewPosition.z);
+}
+
+`;
+
+export default vertexShader;
