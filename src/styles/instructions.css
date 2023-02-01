@@ -45,6 +45,7 @@ button.controls:hover {
 }
 button.controls.hidden {
   opacity: 0;
+  cursor: default;
 }
 
 button.controls svg {
