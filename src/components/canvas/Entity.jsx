@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useFrame, useThree } from '@react-three/fiber';
-import { Html, useCursor } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import vertexShaders from './shaders/orb/vertexShaders';
@@ -21,6 +20,7 @@ const Entity = ({ route, ...props }) => {
     // Make sure the entity is always at the center of the left side of the screen
     group.current.position.x = -1.5 * (window.innerWidth / window.innerHeight);
   });
+
   return (
     <>
       <group ref={group} position={[-2, 0, 0]} {...props}>
@@ -34,6 +34,7 @@ const Entity = ({ route, ...props }) => {
 const Orb = ({ radius }) => {
   const mesh = useRef(null);
   const { traits } = stores.useTraits();
+  const { getAnalyser } = stores.useAudio();
 
   const count = 100;
 
@@ -95,6 +96,7 @@ const Orb = ({ radius }) => {
 
     // Add multiplier to time based on audio
     // Higher frequency = faster
+    console.log(getAnalyser(1));
   });
 
   return (
