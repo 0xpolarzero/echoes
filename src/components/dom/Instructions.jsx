@@ -1,17 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   MdOutlineKeyboardArrowUp,
   MdOutlineKeyboardArrowDown,
 } from 'react-icons/md';
-import stores from '@/stores';
 import { getBackground, getGradient } from '@/systems/utils';
 import Mint from './Mint';
+import Audio from './Audio';
+import stores from '@/stores';
 
 export default function Instructions({ children }) {
   const optionsElem = useRef();
+
   const { options } = stores.useTraits();
   const [current, setCurrent] = useState(0);
   const last = options.length;
+
+  const audio = useMemo(() => {
+    return <Audio />;
+  }, []);
 
   useEffect(() => {
     optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
@@ -19,6 +25,7 @@ export default function Instructions({ children }) {
 
   return (
     <div className='instructions'>
+      {audio}
       <div ref={optionsElem} className='options'>
         {options.map((option, index) => {
           return <Section key={index} option={option} count={index} />;
