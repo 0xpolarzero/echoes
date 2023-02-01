@@ -98,3 +98,12 @@ button.controls.next:hover svg {
 .option-picker button.selected::before {
   content: '_';
 }
+
+@media (min-width: 1200px) {
+  .instructions {
+    padding: 4rem 1rem 1rem 0;
+  }
+  .option-picker {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
