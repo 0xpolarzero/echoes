@@ -73,6 +73,9 @@ const Orb = ({ radius }) => {
       uGain: {
         value: 1.0,
       },
+      uBrighten: {
+        value: 1.0,
+      },
     }),
     [],
   );
@@ -107,6 +110,9 @@ const Orb = ({ radius }) => {
     const analyserData = getAnalyserData();
     mesh.current.material.uniforms.uGain.value =
       1 + analyserData?.gain * 10 || 1;
+    // The frequency is 0-20000, map it to 1-2 where 1 is 0 and 2 is 10000
+    mesh.current.material.uniforms.uBrighten.value =
+      1 + analyserData?.frequency * 0.0001 || 1;
   });
 
   return (
