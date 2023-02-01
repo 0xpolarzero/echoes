@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { traits as options } from '@/data-config';
+import config from '@/data-config';
 
 export default create((set) => ({
   // Get all trait types
-  options,
-  traits: options.reduce((acc, trait) => {
+  options: config,
+  traits: config.reduce((acc, trait) => {
     // Set it to a default value (the first one)
     acc[trait.type] = trait.values[0];
     return acc;
@@ -17,4 +17,6 @@ export default create((set) => ({
       return { traits };
     });
   },
+
+  // Audio/atmosphere
 }));
