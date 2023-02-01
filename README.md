@@ -30,3 +30,9 @@ How to implement something more interesting than just votes, e.g. some daily que
 ## What will improve on daily quest
 
 - particles count (e.g. 100 -> 10 000 max)
+
+In the contract
+originTime = block.timestamp (in constructor)
+minted(mapping id => mintTimestamp)
+-> Calculate e.g. canEnhance = (block.timestamp - minted[id] > 1 day)
+-> Maybe count improved by n per day, so to getCount = baseCount (the base + enhanced) + additionnalCount (currentTime - mintedTimestamp)
