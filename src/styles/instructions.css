@@ -94,6 +94,6 @@ button.controls.next:hover svg {
   border: none;
 }
 
-.option-picker button.selected {
-  color: #fff;
+.option-picker button.selected::before {
+  content: '_';
 }
