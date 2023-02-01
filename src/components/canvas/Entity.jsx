@@ -84,7 +84,7 @@ const Orb = ({ radius }) => {
       ...traits.color.vec3.colorB,
     );
 
-    // Vertex shader
+    // Vertex shader (pattern)
     mesh.current.material.vertexShader =
       vertexShaders[traits.pattern.identifier];
     if (mesh.current.material.vertexShader !== vertex) {
@@ -92,6 +92,9 @@ const Orb = ({ radius }) => {
       mesh.current.material.needsUpdate = true;
       vertex = vertexShaders[traits.pattern.identifier];
     }
+
+    // Add multiplier to time based on audio
+    // Higher frequency = faster
   });
 
   return (
