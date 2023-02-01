@@ -1,4 +1,13 @@
-export const traits = [
+import audio1 from '@/assets/audio/celestial_orbs_sfx-001.mp3';
+import audio2 from '@/assets/audio/celestial_orbs_sfx-002.mp3';
+import audio3 from '@/assets/audio/celestial_orbs_sfx-003.mp3';
+import audio4 from '@/assets/audio/celestial_orbs_sfx-004.mp3';
+import audio5 from '@/assets/audio/celestial_orbs_sfx-005.mp3';
+import audio6 from '@/assets/audio/celestial_orbs_sfx-006.mp3';
+import audio7 from '@/assets/audio/celestial_orbs_sfx-007.mp3';
+import audio8 from '@/assets/audio/celestial_orbs_sfx-008.mp3';
+
+const config = [
   {
     type: 'color',
     label: 'Color',
@@ -185,41 +194,41 @@ export const traits = [
   {
     type: 'atmosphere',
     label: 'Atmosphere',
-    path: '@/assets/audio/',
-    extension: '.mp3',
     values: [
       {
         name: 'Shapeshift',
-        identifier: 'celestial_orbs_sfx-001',
+        src: audio1,
       },
       {
         name: 'Sky Currents',
-        identifier: 'celestial_orbs_sfx-002',
+        src: audio2,
       },
       {
         name: 'Crystal Ripples',
-        identifier: 'celestial_orbs_sfx-003',
+        src: audio3,
       },
       {
         name: 'Arctic Mirage',
-        identifier: 'celestial_orbs_sfx-004',
+        src: audio4,
       },
       {
         name: 'Void Whispers',
-        identifier: 'celestial_orbs_sfx-005',
+        src: audio5,
       },
       {
         name: 'Dream Drifts',
-        identifier: 'celestial_orbs_sfx-006',
+        src: audio6,
       },
       {
         name: 'City Seraph',
-        identifier: 'celestial_orbs_sfx-007',
+        src: audio7,
       },
       {
         name: 'Abyss',
-        identifier: 'celestial_orbs_sfx-008',
+        src: audio8,
       },
     ],
   },
 ];
+
+export default config;
