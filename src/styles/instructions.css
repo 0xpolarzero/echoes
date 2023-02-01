@@ -1,12 +1,14 @@
 .instructions {
   position: relative;
   width: 100%;
+  max-width: 1600px;
   height: 100%;
   display: grid;
   grid-template:
     'controls-prev' auto
     'options' 1fr
     'controls-next' auto;
+  /* justify-items: center; */
   padding: 4rem 0 1rem 0;
 }
 
@@ -80,6 +82,7 @@ button.controls.next:hover svg {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   grid-gap: 1rem;
   width: 100%;
+  max-width: 800px;
 }
 
 .option-picker button {
@@ -100,8 +103,8 @@ button.controls.next:hover svg {
 }
 
 @media (min-width: 1200px) {
-  .instructions {
-    padding: 4rem 1rem 1rem 0;
+  .section {
+    right: 2rem;
   }
   .option-picker {
     grid-template-columns: repeat(2, 1fr);
