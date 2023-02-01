@@ -1,5 +1,6 @@
 const vertexShader = /* glsl */ `
 uniform float uTime;
+uniform float uGain;
 
 varying float vDistance;
 
@@ -50,7 +51,7 @@ void main() {
 
   gl_Position = projectedPosition;
 
-  gl_PointSize = 10.0 * (1.0 + sin(uTime + vDistance * 4.0));
+  gl_PointSize = 10.0 * (1.0 + sin(uTime + vDistance * 4.0)) * uGain;
   gl_PointSize *= (1.0 / - viewPosition.z);
 }
 
