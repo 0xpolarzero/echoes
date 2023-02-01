@@ -34,7 +34,7 @@ const Entity = ({ route, ...props }) => {
 const Orb = ({ radius }) => {
   const mesh = useRef(null);
   const { traits } = stores.useTraits();
-  const { getAnalyser } = stores.useAudio();
+  const { getAnalyserData } = stores.useAudio();
 
   const count = 100;
 
@@ -59,7 +59,10 @@ const Orb = ({ radius }) => {
   const uniforms = useMemo(
     () => ({
       uTime: {
-        value: 0,
+        value: 0.0,
+      },
+      uRadius: {
+        value: radius,
       },
       uColorA: new THREE.Uniform(
         new THREE.Vector3(...traits.color.vec3.colorA),
@@ -67,16 +70,15 @@ const Orb = ({ radius }) => {
       uColorB: new THREE.Uniform(
         new THREE.Vector3(...traits.color.vec3.colorB),
       ),
+      uGain: {
+        value: 1.0,
+      },
     }),
     [],
   );
 
   let vertex;
   useFrame((state, delta) => {
-    // Time
-    const t = state.clock.getElapsedTime();
-    mesh.current.material.uniforms.uTime.value = t;
-
     // Colors
     mesh.current.material.uniforms.uColorA.value = new THREE.Vector3(
       ...traits.color.vec3.colorA,
@@ -94,9 +96,17 @@ const Orb = ({ radius }) => {
       vertex = vertexShaders[traits.pattern.identifier];
     }
 
-    // Add multiplier to time based on audio
-    // Higher frequency = faster
-    console.log(getAnalyser(1));
+    // Time
+    const t = state.clock.getElapsedTime();
+    mesh.current.material.uniforms.uTime.value = t;
+
+    // Modifications based on audio
+    // Modify size in vertex to uSize
+    // Maybe find a way for speed
+    // other ideas: radius that would stretch, also color brightness
+    const analyserData = getAnalyserData();
+    mesh.current.material.uniforms.uGain.value =
+      1 + analyserData?.gain * 10 || 1;
   });
 
   return (
