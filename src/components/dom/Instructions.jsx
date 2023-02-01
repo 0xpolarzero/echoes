@@ -5,12 +5,13 @@ import {
 } from 'react-icons/md';
 import stores from '@/stores';
 import { getBackground, getGradient } from '@/systems/utils';
+import Mint from './Mint';
 
 export default function Instructions({ children }) {
   const optionsElem = useRef();
   const { options } = stores.useTraits();
   const [current, setCurrent] = useState(0);
-  const last = options.length - 1;
+  const last = options.length;
 
   useEffect(() => {
     optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
@@ -22,6 +23,7 @@ export default function Instructions({ children }) {
         {options.map((option, index) => {
           return <Section key={index} option={option} count={index} />;
         })}
+        <Mint count={last} />
       </div>
 
       <button
@@ -66,7 +68,7 @@ const Section = ({ option, count }) => {
                     : option.type === 'background'
                     ? getBackground(value, selected ? true : hovered === value)
                         .background
-                    : '',
+                    : null,
                 textTransform: 'lowercase',
               }}
               onClick={() => setTrait(option.type, value)}>

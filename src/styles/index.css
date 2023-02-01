@@ -3,6 +3,7 @@
 
 @import './nav.css';
 @import './instructions.css';
+@import './mint.css';
 
 :root {
   --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
