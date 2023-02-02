@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import config from '@/data-config';
+import config from '@/data';
 
 export default create((set) => ({
   // Get all trait types
@@ -10,7 +10,7 @@ export default create((set) => ({
       acc[trait.type] = trait.values[0];
       return acc;
     },
-    { count: 100 },
+    { count: 100, signature: null },
   ),
   // Set a trait type to a specific value
   setTrait: (type, values) => {
@@ -24,7 +24,8 @@ export default create((set) => ({
   // Create a metadata object given traits
   getMetadataFromTraits: (traits) =>
     Object.keys(traits).reduce((acc, key) => {
-      acc[key] = key === 'count' ? traits[key] : traits[key].name;
+      acc[key] =
+        key === 'count' || key === 'signature' ? traits[key] : traits[key].name;
       return acc;
     }, {}),
 
@@ -38,6 +39,6 @@ export default create((set) => ({
         acc[trait.type] = traitData;
         return acc;
       },
-      { count: metadata.count },
+      { count: metadata.count, signature: metadata.signature },
     ),
 }));
