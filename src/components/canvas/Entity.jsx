@@ -63,10 +63,10 @@ const Orb = ({ radius }) => {
         value: radius,
       },
       uColorA: new THREE.Uniform(
-        new THREE.Vector3(...traits.color.vec3.colorA),
+        new THREE.Vector3(...traits.spectrum.vec3.colorA),
       ),
       uColorB: new THREE.Uniform(
-        new THREE.Vector3(...traits.color.vec3.colorB),
+        new THREE.Vector3(...traits.spectrum.vec3.colorB),
       ),
       uGain: {
         value: 1.0,
@@ -82,18 +82,18 @@ const Orb = ({ radius }) => {
   useFrame((state, delta) => {
     // Colors
     mesh.current.material.uniforms.uColorA.value = new THREE.Vector3(
-      ...traits.color.vec3.colorA,
+      ...traits.spectrum.vec3.colorA,
     );
     mesh.current.material.uniforms.uColorB.value = new THREE.Vector3(
-      ...traits.color.vec3.colorB,
+      ...traits.spectrum.vec3.colorB,
     );
 
     // Vertex shader (pattern)
-    mesh.current.material.vertexShader = vertexShaders[traits.pattern.id];
+    mesh.current.material.vertexShader = vertexShaders[traits.trace.id];
     if (mesh.current.material.vertexShader !== vertex) {
       // Force update if it's been changed
       mesh.current.material.needsUpdate = true;
-      vertex = vertexShaders[traits.pattern.id];
+      vertex = vertexShaders[traits.trace.id];
     }
 
     // Time
@@ -131,7 +131,7 @@ const Orb = ({ radius }) => {
       <shaderMaterial
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        vertexShader={vertexShaders[traits.pattern.id]}
+        vertexShader={vertexShaders[traits.trace.id]}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
       />
@@ -144,8 +144,8 @@ const Background = () => {
   const { updateTheme } = stores.useTheme();
 
   useEffect(() => {
-    updateTheme(traits.background);
-  }, [traits.background.rgb]);
+    updateTheme(traits.scenery);
+  }, [traits.scenery.rgb]);
 
   return null;
 };
