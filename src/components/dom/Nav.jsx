@@ -1,25 +1,34 @@
 import React, { useEffect } from 'react';
-import Link from 'next/link';
-import { Divider } from 'antd';
+import { useRouter } from 'next/router';
+import { Divider, Tooltip } from 'antd';
 import { CiLight, CiDark } from 'react-icons/ci';
-import { RxSpeakerLoud, RxSpeakerOff } from 'react-icons/rx';
+import { RxPlay, RxSpeakerLoud, RxSpeakerOff } from 'react-icons/rx';
 import stores from '@/stores';
 
 const Nav = () => {
   const { theme, updateTheme } = stores.useTheme();
-  const { suspended: audioOff, toggleMute } = stores.useAudio();
+  const { init, started, suspended: audioOff, toggleMute } = stores.useAudio();
+  const { generate, setGenerate } = stores.useConfig();
+  const router = useRouter();
 
   // Put _ before active page
+
+  const goTo = (page, generate) => {
+    setGenerate(generate);
+    router.push(page);
+  };
 
   return (
     <header className='nav'>
       <div className='title'>
-        <Link href='/'>celestial_orbs</Link>
+        <a onClick={() => goTo('/', false)}>celestial-orbs</a>
       </div>
       <div className='links'>
-        <Link href='/'>explore</Link>
+        <a onClick={() => goTo('/', true)}>generate</a>
         <Divider type='vertical' />
-        <Link href='/'>my orbs</Link>
+        <a onClick={() => goTo('explore', false)}>explore</a>
+        <Divider type='vertical' />
+        <a onClick={() => goTo('my-orbs', false)}>my orbs</a>
         <Divider type='vertical' />
         {theme === 'dark' ? (
           <CiDark size={20} onClick={() => updateTheme('light')} />
@@ -27,10 +36,24 @@ const Nav = () => {
           <CiLight size={20} onClick={() => updateTheme('dark')} />
         )}
         <Divider type='vertical' />
-        {audioOff ? (
-          <RxSpeakerOff size={20} onClick={toggleMute} />
+        {started ? (
+          audioOff ? (
+            <RxSpeakerOff size={20} onClick={toggleMute} />
+          ) : (
+            <RxSpeakerLoud size={20} onClick={toggleMute} />
+          )
         ) : (
-          <RxSpeakerLoud size={20} onClick={toggleMute} />
+          <Tooltip
+            title={
+              generate
+                ? 'Consider playing the soundscape while generating your orb'
+                : ''
+            }
+            color='var(--text-link)'
+            defaultOpen
+            placement='bottomRight'>
+            <RxPlay size={20} onClick={init} />
+          </Tooltip>
         )}
       </div>
     </header>
