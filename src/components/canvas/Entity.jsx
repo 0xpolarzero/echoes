@@ -36,7 +36,7 @@ const Orb = ({ radius }) => {
   const { traits } = stores.useTraits();
   const { getAnalyserData } = stores.useAudio();
 
-  const count = 100;
+  const count = traits.count || 100;
 
   const particlesPosition = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -91,12 +91,11 @@ const Orb = ({ radius }) => {
     );
 
     // Vertex shader (pattern)
-    mesh.current.material.vertexShader =
-      vertexShaders[traits.pattern.identifier];
+    mesh.current.material.vertexShader = vertexShaders[traits.pattern.id];
     if (mesh.current.material.vertexShader !== vertex) {
       // Force update if it's been changed
       mesh.current.material.needsUpdate = true;
-      vertex = vertexShaders[traits.pattern.identifier];
+      vertex = vertexShaders[traits.pattern.id];
     }
 
     // Time
@@ -134,7 +133,7 @@ const Orb = ({ radius }) => {
       <shaderMaterial
         blending={THREE.AdditiveBlending}
         depthWrite={false}
-        vertexShader={vertexShaders[traits.pattern.identifier]}
+        vertexShader={vertexShaders[traits.pattern.id]}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
       />

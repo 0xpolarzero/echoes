@@ -15,6 +15,7 @@ const config = [
       {
         // Soothing Skies and Warm Sands
         name: 'Oceanic Blaze, Sunset Haze',
+        id: 'oceanicBlazeSunsetHaze',
         vec3: {
           colorA: [0.34, 0.53, 0.96],
           colorB: [0.97, 0.7, 0.45],
@@ -27,6 +28,7 @@ const config = [
 
       {
         name: 'Velvet Nightfall, Verdant Whisper',
+        id: 'velvetNightfallVerdantWhisper',
         vec3: {
           colorA: [0.93, 0.8, 0.95],
           colorB: [0.58, 0.92, 0.67],
@@ -38,6 +40,7 @@ const config = [
       },
       {
         name: 'Blushing Petals, Serene Waves',
+        id: 'blushingPetalsSereneWaves',
         vec3: {
           colorA: [0.97, 0.87, 0.89],
           colorB: [0.65, 0.86, 0.97],
@@ -50,6 +53,7 @@ const config = [
 
       {
         name: 'Sunset Symphony, Azure Skies',
+        id: 'sunsetSymphonyAzureSkies',
         vec3: {
           colorA: [0.71, 0.49, 0.9],
           colorB: [0.17, 0.51, 0.95],
@@ -61,6 +65,7 @@ const config = [
       },
       {
         name: 'Celestial Haze, Ethereal Fog',
+        id: 'celestialHazeEtherealFog',
         vec3: {
           colorA: [0.78, 0.38, 0.8],
           colorB: [0.53, 0.53, 0.53],
@@ -72,6 +77,7 @@ const config = [
       },
       {
         name: 'Amber Sunset, Jade Depths',
+        id: 'amberSunsetJadeDepths',
         vec3: {
           colorA: [0.97, 0.84, 0.37],
           colorB: [0.1, 0.47, 0.45],
@@ -83,6 +89,7 @@ const config = [
       },
       {
         name: 'Royal Amethyst, Misty Gray',
+        id: 'royalAmethystMistyGray',
         vec3: {
           colorA: [0.69, 0.33, 0.96],
           colorB: [0.84, 0.84, 0.84],
@@ -94,6 +101,7 @@ const config = [
       },
       {
         name: 'Gold Sands, Sapphire Dreams',
+        id: 'goldSandsSapphireDreams',
         vec3: {
           colorA: [0.88, 0.65, 0.24],
           colorB: [0.27, 0.56, 0.84],
@@ -111,42 +119,42 @@ const config = [
     values: [
       {
         name: 'Midnight Mystery',
-        short: 'midnight',
+        id: 'midnightMystery',
         light: false,
         hex: '#101010',
         rgb: '16, 16, 16',
       },
       {
         name: 'Dark Charcoal',
-        short: 'charcoal',
+        id: 'darkCharcoal',
         light: false,
         hex: '#333333',
         rgb: '51, 51, 51',
       },
       {
         name: 'Deep Space',
-        short: 'space',
+        id: 'deepSpace',
         light: false,
         hex: '#1C2331',
         rgb: '28, 35, 49',
       },
       {
         name: 'Celestial Silver',
-        short: 'silver',
+        id: 'celestialSilver',
         light: true,
         hex: '#E5E5E5',
         rgb: '229, 229, 229',
       },
       {
         name: 'Ethereal Glow',
-        short: 'glow',
+        id: 'etherealGlow',
         light: true,
         hex: '#B2CCD6',
         rgb: '178, 204, 214',
       },
       {
         name: 'Dreamy Cloud',
-        short: 'cloud',
+        id: 'dreamyCloud',
         light: true,
         hex: '#B7CCE2',
         rgb: '183, 204, 226',
@@ -159,35 +167,35 @@ const config = [
     values: [
       {
         name: 'Whirling Vortices',
-        identifier: 'whirlingVortices',
+        id: 'whirlingVortices',
       },
       {
         name: 'Radiant Blossom',
-        identifier: 'radiantBlossom',
+        id: 'radiantBlossom',
       },
       {
         name: 'Dancing Fireflies',
-        identifier: 'dancingFireflies',
+        id: 'dancingFireflies',
       },
       {
         name: 'Celestial Swirl',
-        identifier: 'celestialSwirl',
+        id: 'celestialSwirl',
       },
       {
         name: 'Spiraling Nebula',
-        identifier: 'spiralingNebula',
+        id: 'spiralingNebula',
       },
       {
         name: 'Celestial Waltz',
-        identifier: 'celestialWaltz',
+        id: 'celestialWaltz',
       },
       {
         name: 'Glowing Orbs',
-        identifier: 'glowingOrbs',
+        id: 'glowingOrbs',
       },
       {
         name: 'Radiant Sun',
-        identifier: 'radiantSun',
+        id: 'radiantSun',
       },
     ],
   },
@@ -197,34 +205,42 @@ const config = [
     values: [
       {
         name: 'Shapeshift',
+        id: 'shapeshift',
         src: audio1,
       },
       {
         name: 'Sky Currents',
+        id: 'skyCurrents',
         src: audio2,
       },
       {
         name: 'Crystal Ripples',
+        id: 'crystalRipples',
         src: audio3,
       },
       {
         name: 'Arctic Mirage',
+        id: 'arcticMirage',
         src: audio4,
       },
       {
         name: 'Void Whispers',
+        id: 'voidWhispers',
         src: audio5,
       },
       {
         name: 'Dream Drifts',
+        id: 'dreamDrifts',
         src: audio6,
       },
       {
         name: 'City Seraph',
+        id: 'citySeraph',
         src: audio7,
       },
       {
         name: 'Abyss',
+        id: 'abyss',
         src: audio8,
       },
     ],

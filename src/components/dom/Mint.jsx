@@ -8,7 +8,8 @@ import { useAccount, useBalance, useNetwork } from 'wagmi';
 let chain = 'maticmum';
 
 const Mint = ({ count }) => {
-  const { traits } = stores.useTraits();
+  const { traits, getTraitsFromMetadata, getMetadataFromTraits } =
+    stores.useTraits();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: balance } = useBalance({ address });
@@ -40,6 +41,12 @@ const Mint = ({ count }) => {
     e.target.classList.add('selected');
   };
 
+  useEffect(() => {
+    const metadata = getMetadataFromTraits(traits);
+    console.log(metadata);
+    console.log(getTraitsFromMetadata(metadata));
+  }, [traits]);
+
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
       <h1>_generate</h1>
@@ -70,32 +77,32 @@ const Mint = ({ count }) => {
       <div ref={ref} className='price'>
         <PriceButton
           value={0.001}
-          balance={balance.formatted}
+          balance={balance?.formatted || 0}
           onClick={handleSelect}
           selected={true}
         />
         <PriceButton
           value={0.01}
-          balance={balance.formatted}
+          balance={balance?.formatted || 0}
           onClick={handleSelect}
           selected={false}
         />
         <PriceButton
           value={0.1}
-          balance={balance.formatted}
+          balance={balance?.formatted || 0}
           onClick={handleSelect}
           selected={false}
         />
 
         <Tooltip
-          title={input > balance.formatted ? 'Insufficient balance.' : ''}>
+          title={input > balance?.formatted ? 'Insufficient balance.' : ''}>
           <Input
             type='number'
             onClick={handleSelect}
             placeholder='Custom price (min. 0.001 ETH)'
             value={input}
             onChange={handleInput}
-            className={input > balance.formatted ? 'error' : ''}
+            className={input > balance?.formatted ? 'error' : ''}
             style={{ maxWidth: '200px' }}
             suffix='ETH'
           />
