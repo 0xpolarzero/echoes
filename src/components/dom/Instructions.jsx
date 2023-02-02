@@ -8,7 +8,7 @@ import Mint from './Mint';
 import Audio from './Audio';
 import stores from '@/stores';
 
-export default function Instructions({ children }) {
+export default function Instructions() {
   const optionsElem = useRef();
   const { options } = stores.useTraits();
 
