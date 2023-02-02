@@ -27,6 +27,7 @@
   --background-main-rgb: 16, 16, 16;
 
   --text-link-hover: #535bf2;
+  --error: rgba(255, 95, 95, 0.8);
   --background-button: #1a1a1a;
   --button-border: rgba(255, 255, 255, 0.1);
 
@@ -137,6 +138,9 @@ input::-webkit-inner-spin-button {
 }
 input[type='number'] {
   -moz-appearance: textfield;
+}
+input.error {
+  border-color: var(--error);
 }
 
 .emphasize {
