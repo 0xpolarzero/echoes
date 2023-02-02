@@ -56,4 +56,7 @@ export default create((set) => ({
       </WagmiConfig>
     );
   },
+
+  generate: false,
+  setGenerate: (generate) => set({ generate }),
 }));
