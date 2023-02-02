@@ -17,7 +17,7 @@ export default function Page(props) {
 
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
-Page.canvas = (props) => <Entity route='/blob' />;
+Page.canvas = (props) => <Entity />;
 
 export async function getStaticProps() {
   return { props: { title: 'orbs' } };
