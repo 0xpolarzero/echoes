@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import useTraits from './useTraits';
-import config from '@/data-config';
+import config from '@/data';
 
 const audio = config.find((c) => c.type === 'atmosphere');
 
