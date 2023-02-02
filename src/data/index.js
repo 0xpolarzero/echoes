@@ -7,10 +7,12 @@ import audio6 from '@/assets/audio/celestial_orbs_sfx-006.mp3';
 import audio7 from '@/assets/audio/celestial_orbs_sfx-007.mp3';
 import audio8 from '@/assets/audio/celestial_orbs_sfx-008.mp3';
 
+import names from '@/data/names.json';
+
 const config = [
   {
-    type: 'color',
-    label: 'Color',
+    type: 'spectrum',
+    label: 'Spectrum',
     values: [
       {
         // Soothing Skies and Warm Sands
@@ -114,8 +116,8 @@ const config = [
     ],
   },
   {
-    type: 'background',
-    label: 'Background',
+    type: 'scenery',
+    label: 'Scenery',
     values: [
       {
         name: 'Midnight Mystery',
@@ -162,8 +164,8 @@ const config = [
     ],
   },
   {
-    type: 'pattern',
-    label: 'Pattern',
+    type: 'trace',
+    label: 'Trace',
     values: [
       {
         name: 'Whirling Vortices',
@@ -248,3 +250,4 @@ const config = [
 ];
 
 export default config;
+export { names };
