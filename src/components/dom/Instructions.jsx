@@ -9,23 +9,46 @@ import Audio from './Audio';
 import stores from '@/stores';
 
 export default function Instructions() {
-  const optionsElem = useRef();
-  const { options } = stores.useTraits();
-
-  const [current, setCurrent] = useState(0);
-  const last = options.length;
+  const { generate } = stores.useConfig();
+  const { reset } = stores.useAudio();
 
   const audio = useMemo(() => {
     return <Audio />;
   }, []);
 
   useEffect(() => {
-    optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
-  }, [current]);
+    return () => reset();
+  }, []);
 
   return (
     <div className='instructions'>
       {audio}
+      {generate ? <Generate /> : <Home />}
+    </div>
+  );
+}
+
+const Home = () => {
+  return (
+    <div className='home'>
+      <h1>Orbs</h1>
+    </div>
+  );
+};
+
+const Generate = () => {
+  const optionsElem = useRef();
+  const { options } = stores.useTraits();
+
+  const [current, setCurrent] = useState(0);
+  const last = options.length;
+
+  useEffect(() => {
+    optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
+  }, [current]);
+
+  return (
+    <>
       <div ref={optionsElem} className='options'>
         {options.map((option, index) => {
           return <Section key={index} option={option} count={index} />;
@@ -44,9 +67,9 @@ export default function Instructions() {
         onClick={() => setCurrent(current === last ? last : current + 1)}>
         <MdOutlineKeyboardArrowDown size={20} />
       </button>
-    </div>
+    </>
   );
-}
+};
 
 const Section = ({ option, count }) => {
   const { traits, setTrait } = stores.useTraits();
