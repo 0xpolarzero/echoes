@@ -6,21 +6,11 @@ const audio = config.find((c) => c.type === 'atmosphere');
 
 const Audio = () => {
   const { traits } = stores.useTraits();
-  const { init, sources, update } = stores.useAudio();
+  const { sources, update } = stores.useAudio();
 
   useEffect(() => {
     update();
   }, [traits.atmosphere.src]);
-
-  useEffect(() => {
-    window.addEventListener('keydown', init);
-    window.addEventListener('mousedown', init);
-
-    return () => {
-      window.removeEventListener('keydown', init);
-      window.removeEventListener('mousedown', init);
-    };
-  }, []);
 
   return (
     <>
