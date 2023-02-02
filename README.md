@@ -37,17 +37,23 @@ minted(mapping id => mintTimestamp)
 -> Calculate e.g. canEnhance = (block.timestamp - minted[id] > 1 day)
 -> Maybe count improved by n per day, so to getCount = baseCount (the base + enhanced) + additionnalCount (currentTime - mintedTimestamp)
 
-# Description
+# Contracts
 
-celestial orbs
-A contemplative yet interactive (kind of) fully on-chain collectible.
-Each orb is a combination of 4 creative attributes, and a 5th one that can be enhanced over time.
-Generation:
+- Only 1 orb per wallet Maybe supply limit on mainnet and not on mumbai?
 
-1. color: an association of 2 colors for the particles
-2. background: a background color
-3. pattern: the movement pattern of the particles
-4. atmosphere: a soundscape that affects the particles
+- Use '\_setTokenURI' to update after enhancement
 
-Only 1 orb per wallet
-Maybe supply limit on mainnet and not on mumbai?
+```solidity
+function train(uint256 tokenId) public {
+    require(_exists(tokenId), "Please use an existing token");
+    require(ownerOf(tokenId) == msg.sender, "You must own this token to train it");
+    uint256 currentLevel = tokenIdToLevels[tokenId];
+    tokenIdToLevels[tokenId] = currentLevel + 1;
+    _setTokenURI(tokenId, getTokenURI(tokenId));
+}
+```
+
+- Verify the metadata in the contract (if belongs to existing names)
+
+- How to check that a name was not taken when minting? Where to put that array of names?
+  -> Faire une array usedNames, dans laquelle c'est push à chaque fois, et qui verifie que le nom n'est pas dedans avant de mint
