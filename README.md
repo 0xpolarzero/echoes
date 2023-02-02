@@ -36,3 +36,15 @@ originTime = block.timestamp (in constructor)
 minted(mapping id => mintTimestamp)
 -> Calculate e.g. canEnhance = (block.timestamp - minted[id] > 1 day)
 -> Maybe count improved by n per day, so to getCount = baseCount (the base + enhanced) + additionnalCount (currentTime - mintedTimestamp)
+
+# Description
+
+celestial orbs
+A contemplative yet interactive (kind of) fully on-chain collectible.
+Each orb is a combination of 4 creative attributes, and a 5th one that can be enhanced over time.
+Generation:
+
+1. color: an association of 2 colors for the particles
+2. background: a background color
+3. pattern: the movement pattern of the particles
+4. atmosphere: a soundscape that affects the particles
