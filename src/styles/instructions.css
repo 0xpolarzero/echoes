@@ -110,6 +110,10 @@ button.controls.next:hover svg {
   align-items: flex-start;
 }
 
+.home p {
+  margin: 0.5rem 0;
+}
+
 @media (min-width: 1200px) {
   .section {
     right: 2rem;
