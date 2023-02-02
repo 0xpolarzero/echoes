@@ -71,26 +71,37 @@ const Home = ({ count }) => {
     <div className='section home' style={{ top: `${count * 200}%` }}>
       <h1>
         A <span className='emphasize'>contemplative</span> yet{' '}
-        <span className='emphasize'>interactive</span> (kind of){' '}
-        <span className='emphasize'>fully on-chain</span> collectible.
+        <span className='emphasize'>interactive</span> collectible.
       </h1>
-      <p>Each orb is a combination of multiple creative attributes.</p>
       <p>
-        <span className='emphasize'>spectrum</span> _an association of 2 colors
+        Each orb is a combination of several creative attributes that shape its
+        perceptible experience. These attributes are{' '}
+        <span className='emphasize'>stored on-chain</span>, and some can evolve
+        over time. The code behind the generation and display of the orbs is{' '}
+        <span className='emphasize'>open and transparent</span>, providing full
+        visibility to those interested. The attributes include:
+      </p>
+      <p>
+        <span className='emphasize'>spectrum_</span> a combination of 2 colors
         for the particles
         <br />
-        <span className='emphasize'>scenery</span> _a background color
+        <span className='emphasize'>scenery_</span> a background color
         <br />
-        <span className='emphasize'>trace</span> _the movement pattern of the
+        <span className='emphasize'>trace_</span> the movement pattern of the
         particles
         <br />
-        <span className='emphasize'>atmosphere</span> _a soundscape that affects
-        the particles
+        <span className='emphasize'>atmosphere_</span> an immersive soundscape
+        that affects the particles
       </p>
       <p>
-        <span className='emphasize'>signature</span> _a unique name for your orb
+        <span className='emphasize'>signature_</span> a distinct name that is
+        unique to each orb
       </p>
-      + count
+      <p>
+        <span className='emphasize'>expansion_</span> the growth of the orb,
+        defining the number of particles, which evolves over time and can be
+        enhanced by the owner
+      </p>
     </div>
   );
 };
