@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import stores from '@/stores';
 import config from '@/data';
 
-const audio = config.find((c) => c.type === 'atmosphere');
+const audio = config.traits.find((c) => c.type === 'atmosphere');
 
 const Audio = () => {
   const { traits } = stores.useTraits();
@@ -10,7 +10,7 @@ const Audio = () => {
 
   useEffect(() => {
     update();
-  }, [traits.atmosphere.src]);
+  }, [traits.atmosphere.src, update]);
 
   return (
     <>

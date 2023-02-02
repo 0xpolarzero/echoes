@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import { names } from '@/data';
+import config from '@/data';
 import stores from '@/stores';
 
+const names = config.names;
 const { Option } = Select;
 
 const Signature = ({ count }) => {

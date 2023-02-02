@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import useTraits from './useTraits';
 import config from '@/data';
 
-const audio = config.find((c) => c.type === 'atmosphere');
+const audio = config.traits.find((c) => c.type === 'atmosphere');
 
 export default create((set, get) => ({
   audioContext: null,
