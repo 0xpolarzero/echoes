@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import stores from '@/stores';
-import config from '@/data-config';
+import config from '@/data';
 
 const audio = config.find((c) => c.type === 'atmosphere');
 

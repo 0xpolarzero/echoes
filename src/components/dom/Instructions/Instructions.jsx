@@ -4,6 +4,7 @@ import {
   MdOutlineKeyboardArrowDown,
 } from 'react-icons/md';
 import { getBackground, getGradient } from '@/systems/utils';
+import Signature from './Signature';
 import Mint from './Mint';
 import Audio from './Audio';
 import stores from '@/stores';
@@ -17,7 +18,7 @@ export default function Instructions() {
 
   const [current, setCurrent] = useState(0);
   const first = 0;
-  const last = options.length;
+  const last = options.length + 1;
 
   const audio = useMemo(() => {
     return <Audio />;
@@ -33,11 +34,6 @@ export default function Instructions() {
   }, [current, generate]);
 
   useEffect(() => {
-    // Get to the right section on page click (home / generate)
-    // setCurrent(generate ? 1 : first);
-  }, [generate]);
-
-  useEffect(() => {
     return () => reset();
   }, []);
 
@@ -49,6 +45,7 @@ export default function Instructions() {
         {options.map((option, index) => {
           return <Section key={index} option={option} count={index} />;
         })}
+        <Signature count={last - 1} />
         <Mint count={last} />
       </div>
 
@@ -77,22 +74,23 @@ const Home = ({ count }) => {
         <span className='emphasize'>interactive</span> (kind of){' '}
         <span className='emphasize'>fully on-chain</span> collectible.
       </h1>
+      <p>Each orb is a combination of multiple creative attributes.</p>
       <p>
-        Each orb is a combination of 4 creative attributes, and a 5th one that
-        can be enhanced over time.
-      </p>
-      <p>
-        <span className='emphasize'>color</span> _an association of 2 colors for
-        the particles
+        <span className='emphasize'>spectrum</span> _an association of 2 colors
+        for the particles
         <br />
-        <span className='emphasize'>background</span> _a background color
+        <span className='emphasize'>scenery</span> _a background color
         <br />
-        <span className='emphasize'>pattern</span> _the movement pattern of the
+        <span className='emphasize'>trace</span> _the movement pattern of the
         particles
         <br />
         <span className='emphasize'>atmosphere</span> _a soundscape that affects
         the particles
       </p>
+      <p>
+        <span className='emphasize'>signature</span> _a unique name for your orb
+      </p>
+      + count
     </div>
   );
 };
@@ -116,12 +114,12 @@ const Section = ({ option, count }) => {
               onPointerLeave={() => hover('')}
               style={{
                 background:
-                  option.type === 'color'
+                  option.type === 'spectrum'
                     ? getGradient(
                         value.rgb,
                         selected ? true : hovered === value,
                       ).gradient
-                    : option.type === 'background'
+                    : option.type === 'scenery'
                     ? getBackground(value, selected ? true : hovered === value)
                         .background
                     : null,
