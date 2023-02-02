@@ -32,6 +32,10 @@ export default create((set, get) => ({
     createAnalyser();
   },
 
+  reset: () => {
+    set({ started: false, suspended: true });
+  },
+
   update: () => {
     const { sources, started, createAnalyser } = get();
     const { traits } = useTraits.getState();
