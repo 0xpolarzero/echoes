@@ -12,9 +12,30 @@ export default function Instructions() {
   const { generate } = stores.useConfig();
   const { reset } = stores.useAudio();
 
+  const optionsElem = useRef();
+  const { options } = stores.useTraits();
+
+  const [current, setCurrent] = useState(0);
+  const first = 0;
+  const last = options.length;
+
   const audio = useMemo(() => {
     return <Audio />;
   }, []);
+
+  useEffect(() => {
+    // Get to the right section on button click
+    if (!generate) {
+      optionsElem.current.style.transform = `translateY(200%)`;
+    } else {
+      optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
+    }
+  }, [current, generate]);
+
+  useEffect(() => {
+    // Get to the right section on page click (home / generate)
+    // setCurrent(generate ? 1 : first);
+  }, [generate]);
 
   useEffect(() => {
     return () => reset();
@@ -23,33 +44,8 @@ export default function Instructions() {
   return (
     <div className='instructions'>
       {audio}
-      {generate ? <Generate /> : <Home />}
-    </div>
-  );
-}
-
-const Home = () => {
-  return (
-    <div className='home'>
-      <h1>Orbs</h1>
-    </div>
-  );
-};
-
-const Generate = () => {
-  const optionsElem = useRef();
-  const { options } = stores.useTraits();
-
-  const [current, setCurrent] = useState(0);
-  const last = options.length;
-
-  useEffect(() => {
-    optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
-  }, [current]);
-
-  return (
-    <>
       <div ref={optionsElem} className='options'>
+        <Home count={first - 1} />
         {options.map((option, index) => {
           return <Section key={index} option={option} count={index} />;
         })}
@@ -57,17 +53,47 @@ const Generate = () => {
       </div>
 
       <button
-        className={`controls prev ${current === 0 ? 'hidden' : ''}`}
+        className={`controls prev ${current <= 0 || !generate ? 'hidden' : ''}`}
         onClick={() => setCurrent(current === 0 ? 0 : current - 1)}>
         <MdOutlineKeyboardArrowUp size={20} />
       </button>
 
       <button
-        className={`controls next ${current === last ? 'hidden' : ''}`}
+        className={`controls next ${
+          current === last || !generate ? 'hidden' : ''
+        }`}
         onClick={() => setCurrent(current === last ? last : current + 1)}>
         <MdOutlineKeyboardArrowDown size={20} />
       </button>
-    </>
+    </div>
+  );
+}
+
+const Home = ({ count }) => {
+  return (
+    <div className='section home' style={{ top: `${count * 200}%` }}>
+      <h1>
+        A <span className='emphasize'>contemplative</span> yet{' '}
+        <span className='emphasize'>interactive</span> (kind of){' '}
+        <span className='emphasize'>fully on-chain</span> collectible.
+      </h1>
+      <p>
+        Each orb is a combination of 4 creative attributes, and a 5th one that
+        can be enhanced over time.
+      </p>
+      <p>
+        <span className='emphasize'>color</span> _an association of 2 colors for
+        the particles
+        <br />
+        <span className='emphasize'>background</span> _a background color
+        <br />
+        <span className='emphasize'>pattern</span> _the movement pattern of the
+        particles
+        <br />
+        <span className='emphasize'>atmosphere</span> _a soundscape that affects
+        the particles
+      </p>
+    </div>
   );
 };
 

@@ -103,6 +103,13 @@ button.controls.next:hover svg {
   content: '_';
 }
 
+/* 
+ * Home
+ */
+.home {
+  align-items: flex-start;
+}
+
 @media (min-width: 1200px) {
   .section {
     right: 2rem;

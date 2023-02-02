@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Divider, Tooltip } from 'antd';
 import { CiLight, CiDark } from 'react-icons/ci';
@@ -11,25 +11,44 @@ const Nav = () => {
   const { generate, setGenerate } = stores.useConfig();
   const router = useRouter();
 
-  // Put _ before active page
+  const [activePage, setActivePage] = useState('');
 
   const goTo = (page, generate) => {
     setGenerate(generate);
     router.push(page);
+    setActivePage(page.replace('/', ''));
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') setActivePage(window.location.pathname);
+  }, []);
 
   return (
     <header className='nav'>
       <div className='title'>
-        <a onClick={() => goTo('/', false)}>celestial-orbs</a>
+        <a onClick={() => goTo('/', false)}>celestial_orbs</a>
       </div>
       <div className='links'>
-        <a onClick={() => goTo('/', true)}>generate</a>
+        {/* Pages */}
+        <a
+          onClick={() => goTo('/', true)}
+          className={activePage === '' && generate ? 'emphasize' : 'underline'}>
+          generate
+        </a>
         <Divider type='vertical' />
-        <a onClick={() => goTo('explore', false)}>explore</a>
+        <a
+          onClick={() => goTo('explore', false)}
+          className={activePage === 'explore' ? 'emphasize' : ''}>
+          explore
+        </a>
         <Divider type='vertical' />
-        <a onClick={() => goTo('my-orbs', false)}>my orbs</a>
+        <a
+          onClick={() => goTo('my-orbs', false)}
+          className={activePage === 'my-orbs' ? 'emphasize' : ''}>
+          my orbs
+        </a>
         <Divider type='vertical' />
+        {/* Icons */}
         {theme === 'dark' ? (
           <CiDark size={20} onClick={() => updateTheme('light')} />
         ) : (
