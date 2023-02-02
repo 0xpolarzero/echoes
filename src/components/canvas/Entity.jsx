@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useRouter } from 'next/router';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -7,8 +6,7 @@ import vertexShaders from './shaders/orb/vertexShaders';
 import fragmentShader from './shaders/orb/fragmentShader';
 import stores from '@/stores';
 
-const Entity = ({ route, ...props }) => {
-  const router = useRouter();
+const Entity = ({ ...props }) => {
   const group = useRef(null);
 
   // const [hovered, hover] = useState(false);
