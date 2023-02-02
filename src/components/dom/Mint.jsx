@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { Tooltip } from 'antd';
+import { Input, Tooltip } from 'antd';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import stores from '@/stores';
+import { useAccount, useBalance, useNetwork } from 'wagmi';
 
-let isConnected = false;
+// let isConnected = false;
 let chain = 'maticmum';
 
 const Mint = ({ count }) => {
   const { traits } = stores.useTraits();
+  const { address, isConnected } = useAccount();
+  const { chain } = useNetwork();
+  const { data: balance } = useBalance({ address });
   const ref = useRef();
 
   // Price
@@ -35,12 +39,6 @@ const Mint = ({ count }) => {
 
     e.target.classList.add('selected');
   };
-
-  const connectWallet = () => {};
-
-  useEffect(() => {
-    console.log('rerendered');
-  }, []);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -70,53 +68,78 @@ const Mint = ({ count }) => {
         <ConnectButton label='Connect your wallet to generate the orb' />
       </div>
       <div ref={ref} className='price'>
-        <button onClick={handleSelect} value={0.001} className='selected'>
-          0.001 ETH
-        </button>
-        <button onClick={handleSelect} value={0.01}>
-          0.01 ETH
-        </button>
-        <button onClick={handleSelect} value={0.1}>
-          0.1 ETH
-        </button>
-        {/* <button
-          onClick={handleSelectInput}
-          value={input}
-          onChange={handleInput}>
-          Custom (min. 0.001 ETH)
-        </button> */}
-        <input
-          type='number'
+        <PriceButton
+          value={0.001}
+          balance={balance.formatted}
           onClick={handleSelect}
-          value={input}
-          onChange={handleInput}
+          selected={true}
         />
-        {/* Custom (min. 0.001 ETH) */}
-        {/* </input> */}
+        <PriceButton
+          value={0.01}
+          balance={balance.formatted}
+          onClick={handleSelect}
+          selected={false}
+        />
+        <PriceButton
+          value={0.1}
+          balance={balance.formatted}
+          onClick={handleSelect}
+          selected={false}
+        />
+
+        <Tooltip
+          title={input > balance.formatted ? 'Insufficient balance.' : ''}>
+          <Input
+            type='number'
+            onClick={handleSelect}
+            placeholder='Custom price (min. 0.001 ETH)'
+            value={input}
+            onChange={handleInput}
+            className={input > balance.formatted ? 'error' : ''}
+            style={{ maxWidth: '200px' }}
+            suffix='ETH'
+          />
+        </Tooltip>
       </div>
       <div className='mint'>
         <Tooltip
           title={
-            chain !== 'maticmum'
+            chain?.id !== 80001
               ? 'You need to switch chains to Polygon Mumbai.'
               : ''
           }>
-          <button disabled={chain !== 'maticmum' || !isConnected}>
+          <button disabled={chain?.id !== 80001 || !isConnected}>
             Generate on testnet (free)
           </button>
         </Tooltip>
         <Tooltip
           title={
-            chain !== 'mainnet'
+            chain?.id !== 1
               ? 'You need to switch chains to Ethereum mainnet.'
               : ''
           }>
-          <button disabled={chain !== 'mainnet' || !isConnected}>
+          <button disabled={chain?.id !== 1 || !isConnected}>
             Generate on mainnet ({price} ETH)
           </button>
         </Tooltip>
       </div>
     </div>
+  );
+};
+
+const PriceButton = ({ value, balance, onClick, selected }) => {
+  const notEnoughBalance = value > balance;
+
+  return (
+    <Tooltip title={notEnoughBalance ? 'Insufficient balance.' : ''}>
+      <button
+        onClick={onClick}
+        value={value}
+        disabled={notEnoughBalance}
+        className={selected ? 'selected' : ''}>
+        {value} ETH
+      </button>
+    </Tooltip>
   );
 };
 
