@@ -16,6 +16,8 @@ const Mint = ({ count }) => {
 
   // Price
   const [price, setPrice] = useState(0.01);
+  const [isBalanceEnough, setIsBalanceEnough] = useState(false);
+  const [missingTraits, setMissingTraits] = useState([]);
   // const [input, setInput] = useState(0.001);
 
   // const handleInput = (e) => {
@@ -42,13 +44,23 @@ const Mint = ({ count }) => {
 
   useEffect(() => {
     const metadata = getMetadataFromTraits(traits);
-    // See if any key is undefined, then log the key
-    Object.keys(metadata).forEach((key) => {
-      if (!metadata[key]) {
-        console.log(key);
-      }
-    });
+    let missing = [];
+
+    if (!metadata.name) missing.push('name');
+    for (const trait of metadata.traits) {
+      if (!trait.value) missing.push(trait.trait_type);
+    }
+
+    setMissingTraits(missing);
   }, [traits]);
+
+  useEffect(() => {
+    if (balance?.formatted < price) {
+      setIsBalanceEnough(false);
+    } else {
+      setIsBalanceEnough(true);
+    }
+  }, [balance, price]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -114,21 +126,46 @@ const Mint = ({ count }) => {
       <div className='mint'>
         <Tooltip
           title={
-            chain?.id !== 80001
-              ? 'You need to switch chains to Polygon Mumbai.'
-              : ''
+            chain?.id !== 80001 ? (
+              'You need to switch chains to Polygon Mumbai.'
+            ) : missingTraits.length ? (
+              <>
+                Missing traits:{' '}
+                <span className='emphasize'>{missingTraits.join(', ')}</span>
+              </>
+            ) : (
+              ''
+            )
           }>
-          <button disabled={chain?.id !== 80001 || !isConnected}>
+          <button
+            disabled={
+              chain?.id !== 80001 || !isConnected || missingTraits.length
+            }>
             Generate on testnet (free)
           </button>
         </Tooltip>
         <Tooltip
           title={
-            chain?.id !== 1
-              ? 'You need to switch chains to Ethereum mainnet.'
-              : ''
+            chain?.id !== 1 ? (
+              'You need to switch chains to Ethereum mainnet.'
+            ) : !isBalanceEnough ? (
+              'Insufficient balance.'
+            ) : missingTraits.length ? (
+              <>
+                Missing traits:{' '}
+                <span className='emphasize'>{missingTraits.join(', ')}</span>
+              </>
+            ) : (
+              ''
+            )
           }>
-          <button disabled={chain?.id !== 1 || !isConnected}>
+          <button
+            disabled={
+              chain?.id !== 1 ||
+              !isConnected ||
+              !isBalanceEnough ||
+              missingTraits.length
+            }>
             Generate on mainnet ({price} ETH)
           </button>
         </Tooltip>
