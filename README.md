@@ -48,3 +48,6 @@ Generation:
 2. background: a background color
 3. pattern: the movement pattern of the particles
 4. atmosphere: a soundscape that affects the particles
+
+Only 1 orb per wallet
+Maybe supply limit on mainnet and not on mumbai?
