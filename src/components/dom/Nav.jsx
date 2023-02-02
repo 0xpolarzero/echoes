@@ -26,7 +26,9 @@ const Nav = () => {
   return (
     <header className='nav'>
       <div className='title'>
-        <a onClick={() => goTo('/', false)}>celestial_orbs</a>
+        <a onClick={() => goTo('/', false)}>
+          orbs<span className='emphasize'>_experience</span>
+        </a>
       </div>
       <div className='links'>
         {/* Pages */}
