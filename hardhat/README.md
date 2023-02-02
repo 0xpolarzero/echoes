@@ -20,3 +20,6 @@ function train(uint256 tokenId) public {
   -> Faire une array usedNames, dans laquelle c'est push à chaque fois, et qui verifie que le nom n'est pas dedans avant de mint
 
 https://levelup.gitconnected.com/how-to-create-an-interactive-nft-4aeeed979138
+
+! Emit event when metadata updated to refresh OpenSea (end https://docs.opensea.io/docs/metadata-standards)
+event MetadataUpdate(uint256 \_tokenId)
