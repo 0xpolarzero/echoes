@@ -34,7 +34,7 @@ const Orb = ({ radius }) => {
   const { traits } = stores.useTraits();
   const { getAnalyserData } = stores.useAudio();
 
-  const count = traits.count || 100;
+  const count = traits.expansion || 100;
 
   const particlesPosition = useMemo(() => {
     const positions = new Float32Array(count * 3);

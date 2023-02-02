@@ -10,7 +10,7 @@ export default create((set) => ({
       acc[trait.type] = trait.values[0];
       return acc;
     },
-    { count: 100, signature: null },
+    { expansion: 100, signature: null },
   ),
   // Set a trait type to a specific value
   setTrait: (type, values) => {
@@ -37,14 +37,20 @@ export default create((set) => ({
     }, []);
 
     traitsFormatted.push({
-      trait_type: 'count',
-      value: traits.count,
+      trait_type: 'expansion',
+      value: traits.expansion,
     });
 
     return {
       name,
-      description: config.description,
       traits: traitsFormatted,
+      description: config.description,
+      external_url: config.externalUrl,
+      background_color: config.background,
+      // TODO Add:
+      // image
+      // image_data if not using image (raw svg)
+      // animation_url html page
     };
   },
 
@@ -58,6 +64,6 @@ export default create((set) => ({
         acc[trait.type] = traitData;
         return acc;
       },
-      { count: metadata.count, signature: metadata.signature },
+      { expansion: metadata.expansion, signature: metadata.signature },
     ),
 }));
