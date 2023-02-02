@@ -2,3 +2,23 @@
   text-align: justify;
   max-width: 80ch;
 }
+
+.section .mint,
+.section .price {
+  display: flex;
+  flex-wrap: wrap;
+  /* justify-content: space-between; */
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.section .wallet {
+  align-self: flex-start;
+}
+
+@media (min-height: 800px) {
+  .section:last-of-type {
+    gap: 2rem;
+  }
+}

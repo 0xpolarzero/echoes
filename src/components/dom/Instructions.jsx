@@ -10,8 +10,8 @@ import stores from '@/stores';
 
 export default function Instructions({ children }) {
   const optionsElem = useRef();
-
   const { options } = stores.useTraits();
+
   const [current, setCurrent] = useState(0);
   const last = options.length;
 

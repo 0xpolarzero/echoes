@@ -1,8 +1,46 @@
+import { useEffect, useRef, useState } from 'react';
+import { Tooltip } from 'antd';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import stores from '@/stores';
 
+let isConnected = false;
+let chain = 'maticmum';
+
 const Mint = ({ count }) => {
-  console.log(count);
   const { traits } = stores.useTraits();
+  const ref = useRef();
+
+  // Price
+  const [price, setPrice] = useState(0.001);
+  const [input, setInput] = useState(0.001);
+
+  const handleInput = (e) => {
+    const value = e.target.value;
+    if (value < 0.001) {
+      setInput(0.001);
+      setPrice(0.001);
+    } else {
+      setInput(value);
+      setPrice(value);
+    }
+  };
+
+  const handleSelect = (e) => {
+    const value = e.target.value;
+    setPrice(value);
+
+    const buttons = ref.current.querySelectorAll('button');
+    buttons.forEach((button) => button.classList.remove('selected'));
+    ref.current.querySelector('input').classList.remove('selected');
+
+    e.target.classList.add('selected');
+  };
+
+  const connectWallet = () => {};
+
+  useEffect(() => {
+    console.log('rerendered');
+  }, []);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -13,14 +51,12 @@ const Mint = ({ count }) => {
           mainnet (Ethereum).
         </p>
         <p>
-          The orbs are{' '}
-          <span className='emphasize'>free to generate (only gas)</span>. You
-          are welcome to add any value, if you would like to show support.
-          However, it's important to note that adding value to your NFT{' '}
-          <span className='emphasize'>
-            won't give you any benefits or exclusive privileges
-          </span>
-          . It's simply a way to show your appreciation for the project.
+          The orbs can be generated{' '}
+          <span className='emphasize'>for free on testnet</span>, or{' '}
+          <span className='emphasize'>for a fixed price on mainnet</span>. Both
+          chains provide the{' '}
+          <span className='emphasize'>exact same functionalities</span>, so you
+          are welcome to mint on a testnet if you just want to experiment.
         </p>
         <p style={{ fontSize: '0.9rem' }}>
           Please be aware that minting an orb is an experimental process and
@@ -30,8 +66,56 @@ const Mint = ({ count }) => {
           any warranties or guarantees of any kind.
         </p>
       </div>
-      <div className='price'>Price buttons</div>
-      <div className='mint'>Mint buttons</div>
+      <div className='wallet'>
+        <ConnectButton label='Connect your wallet to generate the orb' />
+      </div>
+      <div ref={ref} className='price'>
+        <button onClick={handleSelect} value={0.001} className='selected'>
+          0.001 ETH
+        </button>
+        <button onClick={handleSelect} value={0.01}>
+          0.01 ETH
+        </button>
+        <button onClick={handleSelect} value={0.1}>
+          0.1 ETH
+        </button>
+        {/* <button
+          onClick={handleSelectInput}
+          value={input}
+          onChange={handleInput}>
+          Custom (min. 0.001 ETH)
+        </button> */}
+        <input
+          type='number'
+          onClick={handleSelect}
+          value={input}
+          onChange={handleInput}
+        />
+        {/* Custom (min. 0.001 ETH) */}
+        {/* </input> */}
+      </div>
+      <div className='mint'>
+        <Tooltip
+          title={
+            chain !== 'maticmum'
+              ? 'You need to switch chains to Polygon Mumbai.'
+              : ''
+          }>
+          <button disabled={chain !== 'maticmum' || !isConnected}>
+            Generate on testnet (free)
+          </button>
+        </Tooltip>
+        <Tooltip
+          title={
+            chain !== 'mainnet'
+              ? 'You need to switch chains to Ethereum mainnet.'
+              : ''
+          }>
+          <button disabled={chain !== 'mainnet' || !isConnected}>
+            Generate on mainnet ({price} ETH)
+          </button>
+        </Tooltip>
+      </div>
     </div>
   );
 };
