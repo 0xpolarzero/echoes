@@ -92,11 +92,15 @@ const { deployments, network, ethers } = require('hardhat');
       /**
        * @notice Dev functions
        */
-      describe('addAttributes', function() {
+      describe('Dev Functions', function() {
         const newAttributesIndex = 0;
         const newAttributes = ['test1', 'test2', 'test3'];
+        const newExpansionCooldown = 100;
+        const newPrice = ethers.utils.parseEther('0.1');
+        const newMintLimit = 10;
 
         it('Should revert if not called by the owner', async () => {
+          // addAttributes
           await expect(
             orbsContract
               .connect(user)
@@ -104,101 +108,19 @@ const { deployments, network, ethers } = require('hardhat');
           ).to.be.revertedWith(
             'ORBS__NOT_OWNER("Only the owner can call this function")',
           );
-        });
-
-        it('Should revert if the attribute index is out of bounds', async () => {
+          // setExpansionCooldown
           await expect(
-            orbsContract.addAttributes(attributes.length, newAttributes),
-          ).to.be.revertedWith(
-            'ORBS__ATTRIBUTE_DOES_NOT_EXIST("The attribute type does not exist")',
-          );
-        });
-
-        it('Should successfully add new attributes to a type', async () => {
-          const tx = await orbsContract.addAttributes(
-            newAttributesIndex,
-            newAttributes,
-          );
-          await tx.wait(1);
-
-          assert.equal(
-            (
-              await orbsContract.getAttributesOfType(newAttributesIndex)
-            ).toString(),
-            [...attributes[newAttributesIndex], ...newAttributes].toString(),
-          );
-        });
-
-        it('Should emit the correct event', async () => {
-          await expect(
-            orbsContract.addAttributes(newAttributesIndex, newAttributes),
-          )
-            .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
-            .withArgs(newAttributesIndex, newAttributes);
-        });
-      });
-
-      describe('setExpansionCooldown', function() {
-        const newExpansionCooldown = 100;
-
-        it('Should revert if not called by the owner', async () => {
-          await expect(
-            orbsContract
-              .connect(user)
-              .setExpansionCooldown(newExpansionCooldown),
+            orbsContract.connect(user).setExpansionCooldown(100),
           ).to.be.revertedWith(
             'ORBS__NOT_OWNER("Only the owner can call this function")',
           );
-        });
-
-        it('Should successfully set the expansion cooldown', async () => {
-          const tx = await orbsContract.setExpansionCooldown(
-            newExpansionCooldown,
-          );
-          await tx.wait(1);
-
-          assert.equal(
-            (await orbsContract.getExpansionCooldown()).toString(),
-            newExpansionCooldown.toString(),
-          );
-        });
-
-        it('Should emit the correct event', async () => {
-          await expect(orbsContract.setExpansionCooldown(newExpansionCooldown))
-            .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
-            .withArgs(newExpansionCooldown);
-        });
-      });
-
-      describe('setPrice', function() {
-        const newPrice = ethers.utils.parseEther('0.1');
-
-        it('Should revert if not called by the owner', async () => {
+          // setPrice
           await expect(
             orbsContract.connect(user).setPrice(newPrice),
           ).to.be.revertedWith(
             'ORBS__NOT_OWNER("Only the owner can call this function")',
           );
-        });
-
-        it('Should successfully set the price', async () => {
-          const tx = await orbsContract.setPrice(newPrice);
-          await tx.wait(1);
-
-          assert.equal((await orbsContract.getPrice()).toString(), newPrice);
-        });
-
-        it('Should emit the correct event', async () => {
-          await expect(orbsContract.setPrice(newPrice))
-            .to.emit(orbsContract, 'ORBS__PRICE_UPDATED')
-            .withArgs(newPrice);
-        });
-      });
-
-      describe('setMintLimit', function() {
-        const newMintLimit = 10;
-
-        it('Should revert if not called by the owner', async () => {
+          // setMintLimit
           await expect(
             orbsContract.connect(user).setMintLimit(newMintLimit),
           ).to.be.revertedWith(
@@ -206,17 +128,94 @@ const { deployments, network, ethers } = require('hardhat');
           );
         });
 
-        it('Should successfully set the mint limit', async () => {
-          const tx = await orbsContract.setMintLimit(newMintLimit);
-          await tx.wait(1);
+        describe('addAttributes', function() {
+          it('Should revert if the attribute index is out of bounds', async () => {
+            await expect(
+              orbsContract.addAttributes(attributes.length, newAttributes),
+            ).to.be.revertedWith(
+              'ORBS__ATTRIBUTE_DOES_NOT_EXIST("The attribute type does not exist")',
+            );
+          });
 
-          assert.equal(await orbsContract.getMintLimit(), newMintLimit);
+          it('Should successfully add new attributes to a type and emit the correct event', async () => {
+            const tx = await expect(
+              await orbsContract.addAttributes(
+                newAttributesIndex,
+                newAttributes,
+              ),
+            )
+              .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
+              .withArgs(newAttributesIndex, newAttributes);
+
+            await tx.wait(1);
+
+            assert.equal(
+              (
+                await orbsContract.getAttributesOfType(newAttributesIndex)
+              ).toString(),
+              [...attributes[newAttributesIndex], ...newAttributes].toString(),
+            );
+          });
+
+          it('Should emit the correct event', async () => {
+            await expect(
+              orbsContract.addAttributes(newAttributesIndex, newAttributes),
+            )
+              .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
+              .withArgs(newAttributesIndex, newAttributes);
+          });
         });
 
-        it('Should emit the correct event', async () => {
-          await expect(orbsContract.setMintLimit(newMintLimit))
-            .to.emit(orbsContract, 'ORBS__MINT_LIMIT_UPDATED')
-            .withArgs(newMintLimit);
+        describe('setExpansionCooldown', function() {
+          it('Should successfully set the expansion cooldown', async () => {
+            const tx = await orbsContract.setExpansionCooldown(
+              newExpansionCooldown,
+            );
+            await tx.wait(1);
+
+            assert.equal(
+              (await orbsContract.getExpansionCooldown()).toString(),
+              newExpansionCooldown.toString(),
+            );
+          });
+
+          it('Should emit the correct event', async () => {
+            await expect(
+              orbsContract.setExpansionCooldown(newExpansionCooldown),
+            )
+              .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
+              .withArgs(newExpansionCooldown);
+          });
+        });
+
+        describe('setPrice', function() {
+          it('Should successfully set the price', async () => {
+            const tx = await orbsContract.setPrice(newPrice);
+            await tx.wait(1);
+
+            assert.equal((await orbsContract.getPrice()).toString(), newPrice);
+          });
+
+          it('Should emit the correct event', async () => {
+            await expect(orbsContract.setPrice(newPrice))
+              .to.emit(orbsContract, 'ORBS__PRICE_UPDATED')
+              .withArgs(newPrice);
+          });
+        });
+
+        describe('setMintLimit', function() {
+          it('Should successfully set the mint limit', async () => {
+            const tx = await orbsContract.setMintLimit(newMintLimit);
+            await tx.wait(1);
+
+            assert.equal(await orbsContract.getMintLimit(), newMintLimit);
+          });
+
+          it('Should emit the correct event', async () => {
+            await expect(orbsContract.setMintLimit(newMintLimit))
+              .to.emit(orbsContract, 'ORBS__MINT_LIMIT_UPDATED')
+              .withArgs(newMintLimit);
+          });
         });
       });
     });
