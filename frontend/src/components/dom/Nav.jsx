@@ -27,7 +27,16 @@ const Nav = () => {
     <header className='nav'>
       <div className='title'>
         <a onClick={() => goTo('/', false)}>
-          orbs<span className='emphasize'>_experience</span>
+          orbs
+          <span className='emphasize'>
+            {activePage === '' && generate
+              ? '_experience'
+              : activePage === 'explore'
+              ? '_explore'
+              : activePage === 'expand'
+              ? '_expand'
+              : ''}
+          </span>
         </a>
       </div>
       <div className='links'>
@@ -35,19 +44,19 @@ const Nav = () => {
         <a
           onClick={() => goTo('/', true)}
           className={activePage === '' && generate ? 'emphasize' : 'underline'}>
-          generate
+          _experience
         </a>
         <Divider type='vertical' />
         <a
           onClick={() => goTo('explore', false)}
           className={activePage === 'explore' ? 'emphasize' : ''}>
-          explore
+          _explore
         </a>
         <Divider type='vertical' />
         <a
-          onClick={() => goTo('my-orbs', false)}
-          className={activePage === 'my-orbs' ? 'emphasize' : ''}>
-          my orbs
+          onClick={() => goTo('expand', false)}
+          className={activePage === 'expand' ? 'emphasize' : ''}>
+          _expand
         </a>
         <Divider type='vertical' />
         {/* Icons */}

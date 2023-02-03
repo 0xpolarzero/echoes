@@ -19,5 +19,5 @@ export default function Page(props) {
 // Page.canvas = (props) => <Entity />;
 
 export async function getStaticProps() {
-  return { props: { title: 'my orbs' } };
+  return { props: { title: 'expand' } };
 }
