@@ -9,6 +9,7 @@ require('dotenv').config();
 const ETHEREUM_MAINNET_RPC_URL = process.env.ETHEREUM_MAINNET_RPC_URL;
 const POLYGON_MUMBAI_RPC_URL = process.env.POLYGON_MUMBAI_RPC_URL;
 const TEST_PRIVATE_KEY = process.env.TEST_PRIVATE_KEY;
+const TEST_PRIVATE_KEY_SECOND = process.env.TEST_PRIVATE_KEY_SECOND;
 const PROD_PRIVATE_KEY = process.env.PROD_PRIVATE_KEY;
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY;
@@ -47,7 +48,7 @@ module.exports = {
     },
     mumbai: {
       url: POLYGON_MUMBAI_RPC_URL,
-      accounts: [TEST_PRIVATE_KEY],
+      accounts: [TEST_PRIVATE_KEY, TEST_PRIVATE_KEY_SECOND],
       chainId: 80001,
       blockConfirmations: 5,
     },
