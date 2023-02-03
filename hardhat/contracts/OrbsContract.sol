@@ -48,7 +48,7 @@ contract OrbsContract is ERC721URIStorage {
     /// Variables
     // Base
     address private immutable i_owner;
-    uint256 private immutable i_creationDate;
+    uint256 private immutable i_creationTimestamp;
     // Metadata
     bytes32 private immutable i_externalUrl;
     bytes32 private immutable i_description;
@@ -113,12 +113,17 @@ contract OrbsContract is ERC721URIStorage {
 
         // Set base
         i_owner = msg.sender;
-        i_creationDate = block.timestamp;
+        i_creationTimestamp = block.timestamp;
     }
 
     // TODO public/external
     function mint() public {
-        // TODO check if usedNames
+        // TODO check if usedSignatures
+        // TODO maybe check if already minted if limit for user
+        // TODO if max supply check + same for value
+        // TODO write to s_orbs
+        // TODO write to s_usedSignatures
+        // TODO do both _setTokenURI and setTokenURIUpdatable
     }
 
     // TODO enhance/expand
@@ -127,6 +132,8 @@ contract OrbsContract is ERC721URIStorage {
         // TODO check if the token is owned by the sender
         // TODO check if the token has been enhanced since x
         // TODO check max expansion
+        // TODO write to s_orbs
+        // TODO only do setTokenURIUpdatable
     }
 
     /// Getters
@@ -135,6 +142,8 @@ contract OrbsContract is ERC721URIStorage {
      * @notice Get the token URI
      * @param _tokenId The tokenId uint to get the URI
      * @dev Builds the metadata for the collectible
+     * -> It will only return the metadata that won't be updated
+     * @return The token URI (string) in JSON format (ERC721 standard)
      */
     function getTokenUri(uint256 _tokenId) public view returns (string memory) {
         // Get the attributes
@@ -144,7 +153,7 @@ contract OrbsContract is ERC721URIStorage {
         string memory trace = getAttributesOfType(2)[orb.traceIndex];
         string memory atmosphere = getAttributesOfType(3)[orb.atmosphereIndex];
 
-        // Get the expansion (if not maxed)
+        // Get the expansion (if not maxed) - it should be the base, but just in case
         uint256 expansion = orb.maxExpansionReached
             ? MAX_EXPANSION
             : getExpansion(_tokenId);
@@ -157,12 +166,42 @@ contract OrbsContract is ERC721URIStorage {
                 scenery,
                 trace,
                 atmosphere,
-                expansion,
                 i_externalUrl,
-                i_animationUrl,
                 i_description,
                 i_backgroundColor,
+                orb.creationTimestamp,
                 _tokenId
+            );
+    }
+
+    /**
+     * @notice Get the token URI updatable
+     * @param _tokenId The tokenId uint to get the URI
+     * @dev Builds the metadata for the collectible
+     * -> It will only return the metadata that will be updated
+     * @return The token URI (string) in JSON format (ERC721 standard)
+     */
+    function getTokenUriUpdatable(
+        uint256 _tokenId
+    ) public view returns (string memory) {
+        Orb memory orb = s_orbs[_tokenId];
+
+        // Get the expansion (if not maxed)
+        uint256 expansion = orb.maxExpansionReached
+            ? MAX_EXPANSION
+            : getExpansion(_tokenId);
+
+        // Build the metadata in the ERC721 format
+        return
+            Utils.formatMetadataUpdatable(
+                i_animationUrl,
+                spectrumIndex,
+                sceneryIndex,
+                traceIndex,
+                atmosphereIndex,
+                expansion,
+                orb.lastExpansionTimestamp,
+                orb.maxExpansionReached
             );
     }
 
@@ -285,8 +324,8 @@ contract OrbsContract is ERC721URIStorage {
     /**
      * @notice Get the creation date
      */
-    function getCreationDate() external view returns (uint256) {
-        return i_creationDate;
+    function getCreationTimestamp() external view returns (uint256) {
+        return i_creationTimestamp;
     }
 
     /**
