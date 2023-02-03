@@ -1,7 +1,7 @@
 const { network, ethers } = require('hardhat');
 const {
   developmentChains,
-  allowedTraits,
+  attributes,
   maxExpansion,
 } = require('../helper-hardhat-config');
 const { verify } = require('../utils/verify');
@@ -11,14 +11,14 @@ module.exports = async function({ getNamedAccounts, deployments }) {
   const { deployer } = await getNamedAccounts();
 
   const args = [
-    allowedTraits.spectrum,
-    allowedTraits.scenery,
-    allowedTraits.trace,
-    allowedTraits.atmosphere,
+    attributes.spectrum,
+    attributes.scenery,
+    attributes.trace,
+    attributes.atmosphere,
     maxExpansion,
   ];
 
-  const orbs = await deploy('Orbs', {
+  const orbs = await deploy('OrbsContract', {
     from: deployer,
     args,
     log: true,

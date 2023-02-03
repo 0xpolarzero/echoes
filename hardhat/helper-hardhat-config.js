@@ -1,6 +1,6 @@
 const developmentChains = ['hardhat', 'localhost'];
 
-const allowedTraits = {
+const attributes = {
   spectrum: [
     'Oceanic Blaze, Sunset Haze',
     'Velvet Nightfall, Verdant Whisper',
@@ -45,6 +45,6 @@ maxExpansion = 10_000;
 
 module.exports = {
   developmentChains,
-  allowedTraits,
+  attributes,
   maxExpansion,
 };
