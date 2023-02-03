@@ -133,12 +133,12 @@ const { deployments, network, ethers } = require('hardhat');
             await expect(
               orbsContract.addAttributes(attributes.length, newAttributes),
             ).to.be.revertedWith(
-              'ORBS__ATTRIBUTE_DOES_NOT_EXIST("The attribute type does not exist")',
+              'ORBS__INVALID_ATTRIBUTE("The attributes type does not exist")',
             );
           });
 
           it('Should successfully add new attributes to a type and emit the correct event', async () => {
-            const tx = await expect(
+            await expect(
               await orbsContract.addAttributes(
                 newAttributesIndex,
                 newAttributes,
@@ -147,8 +147,6 @@ const { deployments, network, ethers } = require('hardhat');
               .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
               .withArgs(newAttributesIndex, newAttributes);
 
-            await tx.wait(1);
-
             assert.equal(
               (
                 await orbsContract.getAttributesOfType(newAttributesIndex)
@@ -156,65 +154,46 @@ const { deployments, network, ethers } = require('hardhat');
               [...attributes[newAttributesIndex], ...newAttributes].toString(),
             );
           });
-
-          it('Should emit the correct event', async () => {
-            await expect(
-              orbsContract.addAttributes(newAttributesIndex, newAttributes),
-            )
-              .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
-              .withArgs(newAttributesIndex, newAttributes);
-          });
         });
 
         describe('setExpansionCooldown', function() {
-          it('Should successfully set the expansion cooldown', async () => {
-            const tx = await orbsContract.setExpansionCooldown(
-              newExpansionCooldown,
-            );
-            await tx.wait(1);
+          it('Should successfully set the expansion cooldown and emit the correct event', async () => {
+            await expect(
+              await orbsContract.setExpansionCooldown(newExpansionCooldown),
+            )
+              .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
+              .withArgs(newExpansionCooldown);
 
             assert.equal(
               (await orbsContract.getExpansionCooldown()).toString(),
               newExpansionCooldown.toString(),
             );
           });
-
-          it('Should emit the correct event', async () => {
-            await expect(
-              orbsContract.setExpansionCooldown(newExpansionCooldown),
-            )
-              .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
-              .withArgs(newExpansionCooldown);
-          });
         });
 
         describe('setPrice', function() {
-          it('Should successfully set the price', async () => {
-            const tx = await orbsContract.setPrice(newPrice);
-            await tx.wait(1);
-
-            assert.equal((await orbsContract.getPrice()).toString(), newPrice);
-          });
-
-          it('Should emit the correct event', async () => {
-            await expect(orbsContract.setPrice(newPrice))
+          it('Should successfully set the price and emit the correct event', async () => {
+            await expect(await orbsContract.setPrice(newPrice))
               .to.emit(orbsContract, 'ORBS__PRICE_UPDATED')
               .withArgs(newPrice);
+
+            assert.equal(
+              (await orbsContract.getPrice()).toString(),
+              newPrice.toString(),
+            );
           });
         });
 
         describe('setMintLimit', function() {
-          it('Should successfully set the mint limit', async () => {
-            const tx = await orbsContract.setMintLimit(newMintLimit);
-            await tx.wait(1);
-
-            assert.equal(await orbsContract.getMintLimit(), newMintLimit);
-          });
-
-          it('Should emit the correct event', async () => {
-            await expect(orbsContract.setMintLimit(newMintLimit))
+          it('Should successfully set the mint limit and emit the correct event', async () => {
+            await expect(await orbsContract.setMintLimit(newMintLimit))
               .to.emit(orbsContract, 'ORBS__MINT_LIMIT_UPDATED')
               .withArgs(newMintLimit);
+
+            assert.equal(
+              (await orbsContract.getMintLimit()).toString(),
+              newMintLimit.toString(),
+            );
           });
         });
       });
