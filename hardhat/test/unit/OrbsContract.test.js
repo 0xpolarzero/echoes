@@ -4,7 +4,8 @@ const {
   attributes,
   name,
   symbol,
-  maxSupply,
+  price,
+  mintLimit,
   description,
   externalUrl,
   animationUrl,
@@ -40,6 +41,8 @@ const { deployments, network, ethers } = require('hardhat');
           assert.equal(await orbsContract.name(), name);
           assert.equal(await orbsContract.symbol(), symbol);
           assert.equal(await orbsContract.getCurrentTokenId(), 0);
+          assert.equal((await orbsContract.getPrice()).toString(), price);
+          assert.equal(await orbsContract.getMintLimit(), mintLimit);
 
           assert.equal(await orbsContract.getOwner(), deployer.address);
           assert.equal(
@@ -164,6 +167,56 @@ const { deployments, network, ethers } = require('hardhat');
           await expect(orbsContract.setExpansionCooldown(newExpansionCooldown))
             .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
             .withArgs(newExpansionCooldown);
+        });
+      });
+
+      describe('setPrice', function() {
+        const newPrice = ethers.utils.parseEther('0.1');
+
+        it('Should revert if not called by the owner', async () => {
+          await expect(
+            orbsContract.connect(user).setPrice(newPrice),
+          ).to.be.revertedWith(
+            'ORBS__NOT_OWNER("Only the owner can call this function")',
+          );
+        });
+
+        it('Should successfully set the price', async () => {
+          const tx = await orbsContract.setPrice(newPrice);
+          await tx.wait(1);
+
+          assert.equal((await orbsContract.getPrice()).toString(), newPrice);
+        });
+
+        it('Should emit the correct event', async () => {
+          await expect(orbsContract.setPrice(newPrice))
+            .to.emit(orbsContract, 'ORBS__PRICE_UPDATED')
+            .withArgs(newPrice);
+        });
+      });
+
+      describe('setMintLimit', function() {
+        const newMintLimit = 10;
+
+        it('Should revert if not called by the owner', async () => {
+          await expect(
+            orbsContract.connect(user).setMintLimit(newMintLimit),
+          ).to.be.revertedWith(
+            'ORBS__NOT_OWNER("Only the owner can call this function")',
+          );
+        });
+
+        it('Should successfully set the mint limit', async () => {
+          const tx = await orbsContract.setMintLimit(newMintLimit);
+          await tx.wait(1);
+
+          assert.equal(await orbsContract.getMintLimit(), newMintLimit);
+        });
+
+        it('Should emit the correct event', async () => {
+          await expect(orbsContract.setMintLimit(newMintLimit))
+            .to.emit(orbsContract, 'ORBS__MINT_LIMIT_UPDATED')
+            .withArgs(newMintLimit);
         });
       });
     });

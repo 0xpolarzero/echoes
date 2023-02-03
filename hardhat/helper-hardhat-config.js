@@ -46,6 +46,8 @@ const attributes = [
 const name = 'Orbs';
 const symbol = 'ORBS';
 const maxSupply = 1_000;
+const price = ethers.utils.parseEther('0.01');
+const mintLimit = 0;
 
 // Base metadata
 const description =
@@ -67,6 +69,8 @@ module.exports = {
   name,
   symbol,
   maxSupply,
+  price,
+  mintLimit,
   description,
   backgroundColor,
   externalUrl,

@@ -7,6 +7,8 @@ const {
   backgroundColor,
   externalUrl,
   animationUrl,
+  price,
+  mintLimit,
 } = require('../helper-hardhat-config');
 const { verify } = require('../utils/verify');
 
@@ -24,6 +26,8 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     externalUrl,
     backgroundColor,
     expansionCooldown,
+    price,
+    mintLimit,
   ];
 
   const orbs = await deploy('OrbsContract', {
