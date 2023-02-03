@@ -48,8 +48,8 @@ const maxExpansion = 10_000;
 const description =
   'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';
 const backgroundColor = '0x101010';
-const externalUrl = 'https://';
-const animationUrl = 'https://';
+const externalUrl = 'https://makesuretofinishwithslash/';
+const animationUrl = 'https://samehere/';
 
 module.exports = {
   developmentChains,
