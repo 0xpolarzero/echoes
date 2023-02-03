@@ -2,7 +2,7 @@ const { network, ethers } = require('hardhat');
 const {
   developmentChains,
   attributes,
-  maxExpansion,
+  expansionCooldown,
   description,
   backgroundColor,
   externalUrl,
@@ -14,20 +14,16 @@ module.exports = async function({ getNamedAccounts, deployments }) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  // Convert to bytes
-  const descriptionBytes = ethers.utils.formatBytes32String(description);
-  const externalUrlBytes = ethers.utils.formatBytes32String(externalUrl);
-
   const args = [
-    attributes.spectrum,
-    attributes.scenery,
-    attributes.trace,
-    attributes.atmosphere,
+    attributes[0],
+    attributes[1],
+    attributes[2],
+    attributes[3],
     animationUrl,
-    externalUrlBytes,
-    descriptionBytes,
+    description,
+    externalUrl,
     backgroundColor,
-    maxExpansion,
+    expansionCooldown,
   ];
 
   const orbs = await deploy('OrbsContract', {
