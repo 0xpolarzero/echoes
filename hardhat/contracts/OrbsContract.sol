@@ -63,6 +63,11 @@ contract OrbsContract is ERC721URIStorage {
     mapping(uint256 => Orb) private s_orbs; // tokenId => Orb
     mapping(uint256 => string[]) private s_attributes; // typeIndex => attributes
 
+    /// Events
+    // Dev functions
+    event ORBS__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
+    event ORBS__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
+
     /// Modifiers
     modifier onlyOwner() {
         if (msg.sender != i_owner)
@@ -243,7 +248,9 @@ contract OrbsContract is ERC721URIStorage {
 
         // Check if the attribute exists
         if (_attributeIndex >= attributes.length)
-            revert ORBS__ATTRIBUTE_DOES_NOT_EXIST("Attribute not in the list");
+            revert ORBS__ATTRIBUTE_DOES_NOT_EXIST(
+                "The attribute type does not exist"
+            );
 
         // Return the attribute
         return attributes[_attributeIndex];
@@ -376,9 +383,13 @@ contract OrbsContract is ERC721URIStorage {
             );
             // If the trait already exists, add the new ones
         } else {
+            // We won't check if the attributes already exist, it would be too expensive
+            // It needs to be carefully checked by the owner
             for (uint256 i = 0; i < _attributes.length; i++) {
                 s_attributes[_attributeIndex].push(_attributes[i]);
             }
+
+            emit ORBS__ATTRIBUTES_ADDED(_attributeIndex, _attributes);
         }
     }
 
@@ -391,5 +402,7 @@ contract OrbsContract is ERC721URIStorage {
         uint256 _expansionCooldown
     ) external onlyOwner {
         s_expansionCooldown = _expansionCooldown;
+
+        emit ORBS__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
     }
 }
