@@ -15,8 +15,14 @@ import "./Formats.sol";
  */
 
 /// Errors
+// Dev functions
 error ORBS__NOT_OWNER(string message);
 error ORBS__ATTRIBUTE_DOES_NOT_EXIST(string message);
+// Mint
+error ORBS__WRONG_PRICE(uint256 value, uint256 price);
+error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
+error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
+error ORBS__SIGNATURE_ALREADY_USED(string signature);
 
 contract OrbsContract is ERC721URIStorage {
     /// Libs
@@ -49,6 +55,8 @@ contract OrbsContract is ERC721URIStorage {
     // Base
     address private immutable i_owner;
     uint256 private immutable i_creationTimestamp;
+    uint256 private s_price;
+    uint256 private s_mintLimit;
     // Metadata
     bytes3 private immutable i_backgroundColor;
     string private i_description;
@@ -67,6 +75,10 @@ contract OrbsContract is ERC721URIStorage {
     // Dev functions
     event ORBS__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
     event ORBS__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
+    event ORBS__PRICE_UPDATED(uint256 price);
+    event ORBS__MINT_LIMIT_UPDATED(uint256 mintLimit);
+    // Mint
+    event ORBS__MINTED(Orb orb);
 
     /// Modifiers
     modifier onlyOwner() {
@@ -97,7 +109,9 @@ contract OrbsContract is ERC721URIStorage {
         string memory _description,
         string memory _externalUrl,
         bytes3 _backgroundColor,
-        uint256 _expansionCooldown
+        uint256 _expansionCooldown,
+        uint256 _price,
+        uint256 _mintLimit
     ) ERC721("Orbs", "ORBS") {
         // Set attributes
         s_attributes[0] = _attributesSpectrum;
@@ -117,16 +131,59 @@ contract OrbsContract is ERC721URIStorage {
         // Set base
         i_owner = msg.sender;
         i_creationTimestamp = block.timestamp;
+        s_price = _price;
+        s_mintLimit = _mintLimit;
     }
 
     // TODO public/external
-    function mint() public {
-        // TODO check if usedSignatures
-        // TODO maybe check if already minted if limit for user
-        // TODO if max supply check + same for value
-        // TODO write to s_orbs
-        // TODO write to s_usedSignatures
-        // TODO do both _setTokenURI and setTokenURIUpdatable
+    function mint(
+        string memory _signature,
+        uint256 _spectrumIndex,
+        uint256 _sceneryIndex,
+        uint256 _traceIndex,
+        uint256 _atmosphereIndex
+    ) public payable {
+        // Increment the tokenId
+        _tokenIds.increment();
+        uint256 tokenId = _tokenIds.current();
+
+        // Check if enough value is sent
+        if (msg.value < s_price) revert ORBS__WRONG_PRICE(msg.value, s_price);
+        // Check if max supply is reached
+        if (tokenId > MAX_SUPPLY) revert ORBS__MAX_SUPPLY_REACHED(tokenId);
+        // Check if the user has not reached the mint limit
+        if (balanceOf(msg.sender) >= s_mintLimit)
+            revert ORBS__MINT_LIMIT_REACHED(s_mintLimit);
+        // Check if the signature is already used
+        if (!isSignatureAvailable(_signature))
+            revert ORBS__SIGNATURE_ALREADY_USED(_signature);
+
+        Orb memory orb = Orb({
+            signature: _signature,
+            spectrumIndex: _spectrumIndex,
+            sceneryIndex: _sceneryIndex,
+            traceIndex: _traceIndex,
+            atmosphereIndex: _atmosphereIndex,
+            expansionMultiplier: 1,
+            lastExpansionTimestamp: block.timestamp,
+            creationTimestamp: block.timestamp,
+            maxExpansionReached: false,
+            tokenId: tokenId
+        });
+
+        // Mint the token
+        _safeMint(msg.sender, tokenId);
+        // Set the full token URI
+        string memory tokenURI = string(
+            abi.encodePacked(getTokenUri(orb), getTokenUriUpdatable(orb))
+        );
+        _setTokenURI(tokenId, tokenURI);
+
+        // Update storage
+        s_usedSignatures.push(_signature);
+        s_orbs[tokenId] = orb;
+
+        emit ORBS__MINTED(orb);
     }
 
     // TODO enhance/expand
@@ -137,69 +194,68 @@ contract OrbsContract is ERC721URIStorage {
         // TODO check max expansion
         // TODO write to s_orbs
         // TODO only do setTokenURIUpdatable
+        // TODO emit MetadataUpdate(uint256 _tokenId) (for OpenSea)
     }
 
     /// Getters
 
     /**
      * @notice Get the token URI
-     * @param _tokenId The tokenId uint to get the URI
+     * @param _orb The Orb struct populated with the new data
      * @dev Builds the metadata for the collectible
      * -> It will only return the metadata that won't be updated
      * @return The token URI (string) in JSON format (ERC721 standard)
      */
     function getTokenUri(
-        uint256 _tokenId
+        Orb memory _orb
     ) internal view returns (string memory) {
         // Get the attributes
-        Orb memory orb = s_orbs[_tokenId];
+        // Orb memory orb = s_orbs[_tokenId];
         string[] memory attributes = new string[](4);
-        attributes[0] = getAttributesOfType(0)[orb.spectrumIndex];
-        attributes[1] = getAttributesOfType(1)[orb.sceneryIndex];
-        attributes[2] = getAttributesOfType(2)[orb.traceIndex];
-        attributes[3] = getAttributesOfType(3)[orb.atmosphereIndex];
+        attributes[0] = getAttributesOfType(0)[_orb.spectrumIndex];
+        attributes[1] = getAttributesOfType(1)[_orb.sceneryIndex];
+        attributes[2] = getAttributesOfType(2)[_orb.traceIndex];
+        attributes[3] = getAttributesOfType(3)[_orb.atmosphereIndex];
 
         // Build the metadata in the ERC721 format
         return
             Formats.formatMetadata(
                 attributes,
-                orb.signature,
+                _orb.signature,
                 i_description,
                 i_externalUrl,
                 i_backgroundColor,
-                orb.creationTimestamp,
-                _tokenId
+                _orb.creationTimestamp,
+                _orb.tokenId
             );
     }
 
     /**
      * @notice Get the token URI updatable
-     * @param _tokenId The tokenId uint to get the URI
+     * @param _orb The Orb struct populated with the new or fetched data
      * @dev Builds the metadata for the collectible
      * -> It will only return the metadata that will be updated
      * @return The token URI (string) in JSON format (ERC721 standard)
      */
     function getTokenUriUpdatable(
-        uint256 _tokenId
+        Orb memory _orb
     ) internal view returns (string memory) {
-        Orb memory orb = s_orbs[_tokenId];
-
         // Get the expansion (if not maxed)
-        uint256 expansion = orb.maxExpansionReached
+        uint256 expansion = _orb.maxExpansionReached
             ? MAX_EXPANSION
-            : getExpansion(_tokenId);
+            : getExpansion(_orb.tokenId);
 
         // Build the metadata in the ERC721 format
         return
             Formats.formatMetadataUpdatable(
                 i_animationUrl,
-                orb.spectrumIndex,
-                orb.sceneryIndex,
-                orb.traceIndex,
-                orb.atmosphereIndex,
+                _orb.spectrumIndex,
+                _orb.sceneryIndex,
+                _orb.traceIndex,
+                _orb.atmosphereIndex,
                 expansion,
-                orb.lastExpansionTimestamp,
-                orb.maxExpansionReached
+                _orb.lastExpansionTimestamp,
+                _orb.maxExpansionReached
             );
     }
 
@@ -277,6 +333,20 @@ contract OrbsContract is ERC721URIStorage {
      */
     function getOrb(uint256 _tokenId) public view returns (Orb memory) {
         return s_orbs[_tokenId];
+    }
+
+    /**
+     * @notice Get the price of the orb
+     */
+    function getPrice() public view returns (uint256) {
+        return s_price;
+    }
+
+    /**
+     * @notice Get the mint limit
+     */
+    function getMintLimit() public view returns (uint256) {
+        return s_mintLimit;
     }
 
     /**
@@ -404,5 +474,27 @@ contract OrbsContract is ERC721URIStorage {
         s_expansionCooldown = _expansionCooldown;
 
         emit ORBS__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
+    }
+
+    /**
+     * @notice Set the price
+     * @param _price The new price
+     * @dev onlyOwner
+     */
+    function setPrice(uint256 _price) external onlyOwner {
+        s_price = _price;
+
+        emit ORBS__PRICE_UPDATED(_price);
+    }
+
+    /**
+     * @notice Set the mint limit
+     * @param _mintLimit The new mint limit
+     * @dev onlyOwner
+     */
+    function setMintLimit(uint256 _mintLimit) external onlyOwner {
+        s_mintLimit = _mintLimit;
+
+        emit ORBS__MINT_LIMIT_UPDATED(_mintLimit);
     }
 }
