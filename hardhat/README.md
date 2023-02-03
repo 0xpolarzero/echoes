@@ -23,3 +23,16 @@ https://levelup.gitconnected.com/how-to-create-an-interactive-nft-4aeeed979138
 
 ! Emit event when metadata updated to refresh OpenSea (end https://docs.opensea.io/docs/metadata-standards)
 event MetadataUpdate(uint256 \_tokenId)
+
+# Updatable tokenURI
+
+- Write all metadata (except what can be changed) in the usual tokenURI (\_setTokenURI)
+- Write the updatable metadata to a different tokenURI:
+  - Mapping tokenId => tokenURIUpdatable
+  - \_setTokenURIUpdatable
+- Override tokenURI (ERC721URIStorage) such as:
+  ```solidity
+  string memory _tokenURI = _tokenURIs[tokenId];
+  // ->
+  string memory _tokenURI = string(abi.encodePacked(_tokenURIs[tokenId], tokenURIsUpdatable[tokenId]))
+  ```
