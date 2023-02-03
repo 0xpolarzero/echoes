@@ -1,5 +1,6 @@
 const developmentChains = ['hardhat', 'localhost'];
 
+// Attributes
 const attributes = {
   spectrum: [
     'Oceanic Blaze, Sunset Haze',
@@ -41,10 +42,21 @@ const attributes = {
   ],
 };
 
-maxExpansion = 10_000;
+const maxExpansion = 10_000;
+
+// Base metadata
+const description =
+  'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';
+const backgroundColor = '0x101010';
+const externalUrl = 'https://';
+const animationUrl = 'https://';
 
 module.exports = {
   developmentChains,
   attributes,
   maxExpansion,
+  description,
+  backgroundColor,
+  externalUrl,
+  animationUrl,
 };
