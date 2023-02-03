@@ -15,9 +15,9 @@ import "./Formats.sol";
  */
 
 /// Errors
+error ORBS__INVALID_ATTRIBUTE(string message);
 // Dev functions
 error ORBS__NOT_OWNER(string message);
-error ORBS__ATTRIBUTE_DOES_NOT_EXIST(string message);
 // Mint
 error ORBS__WRONG_PRICE(uint256 value, uint256 price);
 error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
@@ -33,16 +33,12 @@ contract OrbsContract is ERC721URIStorage {
     struct Orb {
         // Base attributes
         string signature;
-        uint256 spectrumIndex;
-        uint256 sceneryIndex;
-        uint256 traceIndex;
-        uint256 atmosphereIndex;
+        string[] attributes; // spectrum, scenery, trace, atmosphere
         // Systems
         uint256 expansionMultiplier; // will be incremented at each expansion
         uint256 lastExpansionTimestamp;
         uint256 creationTimestamp;
         bool maxExpansionReached; // if the expansion value is equal to the max expansion
-        // Id
         uint256 tokenId;
     }
 
@@ -145,12 +141,12 @@ contract OrbsContract is ERC721URIStorage {
     ) public payable {
         // Increment the tokenId
         _tokenIds.increment();
-        uint256 tokenId = _tokenIds.current();
 
         // Check if enough value is sent
         if (msg.value < s_price) revert ORBS__WRONG_PRICE(msg.value, s_price);
         // Check if max supply is reached
-        if (tokenId > MAX_SUPPLY) revert ORBS__MAX_SUPPLY_REACHED(tokenId);
+        if (_tokenIds.current() > MAX_SUPPLY)
+            revert ORBS__MAX_SUPPLY_REACHED(_tokenIds.current());
         // Check if the user has not reached the mint limit
         if (balanceOf(msg.sender) >= s_mintLimit)
             revert ORBS__MINT_LIMIT_REACHED(s_mintLimit);
@@ -158,30 +154,41 @@ contract OrbsContract is ERC721URIStorage {
         if (!isSignatureAvailable(_signature))
             revert ORBS__SIGNATURE_ALREADY_USED(_signature);
 
+        // Get the attributes
+        string[] memory attributes = new string[](4);
+        attributes[0] = s_attributes[0][_spectrumIndex];
+        attributes[1] = s_attributes[1][_sceneryIndex];
+        attributes[2] = s_attributes[2][_traceIndex];
+        attributes[3] = s_attributes[3][_atmosphereIndex];
+
+        // Check if any of the attributes is empty
+        for (uint256 i = 0; i < attributes.length; i++) {
+            if (bytes(attributes[i]).length == 0)
+                revert ORBS__INVALID_ATTRIBUTE("Wrong attribute provided");
+        }
+
         Orb memory orb = Orb({
             signature: _signature,
-            spectrumIndex: _spectrumIndex,
-            sceneryIndex: _sceneryIndex,
-            traceIndex: _traceIndex,
-            atmosphereIndex: _atmosphereIndex,
+            attributes: attributes,
             expansionMultiplier: 1,
             lastExpansionTimestamp: block.timestamp,
             creationTimestamp: block.timestamp,
             maxExpansionReached: false,
-            tokenId: tokenId
+            tokenId: _tokenIds.current()
         });
 
         // Mint the token
-        _safeMint(msg.sender, tokenId);
+        _safeMint(msg.sender, _tokenIds.current());
+
         // Set the full token URI
-        string memory tokenURI = string(
+        string memory tokenUri = string(
             abi.encodePacked(getTokenUri(orb), getTokenUriUpdatable(orb))
         );
-        _setTokenURI(tokenId, tokenURI);
+        _setTokenURI(_tokenIds.current(), tokenUri);
 
         // Update storage
         s_usedSignatures.push(_signature);
-        s_orbs[tokenId] = orb;
+        s_orbs[_tokenIds.current()] = orb;
 
         emit ORBS__MINTED(orb);
     }
@@ -209,18 +216,10 @@ contract OrbsContract is ERC721URIStorage {
     function getTokenUri(
         Orb memory _orb
     ) internal view returns (string memory) {
-        // Get the attributes
-        // Orb memory orb = s_orbs[_tokenId];
-        string[] memory attributes = new string[](4);
-        attributes[0] = getAttributesOfType(0)[_orb.spectrumIndex];
-        attributes[1] = getAttributesOfType(1)[_orb.sceneryIndex];
-        attributes[2] = getAttributesOfType(2)[_orb.traceIndex];
-        attributes[3] = getAttributesOfType(3)[_orb.atmosphereIndex];
-
         // Build the metadata in the ERC721 format
         return
             Formats.formatMetadata(
-                attributes,
+                _orb.attributes,
                 _orb.signature,
                 i_description,
                 i_externalUrl,
@@ -249,10 +248,7 @@ contract OrbsContract is ERC721URIStorage {
         return
             Formats.formatMetadataUpdatable(
                 i_animationUrl,
-                _orb.spectrumIndex,
-                _orb.sceneryIndex,
-                _orb.traceIndex,
-                _orb.atmosphereIndex,
+                _orb.attributes,
                 expansion,
                 _orb.lastExpansionTimestamp,
                 _orb.maxExpansionReached
@@ -281,16 +277,6 @@ contract OrbsContract is ERC721URIStorage {
     }
 
     /**
-     * @notice Get the attributes of a type (0: spectrum, 1: scenery, 2: trace, 3: atmosphere)
-     * @param _typeIndex The index in the mapping
-     */
-    function getAttributesOfType(
-        uint256 _typeIndex
-    ) public view returns (string[] memory) {
-        return s_attributes[_typeIndex];
-    }
-
-    /**
      * @notice Check the validity of a trait
      * @param _typeIndex The index in the mapping (to get the attributes)
      * @param _attributeIndex The index of the attribute to check
@@ -300,13 +286,11 @@ contract OrbsContract is ERC721URIStorage {
         uint256 _attributeIndex
     ) public view returns (string memory) {
         // Get the attributes
-        string[] memory attributes = getAttributesOfType(_typeIndex);
+        string[] memory attributes = s_attributes[_typeIndex];
 
         // Check if the attribute exists
         if (_attributeIndex >= attributes.length)
-            revert ORBS__ATTRIBUTE_DOES_NOT_EXIST(
-                "The attribute type does not exist"
-            );
+            revert ORBS__INVALID_ATTRIBUTE("The attribute type does not exist");
 
         // Return the attribute
         return attributes[_attributeIndex];
@@ -447,10 +431,8 @@ contract OrbsContract is ERC721URIStorage {
     ) external onlyOwner {
         // If the attributes type does not exist, revert
         // It would be too much of a struggle to add a new type and recursively update all orbs
-        if (getAttributesOfType(_attributeIndex).length == 0) {
-            revert ORBS__ATTRIBUTE_DOES_NOT_EXIST(
-                "The attribute type does not exist"
-            );
+        if (s_attributes[_attributeIndex].length == 0) {
+            revert ORBS__INVALID_ATTRIBUTE("The attribute type does not exist");
             // If the trait already exists, add the new ones
         } else {
             // We won't check if the attributes already exist, it would be too expensive
