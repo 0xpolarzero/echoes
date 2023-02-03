@@ -48,6 +48,7 @@ minted(mapping id => mintTimestamp)
 - Basic minting contract (ERC721)
 - Custom verifications (name, traits, ...)
 - Metadata modifications based on traits "enhancements"
+- Modification of ERC721 to get a tokenURI base and tokenURI modifiable, both unique to a token, so it won't overwrite all the metadata on a single attribute change
 - Time-based enhancements
 - Indexing events on The Graph
 
