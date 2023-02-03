@@ -1,8 +1,8 @@
 const developmentChains = ['hardhat', 'localhost'];
 
 // Attributes
-const attributes = {
-  spectrum: [
+const attributes = [
+  [
     'Oceanic Blaze, Sunset Haze',
     'Velvet Nightfall, Verdant Whisper',
     'Blushing Petals, Serene Waves',
@@ -12,7 +12,7 @@ const attributes = {
     'Royal Amethyst, Misty Gray',
     'Gold Sands, Sapphire Dreams',
   ],
-  scenery: [
+  [
     'Midnight Mystery',
     'Dark Charcoal',
     'Deep Space',
@@ -20,7 +20,7 @@ const attributes = {
     'Ethereal Glow',
     'Dreamy Cloud',
   ],
-  trace: [
+  [
     'Whirling Vortices',
     'Radiant Blossom',
     'Dancing Fireflies',
@@ -30,7 +30,7 @@ const attributes = {
     'Glowing Orbs',
     'Radiant Sun',
   ],
-  atmosphere: [
+  [
     'Shapeshift',
     'Sky Currents',
     'Crystal Ripples',
@@ -40,9 +40,12 @@ const attributes = {
     'City Seraph',
     'Abyss',
   ],
-};
+];
 
-const maxExpansion = 10_000;
+// ERC721
+const name = 'Orbs';
+const symbol = 'ORBS';
+const maxSupply = 1_000;
 
 // Base metadata
 const description =
@@ -51,12 +54,25 @@ const backgroundColor = '0x101010';
 const externalUrl = 'https://makesuretofinishwithslash/';
 const animationUrl = 'https://samehere/';
 
+// Systems
+const expansionCooldown = 60 * 60 * 24;
+
+const BASE_EXPANSION = 100;
+const MAX_EXPANSION = 10_000;
+const MAX_SUPPLY = 1_000;
+
 module.exports = {
   developmentChains,
   attributes,
-  maxExpansion,
+  name,
+  symbol,
+  maxSupply,
   description,
   backgroundColor,
   externalUrl,
   animationUrl,
+  expansionCooldown,
+  BASE_EXPANSION,
+  MAX_EXPANSION,
+  MAX_SUPPLY,
 };
