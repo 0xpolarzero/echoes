@@ -277,6 +277,26 @@ contract OrbsContract is ERC721URIStorage {
     }
 
     /**
+     * @notice Get attributes of a type
+     * @param _typeIndex The index in the mapping (to get the attributes)
+     */
+    function getAttributesOfType(
+        uint256 _typeIndex
+    ) public view returns (string[] memory) {
+        // Get the attributes
+        string[] memory attributes = s_attributes[_typeIndex];
+
+        // Check if the attribute exists
+        if (attributes.length == 0)
+            revert ORBS__INVALID_ATTRIBUTE(
+                "The attributes type does not exist"
+            );
+
+        // Return the attribute
+        return attributes;
+    }
+
+    /**
      * @notice Check the validity of a trait
      * @param _typeIndex The index in the mapping (to get the attributes)
      * @param _attributeIndex The index of the attribute to check
@@ -286,11 +306,11 @@ contract OrbsContract is ERC721URIStorage {
         uint256 _attributeIndex
     ) public view returns (string memory) {
         // Get the attributes
-        string[] memory attributes = s_attributes[_typeIndex];
+        string[] memory attributes = getAttributesOfType(_typeIndex);
 
         // Check if the attribute exists
         if (_attributeIndex >= attributes.length)
-            revert ORBS__INVALID_ATTRIBUTE("The attribute type does not exist");
+            revert ORBS__INVALID_ATTRIBUTE("The attribute does not exist");
 
         // Return the attribute
         return attributes[_attributeIndex];
@@ -429,20 +449,17 @@ contract OrbsContract is ERC721URIStorage {
         uint256 _attributeIndex,
         string[] memory _attributes
     ) external onlyOwner {
-        // If the attributes type does not exist, revert
+        // If the attributes type does not exist, revert (will be done when getting the attributes)
         // It would be too much of a struggle to add a new type and recursively update all orbs
-        if (s_attributes[_attributeIndex].length == 0) {
-            revert ORBS__INVALID_ATTRIBUTE("The attribute type does not exist");
-            // If the trait already exists, add the new ones
-        } else {
-            // We won't check if the attributes already exist, it would be too expensive
-            // It needs to be carefully checked by the owner
-            for (uint256 i = 0; i < _attributes.length; i++) {
-                s_attributes[_attributeIndex].push(_attributes[i]);
-            }
+        getAttributesOfType(_attributeIndex);
 
-            emit ORBS__ATTRIBUTES_ADDED(_attributeIndex, _attributes);
+        // We won't check if the individual attributes already exist either, it would be too expensive
+        // It needs to be carefully checked by the owner
+        for (uint256 i = 0; i < _attributes.length; i++) {
+            s_attributes[_attributeIndex].push(_attributes[i]);
         }
+
+        emit ORBS__ATTRIBUTES_ADDED(_attributeIndex, _attributes);
     }
 
     /**
