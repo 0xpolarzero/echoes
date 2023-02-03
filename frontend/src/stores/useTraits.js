@@ -44,13 +44,6 @@ export default create((set) => ({
     return {
       name,
       traits: traitsFormatted,
-      description: config.description,
-      external_url: config.externalUrl,
-      background_color: config.background,
-      // TODO Add:
-      // image
-      // image_data if not using image (raw svg)
-      // animation_url html page
     };
   },
 
@@ -59,7 +52,8 @@ export default create((set) => ({
     config.traits.reduce(
       (acc, trait) => {
         const traitData = trait.values.find(
-          (value) => value.name === metadata[trait.type],
+          (value) =>
+            value.name.toLowerCase() === metadata[trait.type].toLowerCase(),
         );
         acc[trait.type] = traitData;
         return acc;
