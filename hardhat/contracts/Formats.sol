@@ -21,7 +21,7 @@ library Formats {
             bytes3ColorToString(_backgroundColor)
         );
 
-        // Separate into two parts to avoid "stack too deep" error
+        // Separate the data into two parts to avoid "Stack too deep"
         bytes memory dataA = abi.encodePacked(
             '{"description":"',
             _description,
@@ -54,7 +54,10 @@ library Formats {
             '"},',
             '{"trait_type":"Atmosphere","value":"',
             _attributes[3],
-            '"},',
+            '"},'
+        );
+
+        bytes memory dataC = abi.encodePacked(
             '{"trait_type":"Generation","value":"',
             _creationTimestamp.toString(),
             '"}',
@@ -62,23 +65,18 @@ library Formats {
             "}"
         );
 
-        bytes memory data = abi.encodePacked(dataA, dataB);
-
         return
             string(
                 abi.encodePacked(
                     "data:application/json;base64,",
-                    Base64.encode(data)
+                    Base64.encode(abi.encodePacked(dataA, dataB, dataC))
                 )
             );
     }
 
     function formatMetadataUpdatable(
         string memory _animationUrl,
-        uint256 _spectrumIndex,
-        uint256 _sceneryIndex,
-        uint256 _traceIndex,
-        uint256 _atmosphereIndex,
+        string[] memory _attributes,
         uint256 _expansion,
         uint256 _lastExpansionTimestamp,
         bool _maxExpansionReached
@@ -88,13 +86,13 @@ library Formats {
             abi.encodePacked(
                 _animationUrl,
                 "&0=",
-                _spectrumIndex.toString(),
+                _attributes[0],
                 "&1=",
-                _sceneryIndex.toString(),
+                _attributes[1],
                 "&2=",
-                _traceIndex.toString(),
+                _attributes[2],
                 "&3=",
-                _atmosphereIndex.toString(),
+                _attributes[3],
                 "&4=",
                 _expansion.toString()
             )
