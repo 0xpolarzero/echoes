@@ -2,65 +2,129 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 function formatMetadata(
-    string memory signature,
-    string memory spectrumAttribute,
-    string memory sceneryAttribute,
-    string memory traceAttribute,
-    string memory atmosphereAttribute,
-    string memory expansionAttribute,
-    string memory externalUrl,
-    bytes32 animationUrl,
-    bytes32 description,
-    bytes3 backgroundColor,
-    uint256 tokenId
+    string memory _signature,
+    string memory _spectrumAttribute,
+    string memory _sceneryAttribute,
+    string memory _traceAttribute,
+    string memory _atmosphereAttribute,
+    bytes32 _externalUrl,
+    bytes32 _description,
+    bytes3 _backgroundColor,
+    uint256 _creationTimestamp,
+    uint256 _tokenId
 ) pure returns (string memory) {
+    // All attributes except expansion
     string memory attributes = '"attributes":[';
     attributes +=
         '{"trait_type":"Spectrum","value":"' +
-        spectrumAttribute +
+        _spectrumAttribute +
         '"},';
     attributes +=
         '{"trait_type":"Scenery","value":"' +
-        sceneryAttribute +
+        _sceneryAttribute +
         '"},';
-    attributes += '{"trait_type":"Trace","value":"' + traceAttribute + '"},';
+    attributes += '{"trait_type":"Trace","value":"' + _traceAttribute + '"},';
     attributes +=
         '{"trait_type":"Atmosphere","value":"' +
-        atmosphereAttribute +
+        _atmosphereAttribute +
         '"},';
     attributes +=
-        '{"trait_type":"Expansion","value":"' +
-        expansionAttribute +
+        '{"trait_type":"Generation","value":"' +
+        _creationTimestamp.toString() +
         '"}';
     attributes += "]";
 
-    string memory color = bytes3ColorToString(backgroundColor);
-
     string memory imageData = generateSVG(
-        spectrumAttribute,
-        sceneryAttribute,
-        traceAttribute,
-        atmosphereAttribute,
-        expansionAttribute,
-        color
+        _spectrumAttribute,
+        _sceneryAttribute,
+        _traceAttribute,
+        _atmosphereAttribute,
+        bytes3ColorToString(_backgroundColor)
     );
 
-    string memory metadata = '{"description":"' + description.toString() + '",';
-    metadata += '"external_url":"' + externalUrl + '",';
+    string memory metadata = '{"description":"' +
+        _description.toString() +
+        '",';
     metadata += '"image_data":"' + imageData + '",';
-    metadata += '"name":"' + signature + '",';
-    metadata += '"animation_url":"' + animationUrl.toString() + '",';
-    metadata += '"background_color":"' + bytes3ColorToString(backgroundColor) + '",';
+    metadata +=
+        '"external_url":"' +
+        _externalUrl.toString() +
+        _tokenID.toString() +
+        '",';
+    metadata += '"name":"' + _signature + '",';
+    metadata +=
+        '"background_color":"' +
+        bytes3ColorToString(_backgroundColor) +
+        '",';
     metadata += attributes + "}";
 
     bytes memory data = abi.encodePacked(metadata);
 
-    return string(
+    return
+        string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(data)
+            )
+        );
+}
+
+function formatMetadataUpgradable(
+    string memory _animationUrl,
+    uint256 _spectrumIndex,
+    uint256 _sceneryIndex,
+    uint256 _traceIndex,
+    uint256 _atmosphereIndex,
+    uint256 _expansion,
+    uint256 _lastExpansionTimestamp,
+    bool _maxExpansionReached
+) pure returns (string memory) {
+    // Add expansion to attributes
+    string memory attributes = '"attributes":[';
+    attributes +=
+        '{"trait_type":"Expansion","value":"' +
+        _expansion.toString() +
+        '"},';
+    attributes +=
+        '{"trait_type":"Last Expanse","value":"' +
+        _lastExpansionTimestamp.toString() +
+        '"},';
+    attributes +=
+        '{"trait_type":"Maxed","value":"' +
+        _maxExpansionReached.toString() +
+        '"}';
+    attributes += "]";
+
+    // Get the updated animation URL
+    string memory animationUrl = string(
         abi.encodePacked(
-            "data:application/json;base64,",
-            Base64.encode(data)
+            _animationUrl,
+            "&0=",
+            _spectrumIndex.toString(),
+            "&1=",
+            _sceneryIndex.toString(),
+            "&2=",
+            _traceIndex.toString(),
+            "&3=",
+            _atmosphereIndex.toString(),
+            "&4=",
+            _expansion.toString()
         )
-    )
+    );
+
+    // Add animation URL to metadata
+    string memory metadata = '{"animation_url":"' + animationUrl + '",';
+    metadata += attributes + "}";
+
+    bytes memory data = abi.encodePacked(metadata);
+
+    return
+        string(
+            abi.encodePacked(
+                "data:application/json;base64,",
+                Base64.encode(data)
+            )
+        );
 }
 
 function generateSvg(
@@ -68,7 +132,6 @@ function generateSvg(
     string memory sceneryAttribute,
     string memory traceAttribute,
     string memory atmosphereAttribute,
-    string memory expansionAttribute,
     string memory backgroundColor
 ) pure returns (string memory) {
     string
@@ -113,14 +176,6 @@ function generateSvg(
             "</text>"
         )
     );
-    svg = string(
-        abi.encodePacked(
-            svg,
-            '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#fff">',
-            expansionAttribute,
-            "</text>"
-        )
-    );
     svg = string(abi.encodePacked(svg, "</svg>"));
 
     return svg;
@@ -139,6 +194,8 @@ function generateSvg(
 //     return string(bytesString);
 // }
 
-function bytes3ColorToString(bytes3 color) internal pure returns (string memory) {
+function bytes3ColorToString(
+    bytes3 color
+) internal pure returns (string memory) {
     return string(abi.encodePacked(color).slice(2, 6));
 }
