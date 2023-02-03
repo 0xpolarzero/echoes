@@ -5,8 +5,8 @@ pragma solidity ^0.8.16;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-// Import utils
-import "./utils.sol" as Utils;
+// Import formatting functions
+import "./Formats.sol";
 
 /**
  * @title Orbs contract
@@ -21,7 +21,6 @@ error ORBS__ATTRIBUTE_DOES_NOT_EXIST(string message);
 contract OrbsContract is ERC721URIStorage {
     /// Libs
     using Counters for Counters.Counter;
-    using Strings for uint256;
     Counters.Counter private _tokenIds;
 
     /// Structs
@@ -43,16 +42,17 @@ contract OrbsContract is ERC721URIStorage {
 
     /// Constants
     uint256 private constant BASE_EXPANSION = 100;
-    uint256 private constant MAX_EXPANSION = 10000;
+    uint256 private constant MAX_EXPANSION = 10_000;
+    uint256 private constant MAX_SUPPLY = 1_000;
 
     /// Variables
     // Base
     address private immutable i_owner;
     uint256 private immutable i_creationTimestamp;
     // Metadata
-    bytes32 private immutable i_externalUrl;
-    bytes32 private immutable i_description;
     bytes3 private immutable i_backgroundColor;
+    string private i_description;
+    string private i_externalUrl;
     string private i_animationUrl;
     // Systems
     uint256 private s_expansionCooldown;
@@ -76,11 +76,10 @@ contract OrbsContract is ERC721URIStorage {
      * @param _attributesScenery An array of strings
      * @param _attributesTrace An array of strings
      * @param _attributesAtmosphere An array of strings
+     * @param _description The description for the URI (string)
      * @param _animationUrl The animation URL for the URI (string)
      * @param _externalUrl The external URL for the URI (string)
-     * @param _description The description for the URI (bytes32)
      * @param _backgroundColor The background color for the URI (bytes32)
-     * @param _maxExpansion The max expansion uint (particles count)
      * @dev Add each allowed traits to the mapping on deployment ;
      * additionnal traits can be provided later
      */
@@ -90,10 +89,9 @@ contract OrbsContract is ERC721URIStorage {
         string[] memory _attributesTrace,
         string[] memory _attributesAtmosphere,
         string memory _animationUrl,
-        bytes32 _externalUrl,
-        bytes32 _description,
+        string memory _description,
+        string memory _externalUrl,
         bytes3 _backgroundColor,
-        uint256 _maxExpansion,
         uint256 _expansionCooldown
     ) ERC721("Orbs", "ORBS") {
         // Set attributes
@@ -145,29 +143,24 @@ contract OrbsContract is ERC721URIStorage {
      * -> It will only return the metadata that won't be updated
      * @return The token URI (string) in JSON format (ERC721 standard)
      */
-    function getTokenUri(uint256 _tokenId) public view returns (string memory) {
+    function getTokenUri(
+        uint256 _tokenId
+    ) internal view returns (string memory) {
         // Get the attributes
         Orb memory orb = s_orbs[_tokenId];
-        string memory spectrum = getAttributesOfType(0)[orb.spectrumIndex];
-        string memory scenery = getAttributesOfType(1)[orb.sceneryIndex];
-        string memory trace = getAttributesOfType(2)[orb.traceIndex];
-        string memory atmosphere = getAttributesOfType(3)[orb.atmosphereIndex];
-
-        // Get the expansion (if not maxed) - it should be the base, but just in case
-        uint256 expansion = orb.maxExpansionReached
-            ? MAX_EXPANSION
-            : getExpansion(_tokenId);
+        string[] memory attributes = new string[](4);
+        attributes[0] = getAttributesOfType(0)[orb.spectrumIndex];
+        attributes[1] = getAttributesOfType(1)[orb.sceneryIndex];
+        attributes[2] = getAttributesOfType(2)[orb.traceIndex];
+        attributes[3] = getAttributesOfType(3)[orb.atmosphereIndex];
 
         // Build the metadata in the ERC721 format
         return
-            Utils.formatMetadata(
+            Formats.formatMetadata(
+                attributes,
                 orb.signature,
-                spectrum,
-                scenery,
-                trace,
-                atmosphere,
-                i_externalUrl,
                 i_description,
+                i_externalUrl,
                 i_backgroundColor,
                 orb.creationTimestamp,
                 _tokenId
@@ -183,7 +176,7 @@ contract OrbsContract is ERC721URIStorage {
      */
     function getTokenUriUpdatable(
         uint256 _tokenId
-    ) public view returns (string memory) {
+    ) internal view returns (string memory) {
         Orb memory orb = s_orbs[_tokenId];
 
         // Get the expansion (if not maxed)
@@ -193,12 +186,12 @@ contract OrbsContract is ERC721URIStorage {
 
         // Build the metadata in the ERC721 format
         return
-            Utils.formatMetadataUpdatable(
+            Formats.formatMetadataUpdatable(
                 i_animationUrl,
-                spectrumIndex,
-                sceneryIndex,
-                traceIndex,
-                atmosphereIndex,
+                orb.spectrumIndex,
+                orb.sceneryIndex,
+                orb.traceIndex,
+                orb.atmosphereIndex,
                 expansion,
                 orb.lastExpansionTimestamp,
                 orb.maxExpansionReached
@@ -301,6 +294,20 @@ contract OrbsContract is ERC721URIStorage {
     }
 
     /**
+     * @notice Get the current token ID
+     */
+    function getCurrentTokenId() public view returns (uint256) {
+        return _tokenIds.current();
+    }
+
+    /**
+     * @notice Get the description
+     */
+    function getDescription() public view returns (string memory) {
+        return i_description;
+    }
+
+    /**
      * @notice Get the animation URL
      */
     function getAnimationUrl() public view returns (string memory) {
@@ -310,15 +317,8 @@ contract OrbsContract is ERC721URIStorage {
     /**
      * @notice Get the external URL
      */
-    function getExternalUrl() public view returns (bytes32) {
+    function getExternalUrl() public view returns (string memory) {
         return i_externalUrl;
-    }
-
-    /**
-     * @notice Get the description
-     */
-    function getDescription() public view returns (bytes32) {
-        return i_description;
     }
 
     /**
@@ -347,6 +347,13 @@ contract OrbsContract is ERC721URIStorage {
      */
     function getMaxExpansion() public pure returns (uint256) {
         return MAX_EXPANSION;
+    }
+
+    /**
+     * @notice Get the max supply
+     */
+    function getMaxSupply() public pure returns (uint256) {
+        return MAX_SUPPLY;
     }
 
     /// Dev functions
