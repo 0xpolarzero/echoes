@@ -36,14 +36,6 @@ const { deployments, network, ethers } = require('hardhat');
        */
       describe('constructor', function() {
         it('Should initialize the variables with the right value', async () => {
-          // name & symbol
-          // _tokenIds at 0
-          // owner & creation date
-          // Metadata: externalurl, description, animationurl
-          // Systems: expansioncooldown
-          // Attributes: attributes
-          // Constants: base expansion & max expansion & max supply
-
           // ERC721
           assert.equal(await orbsContract.name(), name);
           assert.equal(await orbsContract.symbol(), symbol);
@@ -98,10 +90,80 @@ const { deployments, network, ethers } = require('hardhat');
        * @notice Dev functions
        */
       describe('addAttributes', function() {
-        //
+        const newAttributesIndex = 0;
+        const newAttributes = ['test1', 'test2', 'test3'];
+
+        it('Should revert if not called by the owner', async () => {
+          await expect(
+            orbsContract
+              .connect(user)
+              .addAttributes(newAttributesIndex, newAttributes),
+          ).to.be.revertedWith(
+            'ORBS__NOT_OWNER("Only the owner can call this function")',
+          );
+        });
+
+        it('Should revert if the attribute index is out of bounds', async () => {
+          await expect(
+            orbsContract.addAttributes(attributes.length, newAttributes),
+          ).to.be.revertedWith(
+            'ORBS__ATTRIBUTE_DOES_NOT_EXIST("The attribute type does not exist")',
+          );
+        });
+
+        it('Should successfully add new attributes to a type', async () => {
+          const tx = await orbsContract.addAttributes(
+            newAttributesIndex,
+            newAttributes,
+          );
+          await tx.wait(1);
+
+          assert.equal(
+            (
+              await orbsContract.getAttributesOfType(newAttributesIndex)
+            ).toString(),
+            [...attributes[newAttributesIndex], ...newAttributes].toString(),
+          );
+        });
+
+        it('Should emit the correct event', async () => {
+          await expect(
+            orbsContract.addAttributes(newAttributesIndex, newAttributes),
+          )
+            .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
+            .withArgs(newAttributesIndex, newAttributes);
+        });
       });
 
       describe('setExpansionCooldown', function() {
-        //
+        const newExpansionCooldown = 100;
+
+        it('Should revert if not called by the owner', async () => {
+          await expect(
+            orbsContract
+              .connect(user)
+              .setExpansionCooldown(newExpansionCooldown),
+          ).to.be.revertedWith(
+            'ORBS__NOT_OWNER("Only the owner can call this function")',
+          );
+        });
+
+        it('Should successfully set the expansion cooldown', async () => {
+          const tx = await orbsContract.setExpansionCooldown(
+            newExpansionCooldown,
+          );
+          await tx.wait(1);
+
+          assert.equal(
+            (await orbsContract.getExpansionCooldown()).toString(),
+            newExpansionCooldown.toString(),
+          );
+        });
+
+        it('Should emit the correct event', async () => {
+          await expect(orbsContract.setExpansionCooldown(newExpansionCooldown))
+            .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
+            .withArgs(newExpansionCooldown);
+        });
       });
     });
