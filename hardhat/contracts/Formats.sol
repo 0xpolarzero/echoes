@@ -83,9 +83,9 @@ library Formats {
     function metadataUpdatable(
         string memory _animationUrl,
         uint256[] memory _attributesIndexes,
-        uint256 _expansion,
+        uint256 _expanse,
         uint256 _lastExpansionTimestamp,
-        bool _maxExpansionReached
+        bool _maxExpanseReached
     ) internal pure returns (string memory) {
         // Get the updated animation URL
         string memory animationUrl = string(
@@ -100,19 +100,19 @@ library Formats {
                 "&3=",
                 _attributesIndexes[3].toString(),
                 "&4=",
-                _expansion.toString()
+                _expanse.toString()
             )
         );
 
         bytes memory data = abi.encodePacked(
-            '{"trait_type":"Expansion","value":"',
-            _expansion.toString(),
+            '{"trait_type":"Expanse","value":"',
+            _expanse.toString(),
             '"},',
-            '{"display_type":"date","trait_type":"Last Expanse","value":"',
+            '{"display_type":"date","trait_type":"Last Expansion","value":"',
             _lastExpansionTimestamp.toString(),
             '"},',
-            '{"trait_type":"Maxed","value":"',
-            _maxExpansionReached ? "true" : "false",
+            '{"trait_type":"Max Expanse","value":"',
+            _maxExpanseReached ? "true" : "false",
             '"}',
             "],",
             '"animation_url":"',
