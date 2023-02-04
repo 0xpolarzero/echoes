@@ -17,8 +17,6 @@ import "./Formats.sol";
 
 /// Errors
 error ORBS__INVALID_ATTRIBUTE(string message);
-// Dev functions
-error ORBS__NOT_OWNER(string message);
 // Mint
 error ORBS__INVALID_PRICE(uint256 value, uint256 price);
 error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
