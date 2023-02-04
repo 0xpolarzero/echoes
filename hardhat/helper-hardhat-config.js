@@ -75,8 +75,8 @@ const contractUri = {
 // Systems
 const expansionCooldown = 60 * 60 * 24;
 
-const BASE_EXPANSION = 100;
-const MAX_EXPANSION = 10_000;
+const BASE_EXPANSE = 100;
+const MAX_EXPANSE = 10_000;
 
 module.exports = {
   developmentChains,
@@ -93,7 +93,7 @@ module.exports = {
   animationUrl,
   contractUri,
   expansionCooldown,
-  BASE_EXPANSION,
-  MAX_EXPANSION,
+  BASE_EXPANSE,
+  MAX_EXPANSE,
   feeRecipient,
 };

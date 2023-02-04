@@ -36,16 +36,16 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         string signature;
         string[] attributes; // spectrum, scenery, trace, atmosphere
         // Systems
-        uint256 expansionMultiplier; // will be incremented at each expansion
+        uint256 expansionMultiplier; // will be incremented at each expanse
         uint256 lastExpansionTimestamp;
         uint256 creationTimestamp;
-        bool maxExpansionReached; // if the expansion value is equal to the max expansion
+        bool maxExpanseReached; // if the expanse value is equal to the max expanse
         uint256 tokenId;
     }
 
     /// Constants
-    uint256 private constant BASE_EXPANSION = 100;
-    uint256 private constant MAX_EXPANSION = 10_000;
+    uint256 private constant BASE_EXPANSE = 100;
+    uint256 private constant MAX_EXPANSE = 10_000;
 
     /// Variables
     // Base
@@ -180,7 +180,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
             expansionMultiplier: 1,
             lastExpansionTimestamp: block.timestamp,
             creationTimestamp: block.timestamp,
-            maxExpansionReached: false,
+            maxExpanseReached: false,
             tokenId: _tokenIds.current()
         });
 
@@ -315,19 +315,19 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         Orb memory _orb,
         uint256[] memory _indexes
     ) internal view returns (string memory) {
-        // Get the expansion (if not maxed)
-        uint256 expansion = _orb.maxExpansionReached
-            ? MAX_EXPANSION
-            : getExpansion(_orb.tokenId);
+        // Get the expanse (if not maxed)
+        uint256 expanse = _orb.maxExpanseReached
+            ? MAX_EXPANSE
+            : getExpanse(_orb.tokenId);
 
         // Build the metadata in the ERC721 format
         return
             Formats.metadataUpdatable(
                 i_animationUrl,
                 _indexes,
-                expansion,
+                expanse,
                 _orb.lastExpansionTimestamp,
-                _orb.maxExpansionReached
+                _orb.maxExpanseReached
             );
     }
 
@@ -393,16 +393,15 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @notice Get the expansion of the orb
+     * @notice Get the expanse of the orb
      * @param _tokenId The tokenId uint of the orb
      */
-    function getExpansion(uint256 _tokenId) public view returns (uint256) {
-        // Calculate the expansion
-        uint256 expansion = s_orbs[_tokenId].expansionMultiplier *
-            BASE_EXPANSION;
+    function getExpanse(uint256 _tokenId) public view returns (uint256) {
+        // Calculate the expanse
+        uint256 expanse = s_orbs[_tokenId].expansionMultiplier * BASE_EXPANSE;
 
-        // If it reaches the max expansion, return the max expansion
-        return expansion >= MAX_EXPANSION ? MAX_EXPANSION : expansion;
+        // If it reaches the max expanse, return the max expanse
+        return expanse >= MAX_EXPANSE ? MAX_EXPANSE : expanse;
     }
 
     /**
@@ -498,17 +497,17 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @notice Get the base expansion
+     * @notice Get the base expanse
      */
-    function getBaseExpansion() public pure returns (uint256) {
-        return BASE_EXPANSION;
+    function getBaseExpanse() public pure returns (uint256) {
+        return BASE_EXPANSE;
     }
 
     /**
-     * @notice Get the max expansion
+     * @notice Get the max expanse
      */
-    function getMaxExpansion() public pure returns (uint256) {
-        return MAX_EXPANSION;
+    function getMaxExpanse() public pure returns (uint256) {
+        return MAX_EXPANSE;
     }
 
     /// Dev functions
