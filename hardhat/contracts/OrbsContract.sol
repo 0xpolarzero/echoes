@@ -3,6 +3,7 @@ pragma solidity ^0.8.16;
 
 // Import OpenZeppelin contracts
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
 // Import formatting functions
@@ -24,7 +25,7 @@ error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
 error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
 error ORBS__SIGNATURE_ALREADY_USED(string signature);
 
-contract OrbsContract is ERC721URIStorage {
+contract OrbsContract is ERC721URIStorage, Ownable {
     /// Libs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -76,13 +77,6 @@ contract OrbsContract is ERC721URIStorage {
     event ORBS__MINT_LIMIT_UPDATED(uint256 mintLimit);
     // Mint
     event ORBS__MINTED(Orb orb);
-
-    /// Modifiers
-    modifier onlyOwner() {
-        if (msg.sender != i_owner)
-            revert ORBS__NOT_OWNER("Only the owner can call this function");
-        _;
-    }
 
     /**
      * @notice Constructor
