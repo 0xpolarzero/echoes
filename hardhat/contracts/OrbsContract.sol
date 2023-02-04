@@ -54,7 +54,7 @@ contract OrbsContract is ERC721URIStorage {
     uint256 private s_price;
     uint256 private s_mintLimit;
     // Metadata
-    bytes3 private immutable i_backgroundColor;
+    uint256 private immutable i_backgroundColor;
     string private i_description;
     string private i_externalUrl;
     string private i_animationUrl;
@@ -92,7 +92,7 @@ contract OrbsContract is ERC721URIStorage {
      * @param _description The description for the URI (string)
      * @param _animationUrl The animation URL for the URI (string)
      * @param _externalUrl The external URL for the URI (string)
-     * @param _backgroundColor The background color for the URI (bytes32)
+     * @param _backgroundColor The background color for the URI (uint256)
      * @dev Add each allowed traits to the mapping on deployment ;
      * additionnal traits can be provided later
      */
@@ -104,7 +104,7 @@ contract OrbsContract is ERC721URIStorage {
         string memory _animationUrl,
         string memory _description,
         string memory _externalUrl,
-        bytes3 _backgroundColor,
+        uint256 _backgroundColor,
         uint256 _expansionCooldown,
         uint256[] memory _base // price, mintLimit, maxSupply
     ) ERC721("Orbs", "ORBS") {
@@ -127,7 +127,7 @@ contract OrbsContract is ERC721URIStorage {
         i_owner = msg.sender;
         i_creationTimestamp = block.timestamp;
         s_price = _base[0];
-        s_mintLimit = _base[1];
+        s_mintLimit = _base[1]; // 0 = no limit
         i_maxSupply = _base[2]; // Easier to set here than constant - for testing purpose
     }
 
@@ -145,11 +145,11 @@ contract OrbsContract is ERC721URIStorage {
         // Check if enough value is sent
         if (msg.value < s_price) revert ORBS__INVALID_PRICE(msg.value, s_price);
         // Check if the user has not reached the mint limit
-        if (balanceOf(msg.sender) >= s_mintLimit)
+        if (s_mintLimit != 0 && balanceOf(msg.sender) >= s_mintLimit)
             revert ORBS__MINT_LIMIT_REACHED(s_mintLimit);
         // Check if max supply is reached
         if (_tokenIds.current() > i_maxSupply)
-            revert ORBS__MAX_SUPPLY_REACHED(_tokenIds.current());
+            revert ORBS__MAX_SUPPLY_REACHED(i_maxSupply);
         // Check if the signature is provided
         if (bytes(_signature).length == 0)
             revert ORBS__INVALID_ATTRIBUTE("Signature is empty");
@@ -159,10 +159,15 @@ contract OrbsContract is ERC721URIStorage {
 
         // Get the attributes
         string[] memory attributes = new string[](4);
-        attributes[0] = s_attributes[0][_spectrumIndex];
-        attributes[1] = s_attributes[1][_sceneryIndex];
-        attributes[2] = s_attributes[2][_traceIndex];
-        attributes[3] = s_attributes[3][_atmosphereIndex];
+        attributes[0] = getAttribute(0, _spectrumIndex);
+        attributes[1] = getAttribute(1, _sceneryIndex);
+        attributes[2] = getAttribute(2, _traceIndex);
+        attributes[3] = getAttribute(3, _atmosphereIndex);
+        uint256[] memory indexes = new uint256[](4);
+        indexes[0] = _spectrumIndex;
+        indexes[1] = _sceneryIndex;
+        indexes[2] = _traceIndex;
+        indexes[3] = _atmosphereIndex;
 
         // Check if any of the attributes is empty
         for (uint256 i = 0; i < attributes.length; i++) {
@@ -183,17 +188,84 @@ contract OrbsContract is ERC721URIStorage {
         // Mint the token
         _safeMint(msg.sender, _tokenIds.current());
 
-        // Set the full token URI
-        string memory tokenUri = string(
-            abi.encodePacked(getTokenUri(orb), getTokenUriUpdatable(orb))
-        );
-        _setTokenURI(_tokenIds.current(), tokenUri);
+        // Set the full token URI (concat both strings)
+        // string memory tokenUri = string.concat(
+        //     getTokenUri(orb),
+        //     getTokenUriUpdatable(orb, indexes)
+        // );
+        // _setTokenURI(_tokenIds.current(), tokenUri);
 
         // Update storage
         s_usedSignatures.push(_signature);
         s_orbs[_tokenIds.current()] = orb;
 
         emit ORBS__MINTED(orb);
+    }
+
+    // Or maybe override function tokenURI(uint256 tokenId) public view virtual override returns (string memory)
+    // to just get both strings and concat them
+    function tokenURI(
+        uint256 _tokenId
+    )
+        public
+        view
+        override
+        returns (
+            // virtual
+            string memory
+        )
+    {
+        _requireMinted(_tokenId);
+
+        // string memory _tokenURI = _tokenURIs[_tokenId];
+        // string memory base = _baseURI();
+
+        // If there is no base URI, return the token URI.
+        // if (bytes(base).length == 0) {
+        //     return _tokenURI;
+        // }
+        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
+        Orb memory orb = s_orbs[_tokenId];
+        uint256[] memory indexes = new uint256[](4);
+        indexes[0] = getAttributeIndex(0, orb.attributes[0]);
+        indexes[1] = getAttributeIndex(1, orb.attributes[1]);
+        indexes[2] = getAttributeIndex(2, orb.attributes[2]);
+        indexes[3] = getAttributeIndex(3, orb.attributes[3]);
+
+        if (
+            bytes(
+                string.concat(
+                    getTokenUri(orb),
+                    getTokenUriUpdatable(orb, indexes)
+                )
+            ).length > 0
+        ) {
+            // Encode in base64 both parts of the URI
+            // This allows users to only update a limited part of the metadata
+            // Yet still have the full updated metadata available in the tokenURI
+            return
+                Formats.metadataEncode(
+                    getTokenUri(orb),
+                    getTokenUriUpdatable(orb, indexes)
+                );
+        }
+
+        return super.tokenURI(_tokenId);
+    }
+
+    function getAttributeIndex(
+        uint256 _type,
+        string memory _attribute
+    ) internal view returns (uint256) {
+        for (uint256 i = 0; i < s_attributes[_type].length; i++) {
+            if (
+                keccak256(abi.encodePacked(s_attributes[_type][i])) ==
+                keccak256(abi.encodePacked(_attribute))
+            ) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     // TODO enhance/expand
@@ -220,8 +292,8 @@ contract OrbsContract is ERC721URIStorage {
         Orb memory _orb
     ) internal view returns (string memory) {
         // Build the metadata in the ERC721 format
-        return
-            Formats.formatMetadata(
+        return (
+            Formats.metadataBase(
                 _orb.attributes,
                 _orb.signature,
                 i_description,
@@ -229,7 +301,8 @@ contract OrbsContract is ERC721URIStorage {
                 i_backgroundColor,
                 _orb.creationTimestamp,
                 _orb.tokenId
-            );
+            )
+        );
     }
 
     /**
@@ -240,7 +313,8 @@ contract OrbsContract is ERC721URIStorage {
      * @return The token URI (string) in JSON format (ERC721 standard)
      */
     function getTokenUriUpdatable(
-        Orb memory _orb
+        Orb memory _orb,
+        uint256[] memory _indexes
     ) internal view returns (string memory) {
         // Get the expansion (if not maxed)
         uint256 expansion = _orb.maxExpansionReached
@@ -249,9 +323,9 @@ contract OrbsContract is ERC721URIStorage {
 
         // Build the metadata in the ERC721 format
         return
-            Formats.formatMetadataUpdatable(
+            Formats.metadataUpdatable(
                 i_animationUrl,
-                _orb.attributes,
+                _indexes,
                 expansion,
                 _orb.lastExpansionTimestamp,
                 _orb.maxExpansionReached
