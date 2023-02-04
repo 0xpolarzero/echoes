@@ -9,6 +9,8 @@ const {
   animationUrl,
   price,
   mintLimit,
+  maxSupply,
+  maxSupplyMock,
 } = require('../helper-hardhat-config');
 const { verify } = require('../utils/verify');
 
@@ -26,8 +28,11 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     externalUrl,
     backgroundColor,
     expansionCooldown,
-    price,
-    mintLimit,
+    [
+      price,
+      mintLimit,
+      developmentChains.includes(network.name) ? maxSupplyMock : maxSupply,
+    ],
   ];
 
   const orbs = await deploy('OrbsContract', {
