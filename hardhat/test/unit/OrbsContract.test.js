@@ -6,13 +6,14 @@ const {
   symbol,
   price,
   mintLimit,
+  maxSupply,
+  maxSupplyMock,
   description,
   externalUrl,
   animationUrl,
   expansionCooldown,
   BASE_EXPANSION,
   MAX_EXPANSION,
-  MAX_SUPPLY,
 } = require('../../helper-hardhat-config');
 const { deployments, network, ethers } = require('hardhat');
 
@@ -22,6 +23,7 @@ const { deployments, network, ethers } = require('hardhat');
       let deployer;
       let user;
       let orbsContract;
+      let orbsContractUser;
       let deployTx;
 
       beforeEach(async () => {
@@ -30,6 +32,7 @@ const { deployments, network, ethers } = require('hardhat');
         user = accounts[1];
         deployTx = await deployments.fixture(['main']);
         orbsContract = await ethers.getContract('OrbsContract', deployer);
+        orbsContractUser = await ethers.getContract('OrbsContract', user);
       });
 
       /**
@@ -84,9 +87,64 @@ const { deployments, network, ethers } = require('hardhat');
           );
           assert.equal(
             (await orbsContract.getMaxSupply()).toString(),
-            MAX_SUPPLY.toString(),
+            maxSupply.toString(),
           );
         });
+      });
+
+      /**
+       * @notice Mint
+       */
+      describe.only('mint', function() {
+        const argsNoPrice = ['Name of the orb', 0, 0, 0, 0]; // signature + attributes indexes
+        const args = [...argsNoPrice, { value: price }];
+
+        describe('Should revert if any verification fails', function() {
+          it('price not paid', async () => {
+            await expect(
+              orbsContractUser.mint(...argsNoPrice),
+            ).to.be.revertedWith(`ORBS__INVALID_PRICE(${0}, ${price})`);
+          });
+          it('mint limit reached', async () => {
+            const newLimit = 0;
+            await orbsContract.setMintLimit(newLimit);
+            await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
+              `ORBS__MINT_LIMIT_REACHED(${newLimit})`,
+            );
+          });
+          it('max supply reached', async () => {
+            await orbsContract.setMintLimit(maxSupplyMock); // during unit tests is set to 10 instead of 1000
+            for (let i = 0; i < maxSupplyMock; i++) {
+              await orbsContract.mint(`Name of the orb ${i}`, 0, 0, 0, 0, {
+                value: price,
+              });
+            }
+            await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
+              `ORBS__MAX_SUPPLY_REACHED(${maxSupplyMock})`,
+            );
+          });
+          it('signature not provided', async () => {
+            //
+          });
+          it('signature already used', async () => {
+            //
+          });
+          it('attribute index out of bounds (does not exist)', async () => {
+            //
+          });
+        });
+        //
+        // Should mint the correct amount of tokens
+        // Should increment the current token id
+        // Should set the correct owner
+        //
+        // Should create the correct orb (signature, attributes, expansionMultiplier, lastExpansionTimestamp, creationTimestamp, maxExpansionReached, tokenId)
+        // Should set the tokenURI with the right json metadata
+        //
+        // Should add the orb to the mapping
+        // Should add the signature to the array
+        //
+        // Should emit the correct event
       });
 
       /**
