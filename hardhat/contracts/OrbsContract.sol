@@ -74,6 +74,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     event ORBS__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
     event ORBS__PRICE_UPDATED(uint256 price);
     event ORBS__MINT_LIMIT_UPDATED(uint256 mintLimit);
+    event ORBS__CONTRACT_URI_UPDATED(string contractUri);
     // Mint
     event ORBS__MINTED(address owner, uint256 tokenId, string signature);
 
@@ -533,8 +534,12 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      */
     function setContractURI(string memory _contractUri) external onlyOwner {
         s_contractUri = _contractUri;
+
+        emit ORBS__CONTRACT_URI_UPDATED(_contractUri);
     }
 
+    /// @dev Notice the uppercased `URI` in the function name (for OpenSea to find it)
+    /// the rest of the contract prefers a lowercased `uri` / `xUri`
     function contractURI() public view returns (string memory) {
         return s_contractUri;
     }

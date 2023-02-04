@@ -6,7 +6,6 @@ const {
   symbol,
   price,
   mintLimit,
-  maxSupply,
   maxSupplyMock,
   description,
   externalUrl,
@@ -15,6 +14,7 @@ const {
   BASE_EXPANSE,
   MAX_EXPANSE,
   backgroundColor,
+  contractUri,
 } = require('../../helper-hardhat-config');
 const { deployments, network, ethers } = require('hardhat');
 
@@ -62,6 +62,10 @@ const { deployments, network, ethers } = require('hardhat');
           assert.equal(await orbsContract.getExternalUrl(), externalUrl);
           assert.equal(await orbsContract.getDescription(), description);
           assert.equal(await orbsContract.getAnimationUrl(), animationUrl);
+          assert.equal(
+            await orbsContract.contractURI(),
+            JSON.stringify(contractUri),
+          );
 
           // Systems
           assert.equal(
@@ -288,6 +292,10 @@ const { deployments, network, ethers } = require('hardhat');
           await expect(
             orbsContract.connect(user).setMintLimit(newMintLimit),
           ).to.be.revertedWith('Ownable: caller is not the owner');
+          // setContractURI
+          await expect(
+            orbsContract.connect(user).setContractURI('test'),
+          ).to.be.revertedWith('Ownable: caller is not the owner');
         });
       });
 
@@ -354,6 +362,16 @@ const { deployments, network, ethers } = require('hardhat');
             (await orbsContract.getMintLimit()).toString(),
             newMintLimit.toString(),
           );
+        });
+      });
+
+      describe('[dev functions] - setContractURI (OpenSea)', function() {
+        it('Should successfully update the contract URI and emit the correct event', async () => {
+          await expect(await orbsContract.setContractURI('test'))
+            .to.emit(orbsContract, 'ORBS__CONTRACT_URI_UPDATED')
+            .withArgs('test');
+
+          assert.equal(await orbsContract.getContractURI(), 'test');
         });
       });
     });
