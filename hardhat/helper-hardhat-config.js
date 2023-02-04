@@ -57,6 +57,21 @@ const backgroundColor = 101010;
 const externalUrl = 'https://makesuretofinishwithslash/';
 const animationUrl = 'https://samehere/';
 
+// OpenSea
+const feeRecipient = {
+  prod: '0x8e2c250A85D97c94405471C261BF28feC5D6b0c9',
+  test: '0x8e2c250A85D97c94405471C261BF28feC5D6b0c9',
+};
+
+const contractUri = {
+  name,
+  description,
+  image: '',
+  external_link: '',
+  seller_fee_basis_points: 1000,
+  fee_recipient: feeRecipient.prod,
+};
+
 // Systems
 const expansionCooldown = 60 * 60 * 24;
 
@@ -76,7 +91,9 @@ module.exports = {
   backgroundColor,
   externalUrl,
   animationUrl,
+  contractUri,
   expansionCooldown,
   BASE_EXPANSION,
   MAX_EXPANSION,
+  feeRecipient,
 };

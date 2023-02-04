@@ -7,10 +7,12 @@ const {
   backgroundColor,
   externalUrl,
   animationUrl,
+  contractUri,
   price,
   mintLimit,
   maxSupply,
   maxSupplyMock,
+  feeRecipient,
 } = require('../helper-hardhat-config');
 const { verify } = require('../utils/verify');
 
@@ -26,6 +28,12 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     animationUrl,
     description,
     externalUrl,
+    JSON.stringify({
+      ...contractUri,
+      fee_recipient: developmentChains.includes(network.name)
+        ? feeRecipient.test
+        : feeRecipient.prod,
+    }),
     backgroundColor,
     expansionCooldown,
     [
