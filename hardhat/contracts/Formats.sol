@@ -130,6 +130,7 @@ library Formats {
     ) internal pure returns (string memory) {
         string
             memory svg = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 500 500">';
+
         svg = string(
             abi.encodePacked(
                 svg,
@@ -138,38 +139,20 @@ library Formats {
                 '"/>'
             )
         );
-        svg = string(
-            abi.encodePacked(
-                svg,
-                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#fff">',
-                _attributes[0],
-                "</text>"
-            )
-        );
-        svg = string(
-            abi.encodePacked(
-                svg,
-                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#fff">',
-                _attributes[1],
-                "</text>"
-            )
-        );
-        svg = string(
-            abi.encodePacked(
-                svg,
-                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#fff">',
-                _attributes[2],
-                "</text>"
-            )
-        );
-        svg = string(
-            abi.encodePacked(
-                svg,
-                '<text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#fff">',
-                _attributes[3],
-                "</text>"
-            )
-        );
+
+        for (uint8 i = 0; i < 4; i++) {
+            uint256 y = i * 20 + 20;
+            svg = string(
+                abi.encodePacked(
+                    svg,
+                    '<text x="50%" y="',
+                    y.toString(),
+                    '%" dominant-baseline="middle" text-anchor="middle" font-size="25" font-family="monospace" fill="#fff">',
+                    _attributes[i],
+                    "</text>"
+                )
+            );
+        }
         svg = string(abi.encodePacked(svg, "</svg>"));
 
         return (
