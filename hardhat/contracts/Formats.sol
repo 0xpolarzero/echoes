@@ -71,7 +71,7 @@ library Formats {
         );
 
         bytes memory dataC = abi.encodePacked(
-            '{"trait_type":"Generation","value":"',
+            '{"display_type":"date","trait_type":"Generation","value":"',
             _creationTimestamp.toString(),
             '"}',
             ","
@@ -108,7 +108,7 @@ library Formats {
             '{"trait_type":"Expansion","value":"',
             _expansion.toString(),
             '"},',
-            '{"trait_type":"Last Expanse","value":"',
+            '{"display_type":"date","trait_type":"Last Expanse","value":"',
             _lastExpansionTimestamp.toString(),
             '"},',
             '{"trait_type":"Maxed","value":"',
