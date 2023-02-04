@@ -106,14 +106,15 @@ const { deployments, network, ethers } = require('hardhat');
             ).to.be.revertedWith(`ORBS__INVALID_PRICE(${0}, ${price})`);
           });
           it('mint limit reached', async () => {
-            const newLimit = 0;
+            const newLimit = 1;
             await orbsContract.setMintLimit(newLimit);
+            await orbsContractUser.mint(...args);
             await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
               `ORBS__MINT_LIMIT_REACHED(${newLimit})`,
             );
+            await orbsContract.setMintLimit(mintLimit); // during unit tests is set to 10 instead of 1000
           });
           it('max supply reached', async () => {
-            await orbsContract.setMintLimit(maxSupplyMock); // during unit tests is set to 10 instead of 1000
             for (let i = 0; i < maxSupplyMock; i++) {
               await orbsContract.mint(`Name of the orb ${i}`, 0, 0, 0, 0, {
                 value: price,
@@ -124,27 +125,97 @@ const { deployments, network, ethers } = require('hardhat');
             );
           });
           it('signature not provided', async () => {
-            //
+            await expect(
+              orbsContractUser.mint('', 0, 0, 0, 0, { value: price }),
+            ).to.be.revertedWith(
+              `ORBS__INVALID_ATTRIBUTE("Signature is empty")`,
+            );
           });
           it('signature already used', async () => {
-            //
+            await orbsContract.mint(...args);
+            await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
+              `ORBS__SIGNATURE_ALREADY_USED("${args[0]}")`,
+            );
           });
           it('attribute index out of bounds (does not exist)', async () => {
-            //
+            await expect(
+              orbsContractUser.mint('Name', attributes[0].length, 0, 0, 0, {
+                value: price,
+              }),
+            ).to.be.revertedWith(
+              `ORBS__INVALID_ATTRIBUTE("The attribute does not exist")`,
+            );
           });
         });
-        //
-        // Should mint the correct amount of tokens
-        // Should increment the current token id
-        // Should set the correct owner
-        //
-        // Should create the correct orb (signature, attributes, expansionMultiplier, lastExpansionTimestamp, creationTimestamp, maxExpansionReached, tokenId)
-        // Should set the tokenURI with the right json metadata
-        //
-        // Should add the orb to the mapping
-        // Should add the signature to the array
-        //
-        // Should emit the correct event
+
+        describe('Should successfully mint and update all storage states', function() {
+          const signature = 'Name of the orb';
+          const args = [signature, 0, 0, 0, 0, { value: price }];
+          const chosedAttributes = [
+            attributes[0][args[1]],
+            attributes[1][args[2]],
+            attributes[2][args[3]],
+            attributes[3][args[4]],
+          ];
+          let mintTx;
+
+          beforeEach(async () => {
+            const mint = await orbsContractUser.mint(...args);
+            mintTx = await mint.wait(1);
+          });
+
+          it('correct amount of tokens minted', async () => {
+            assert.equal(
+              (await orbsContract.balanceOf(user.address)).toString(),
+              '1',
+            );
+          });
+          it('current token id incremented', async () => {
+            assert.equal(
+              (await orbsContract.getCurrentTokenId()).toString(),
+              '1',
+            );
+          });
+          it('correct owner set', async () => {
+            assert.equal(await orbsContract.ownerOf(1), user.address);
+          });
+
+          it('correct orb created', async () => {
+            const orb = await orbsContract.getOrb(1);
+            const timestamp = (await mintTx.events[0].getBlock()).timestamp;
+
+            assert.equal(orb.signature, signature);
+            assert.equal(
+              orb.attributes.toString(),
+              chosedAttributes.toString(),
+            );
+            assert.equal(orb.expansionMultiplier.toString(), '1');
+            assert.equal(
+              orb.lastExpansionTimestamp.toString(),
+              timestamp.toString(),
+            );
+            assert.equal(
+              orb.creationTimestamp.toString(),
+              timestamp.toString(),
+            );
+            assert.equal(orb.maxExpansionReached, false);
+            assert.equal(orb.tokenId.toString(), '1');
+          });
+          // Should set the tokenURI with the right json metadata
+          it('correct tokenURI set', async () => {
+            const tokenURI = await orbsContract.tokenURI(1);
+            const decoded = Buffer.from(
+              tokenURI.split(',')[1],
+              'base64',
+            ).toString('ascii');
+            console.log(decoded);
+          });
+          //
+          // Should add the orb to the mapping
+          // Should add the signature to the array
+          //
+          // Should emit the correct event
+        });
       });
 
       /**
