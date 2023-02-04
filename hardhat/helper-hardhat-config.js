@@ -46,6 +46,7 @@ const attributes = [
 const name = 'Orbs';
 const symbol = 'ORBS';
 const maxSupply = 1_000;
+const maxSupplyMock = 10;
 const price = ethers.utils.parseEther('0.01');
 const mintLimit = 0;
 
@@ -61,7 +62,6 @@ const expansionCooldown = 60 * 60 * 24;
 
 const BASE_EXPANSION = 100;
 const MAX_EXPANSION = 10_000;
-const MAX_SUPPLY = 1_000;
 
 module.exports = {
   developmentChains,
@@ -69,6 +69,7 @@ module.exports = {
   name,
   symbol,
   maxSupply,
+  maxSupplyMock,
   price,
   mintLimit,
   description,
@@ -78,5 +79,4 @@ module.exports = {
   expansionCooldown,
   BASE_EXPANSION,
   MAX_EXPANSION,
-  MAX_SUPPLY,
 };
