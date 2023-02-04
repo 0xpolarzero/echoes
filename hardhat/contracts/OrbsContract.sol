@@ -32,11 +32,12 @@ contract OrbsContract is ERC721URIStorage, Ownable {
 
     /// Structs
     struct Orb {
+        address owner;
         // Base attributes
         string signature;
         string[] attributes; // spectrum, scenery, trace, atmosphere
         // Systems
-        uint256 expansionMultiplier; // will be incremented at each expanse
+        uint256 expansionRate; // will be incremented at each expanse
         uint256 lastExpansionTimestamp;
         uint256 creationTimestamp;
         bool maxExpanseReached; // if the expanse value is equal to the max expanse
@@ -130,14 +131,13 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         i_maxSupply = _base[2]; // Easier to set here than constant - for testing purpose
     }
 
-    // TODO public/external
     function mint(
         string memory _signature,
         uint256 _spectrumIndex,
         uint256 _sceneryIndex,
         uint256 _traceIndex,
         uint256 _atmosphereIndex
-    ) public payable {
+    ) external payable {
         // Increment the tokenId
         _tokenIds.increment();
 
@@ -175,9 +175,10 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         }
 
         Orb memory orb = Orb({
+            owner: msg.sender,
             signature: _signature,
             attributes: attributes,
-            expansionMultiplier: 1,
+            expansionRate: 1,
             lastExpansionTimestamp: block.timestamp,
             creationTimestamp: block.timestamp,
             maxExpanseReached: false,
@@ -187,12 +188,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         // Mint the token
         _safeMint(msg.sender, _tokenIds.current());
 
-        // Set the full token URI (concat both strings)
-        // string memory tokenUri = string.concat(
-        //     getTokenUri(orb),
-        //     getTokenUriUpdatable(orb, indexes)
-        // );
-        // _setTokenURI(_tokenIds.current(), tokenUri);
+        // Don't set the tokenURI here, it will be dynamically updated when queried
 
         // Update storage
         s_usedSignatures.push(_signature);
@@ -201,74 +197,8 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         emit ORBS__MINTED(orb);
     }
 
-    // Or maybe override function tokenURI(uint256 tokenId) public view virtual override returns (string memory)
-    // to just get both strings and concat them
-    function tokenURI(
-        uint256 _tokenId
-    )
-        public
-        view
-        override
-        returns (
-            // virtual
-            string memory
-        )
-    {
-        _requireMinted(_tokenId);
-
-        // string memory _tokenURI = _tokenURIs[_tokenId];
-        // string memory base = _baseURI();
-
-        // If there is no base URI, return the token URI.
-        // if (bytes(base).length == 0) {
-        //     return _tokenURI;
-        // }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-        Orb memory orb = s_orbs[_tokenId];
-        uint256[] memory indexes = new uint256[](4);
-        indexes[0] = getAttributeIndex(0, orb.attributes[0]);
-        indexes[1] = getAttributeIndex(1, orb.attributes[1]);
-        indexes[2] = getAttributeIndex(2, orb.attributes[2]);
-        indexes[3] = getAttributeIndex(3, orb.attributes[3]);
-
-        if (
-            bytes(
-                string.concat(
-                    getTokenUri(orb),
-                    getTokenUriUpdatable(orb, indexes)
-                )
-            ).length > 0
-        ) {
-            // Encode in base64 both parts of the URI
-            // This allows users to only update a limited part of the metadata
-            // Yet still have the full updated metadata available in the tokenURI
-            return
-                Formats.metadataEncode(
-                    getTokenUri(orb),
-                    getTokenUriUpdatable(orb, indexes)
-                );
-        }
-
-        return super.tokenURI(_tokenId);
-    }
-
-    function getAttributeIndex(
-        uint256 _type,
-        string memory _attribute
-    ) internal view returns (uint256) {
-        for (uint256 i = 0; i < s_attributes[_type].length; i++) {
-            if (
-                keccak256(abi.encodePacked(s_attributes[_type][i])) ==
-                keccak256(abi.encodePacked(_attribute))
-            ) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
     // TODO enhance/expand
-    function enhance(uint256 _tokenId) public {
+    function expand(uint256 _tokenId) public {
         // TODO check if the token exists
         // TODO check if the token is owned by the sender
         // TODO check if the token has been enhanced since x
@@ -281,54 +211,60 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     /// Getters
 
     /**
-     * @notice Get the token URI
-     * @param _orb The Orb struct populated with the new data
-     * @dev Builds the metadata for the collectible
-     * -> It will only return the metadata that won't be updated
-     * @return The token URI (string) in JSON format (ERC721 standard)
+     * @notice Get the token URI for the given tokenId
+     * @param _tokenId The tokenId of the orb
+     * @dev Override the ERC721 tokenURI function
+     * -> This will return the full token URI (concat both strings), with bothe the
+     * static and updatable parts
+     * -> The expanse will be updated with the current timestamp
+     * @return The full token URI in JSON (ERC721 standard)
      */
-    function getTokenUri(
-        Orb memory _orb
-    ) internal view returns (string memory) {
-        // Build the metadata in the ERC721 format
-        return (
-            Formats.metadataBase(
-                _orb.attributes,
-                _orb.signature,
-                i_description,
-                i_externalUrl,
-                i_backgroundColor,
-                _orb.creationTimestamp,
-                _orb.tokenId
-            )
+    function tokenURI(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
+        _requireMinted(_tokenId);
+
+        // Get the orb & attributes indexes
+        Orb memory orb = s_orbs[_tokenId];
+        uint256[] memory indexes = new uint256[](4);
+        indexes[0] = getAttributeIndex(0, orb.attributes[0]);
+        indexes[1] = getAttributeIndex(1, orb.attributes[1]);
+        indexes[2] = getAttributeIndex(2, orb.attributes[2]);
+        indexes[3] = getAttributeIndex(3, orb.attributes[3]);
+
+        // Get the base URI (non updatable)
+        string memory baseUri = Formats.metadataBase(
+            orb.attributes,
+            orb.signature,
+            i_description,
+            i_externalUrl,
+            i_backgroundColor,
+            orb.creationTimestamp,
+            orb.tokenId
         );
-    }
 
-    /**
-     * @notice Get the token URI updatable
-     * @param _orb The Orb struct populated with the new or fetched data
-     * @dev Builds the metadata for the collectible
-     * -> It will only return the metadata that will be updated
-     * @return The token URI (string) in JSON format (ERC721 standard)
-     */
-    function getTokenUriUpdatable(
-        Orb memory _orb,
-        uint256[] memory _indexes
-    ) internal view returns (string memory) {
         // Get the expanse (if not maxed)
-        uint256 expanse = _orb.maxExpanseReached
+        uint256 expanse = orb.maxExpanseReached
             ? MAX_EXPANSE
-            : getExpanse(_orb.tokenId);
+            : getExpanse(orb.tokenId);
 
-        // Build the metadata in the ERC721 format
-        return
-            Formats.metadataUpdatable(
-                i_animationUrl,
-                _indexes,
-                expanse,
-                _orb.lastExpansionTimestamp,
-                _orb.maxExpanseReached
-            );
+        // Get the updatable URI
+        string memory updatableUri = Formats.metadataUpdatable(
+            i_animationUrl,
+            indexes,
+            expanse,
+            orb.lastExpansionTimestamp,
+            orb.maxExpanseReached
+        );
+
+        if (bytes(baseUri).length > 0 && bytes(updatableUri).length > 0) {
+            // Encode in base64 both parts of the URI
+            // This allows users to only update a limited part of the metadata
+            // Yet still have the full updated metadata available in the tokenURI
+            return Formats.metadataEncode(baseUri, updatableUri);
+        }
+
+        return super.tokenURI(_tokenId);
     }
 
     /**
@@ -373,6 +309,26 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     }
 
     /**
+     *
+     * @param _type The type (index) of the attribute (0 = spectrum, 1 = scenery, 2 = trace, 3 = atmosphere)
+     * @param _attribute The attribute name (string)
+     */
+    function getAttributeIndex(
+        uint256 _type,
+        string memory _attribute
+    ) internal view returns (uint256) {
+        for (uint256 i = 0; i < s_attributes[_type].length; i++) {
+            if (
+                keccak256(abi.encodePacked(s_attributes[_type][i])) ==
+                keccak256(abi.encodePacked(_attribute))
+            ) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    /**
      * @notice Check the validity of a trait
      * @param _typeIndex The index in the mapping (to get the attributes)
      * @param _attributeIndex The index of the attribute to check
@@ -398,7 +354,10 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      */
     function getExpanse(uint256 _tokenId) public view returns (uint256) {
         // Calculate the expanse
-        uint256 expanse = s_orbs[_tokenId].expansionMultiplier * BASE_EXPANSE;
+        // = (base + expansionRate) * hours since creation
+        uint256 expanse = (BASE_EXPANSE + s_orbs[_tokenId].expansionRate) *
+            ((currentTimestamp() - s_orbs[_tokenId].creationTimestamp) /
+                1 hours);
 
         // If it reaches the max expanse, return the max expanse
         return expanse >= MAX_EXPANSE ? MAX_EXPANSE : expanse;
@@ -490,9 +449,9 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @notice Get the current date
+     * @notice Get the current timestamp
      */
-    function currentDate() internal view returns (uint256) {
+    function currentTimestamp() internal view returns (uint256) {
         return block.timestamp;
     }
 
