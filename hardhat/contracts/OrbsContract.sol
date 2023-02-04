@@ -19,7 +19,7 @@ error ORBS__INVALID_ATTRIBUTE(string message);
 // Dev functions
 error ORBS__NOT_OWNER(string message);
 // Mint
-error ORBS__WRONG_PRICE(uint256 value, uint256 price);
+error ORBS__INVALID_PRICE(uint256 value, uint256 price);
 error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
 error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
 error ORBS__SIGNATURE_ALREADY_USED(string signature);
@@ -45,12 +45,12 @@ contract OrbsContract is ERC721URIStorage {
     /// Constants
     uint256 private constant BASE_EXPANSION = 100;
     uint256 private constant MAX_EXPANSION = 10_000;
-    uint256 private constant MAX_SUPPLY = 1_000;
 
     /// Variables
     // Base
     address private immutable i_owner;
     uint256 private immutable i_creationTimestamp;
+    uint256 private immutable i_maxSupply; // 1_000
     uint256 private s_price;
     uint256 private s_mintLimit;
     // Metadata
@@ -106,8 +106,7 @@ contract OrbsContract is ERC721URIStorage {
         string memory _externalUrl,
         bytes3 _backgroundColor,
         uint256 _expansionCooldown,
-        uint256 _price,
-        uint256 _mintLimit
+        uint256[] memory _base // price, mintLimit, maxSupply
     ) ERC721("Orbs", "ORBS") {
         // Set attributes
         s_attributes[0] = _attributesSpectrum;
@@ -127,8 +126,9 @@ contract OrbsContract is ERC721URIStorage {
         // Set base
         i_owner = msg.sender;
         i_creationTimestamp = block.timestamp;
-        s_price = _price;
-        s_mintLimit = _mintLimit;
+        s_price = _base[0];
+        s_mintLimit = _base[1];
+        i_maxSupply = _base[2]; // Easier to set here than constant - for testing purpose
     }
 
     // TODO public/external
@@ -143,13 +143,16 @@ contract OrbsContract is ERC721URIStorage {
         _tokenIds.increment();
 
         // Check if enough value is sent
-        if (msg.value < s_price) revert ORBS__WRONG_PRICE(msg.value, s_price);
-        // Check if max supply is reached
-        if (_tokenIds.current() > MAX_SUPPLY)
-            revert ORBS__MAX_SUPPLY_REACHED(_tokenIds.current());
+        if (msg.value < s_price) revert ORBS__INVALID_PRICE(msg.value, s_price);
         // Check if the user has not reached the mint limit
         if (balanceOf(msg.sender) >= s_mintLimit)
             revert ORBS__MINT_LIMIT_REACHED(s_mintLimit);
+        // Check if max supply is reached
+        if (_tokenIds.current() > i_maxSupply)
+            revert ORBS__MAX_SUPPLY_REACHED(_tokenIds.current());
+        // Check if the signature is provided
+        if (bytes(_signature).length == 0)
+            revert ORBS__INVALID_ATTRIBUTE("Signature is empty");
         // Check if the signature is already used
         if (!isSignatureAvailable(_signature))
             revert ORBS__SIGNATURE_ALREADY_USED(_signature);
@@ -354,6 +357,13 @@ contract OrbsContract is ERC721URIStorage {
     }
 
     /**
+     * @notice Get the max supply
+     */
+    function getMaxSupply() public view returns (uint256) {
+        return i_maxSupply;
+    }
+
+    /**
      * @notice Get the expansion cooldown
      */
     function getExpansionCooldown() public view returns (uint256) {
@@ -428,13 +438,6 @@ contract OrbsContract is ERC721URIStorage {
      */
     function getMaxExpansion() public pure returns (uint256) {
         return MAX_EXPANSION;
-    }
-
-    /**
-     * @notice Get the max supply
-     */
-    function getMaxSupply() public pure returns (uint256) {
-        return MAX_SUPPLY;
     }
 
     /// Dev functions
