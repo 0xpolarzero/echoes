@@ -12,8 +12,9 @@ const {
   externalUrl,
   animationUrl,
   expansionCooldown,
-  BASE_EXPANSION,
-  MAX_EXPANSION,
+  BASE_EXPANSE,
+  MAX_EXPANSE,
+  backgroundColor,
 } = require('../../helper-hardhat-config');
 const { deployments, network, ethers } = require('hardhat');
 
@@ -79,11 +80,11 @@ const { deployments, network, ethers } = require('hardhat');
           // Constants
           assert.equal(
             (await orbsContract.getBaseExpansion()).toString(),
-            BASE_EXPANSION.toString(),
+            BASE_EXPANSE.toString(),
           );
           assert.equal(
             (await orbsContract.getMaxExpansion()).toString(),
-            MAX_EXPANSION.toString(),
+            MAX_EXPANSE.toString(),
           );
           assert.equal(
             (await orbsContract.getMaxSupply()).toString(),
@@ -157,11 +158,12 @@ const { deployments, network, ethers } = require('hardhat');
             attributes[2][args[3]],
             attributes[3][args[4]],
           ];
-          let mintTx;
+          let timestamp;
 
           beforeEach(async () => {
             const mint = await orbsContractUser.mint(...args);
-            mintTx = await mint.wait(1);
+            const mintTx = await mint.wait(1);
+            timestamp = (await mintTx.events[0].getBlock()).timestamp;
           });
 
           it('correct amount of tokens minted', async () => {
@@ -182,7 +184,6 @@ const { deployments, network, ethers } = require('hardhat');
 
           it('correct orb created', async () => {
             const orb = await orbsContract.getOrb(1);
-            const timestamp = (await mintTx.events[0].getBlock()).timestamp;
 
             assert.equal(orb.signature, signature);
             assert.equal(
@@ -198,19 +199,20 @@ const { deployments, network, ethers } = require('hardhat');
               orb.creationTimestamp.toString(),
               timestamp.toString(),
             );
-            assert.equal(orb.maxExpansionReached, false);
+            assert.equal(orb.maxExpanseReached, false);
             assert.equal(orb.tokenId.toString(), '1');
           });
-          // Should set the tokenURI with the right json metadata
           it('correct tokenURI set', async () => {
             const tokenURI = await orbsContract.tokenURI(1);
             const decoded = Buffer.from(
               tokenURI.split(',')[1],
               'base64',
             ).toString('ascii');
-            console.log(decoded);
+            const json = JSON.parse(decoded);
+
+            // See at the bottom of the file for the full test
+            testTokenUri(json, 1, chosedAttributes, signature, timestamp);
           });
-          //
           // Should add the orb to the mapping
           // Should add the signature to the array
           //
@@ -327,3 +329,61 @@ const { deployments, network, ethers } = require('hardhat');
         });
       });
     });
+
+const testTokenUri = (
+  json,
+  tokenId,
+  chosenAttributes,
+  signature,
+  timestamp,
+) => {
+  // Base
+  assert.equal(json.description, description, 'description');
+  assert.equal(json.name, signature, 'name');
+  // We can't really test the SVG here, so we just check if it exists
+  assert(json.image_data.includes('data:image/svg+xml;base64,'), 'image_data');
+  assert.equal(json.external_url, externalUrl + tokenId, 'external_url');
+  assert.equal(json.background_color, backgroundColor, 'background_color');
+
+  // Animation url
+  const expectedAnimationUrl = `${animationUrl}&0=${attributes[0].indexOf(
+    chosenAttributes[0],
+  )}&1=${attributes[1].indexOf(chosenAttributes[1])}&2=${attributes[2].indexOf(
+    chosenAttributes[2],
+  )}&3=${attributes[3].indexOf(chosenAttributes[3])}&4=${BASE_EXPANSE}`;
+  assert.equal(json.animation_url, expectedAnimationUrl, 'animation_url');
+
+  // Attributes
+  const attributesTypes = [
+    'Spectrum',
+    'Scenery',
+    'Trace',
+    'Atmosphere',
+    'Generation',
+    'Expanse',
+    'Last Expansion',
+    'Max Expanse',
+  ];
+  const attributesValues = [
+    ...chosenAttributes,
+    timestamp.toString(),
+    BASE_EXPANSE,
+    timestamp.toString(),
+    'false',
+  ];
+
+  for (let i = 0; i < attributesValues.length; i++) {
+    // Type
+    assert.equal(
+      json.attributes[i].trait_type,
+      attributesTypes[i],
+      `trait_type ${attributesTypes[i]}`,
+    );
+    // Value
+    assert.equal(
+      json.attributes[i].value,
+      attributesValues[i],
+      `value ${attributesTypes[i]}`,
+    );
+  }
+};
