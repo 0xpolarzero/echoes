@@ -92,13 +92,13 @@ library Formats {
             abi.encodePacked(
                 _animationUrl,
                 "&0=",
-                _attributesIndexes[0],
+                _attributesIndexes[0].toString(),
                 "&1=",
-                _attributesIndexes[1],
+                _attributesIndexes[1].toString(),
                 "&2=",
-                _attributesIndexes[2],
+                _attributesIndexes[2].toString(),
                 "&3=",
-                _attributesIndexes[3],
+                _attributesIndexes[3].toString(),
                 "&4=",
                 _expansion.toString()
             )
@@ -112,7 +112,7 @@ library Formats {
             _lastExpansionTimestamp.toString(),
             '"},',
             '{"trait_type":"Maxed","value":"',
-            _maxExpansionReached,
+            _maxExpansionReached ? "true" : "false",
             '"}',
             "],",
             '"animation_url":"',
