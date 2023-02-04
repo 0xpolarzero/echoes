@@ -371,7 +371,7 @@ const { deployments, network, ethers } = require('hardhat');
             .to.emit(orbsContract, 'ORBS__CONTRACT_URI_UPDATED')
             .withArgs('test');
 
-          assert.equal(await orbsContract.getContractURI(), 'test');
+          assert.equal(await orbsContract.contractURI(), 'test');
         });
       });
     });
