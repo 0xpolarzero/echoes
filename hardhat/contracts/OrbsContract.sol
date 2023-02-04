@@ -397,14 +397,12 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      * @param _tokenId The tokenId uint of the orb
      */
     function getExpansion(uint256 _tokenId) public view returns (uint256) {
-        uint256 maxExpansion = getMaxExpansion();
         // Calculate the expansion
-        uint256 expansion = s_orbs[_tokenId].expansionMultiplier * maxExpansion;
+        uint256 expansion = s_orbs[_tokenId].expansionMultiplier *
+            BASE_EXPANSION;
 
         // If it reaches the max expansion, return the max expansion
-        if (expansion >= maxExpansion) return maxExpansion;
-
-        return expansion;
+        return expansion >= MAX_EXPANSION ? MAX_EXPANSION : expansion;
     }
 
     /**
