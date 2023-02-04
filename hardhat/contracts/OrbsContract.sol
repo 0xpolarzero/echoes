@@ -77,7 +77,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     event ORBS__PRICE_UPDATED(uint256 price);
     event ORBS__MINT_LIMIT_UPDATED(uint256 mintLimit);
     // Mint
-    event ORBS__MINTED(Orb orb);
+    event ORBS__MINTED(address owner, uint256 tokenId, string signature);
 
     /**
      * @notice Constructor
@@ -194,7 +194,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         s_usedSignatures.push(_signature);
         s_orbs[_tokenIds.current()] = orb;
 
-        emit ORBS__MINTED(orb);
+        emit ORBS__MINTED(msg.sender, _tokenIds.current(), _signature);
     }
 
     // TODO enhance/expand
@@ -273,7 +273,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      */
     function isSignatureAvailable(
         string memory _signature
-    ) internal view returns (bool) {
+    ) public view returns (bool) {
         string[] memory usedSignatures = s_usedSignatures;
 
         for (uint256 i = 0; i < usedSignatures.length; i++) {
@@ -354,8 +354,9 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      */
     function getExpanse(uint256 _tokenId) public view returns (uint256) {
         // Calculate the expanse
-        // = (base + expansionRate) * hours since creation
-        uint256 expanse = (BASE_EXPANSE + s_orbs[_tokenId].expansionRate) *
+        // = base + (base + expansionRate) * hours since creation
+        uint256 expanse = BASE_EXPANSE +
+            (BASE_EXPANSE + s_orbs[_tokenId].expansionRate) *
             ((currentTimestamp() - s_orbs[_tokenId].creationTimestamp) /
                 1 hours);
 
