@@ -58,6 +58,7 @@ contract OrbsContract is ERC721URIStorage {
     string private i_description;
     string private i_externalUrl;
     string private i_animationUrl;
+    string private s_contractUri;
     // Systems
     uint256 private s_expansionCooldown;
 
@@ -104,6 +105,7 @@ contract OrbsContract is ERC721URIStorage {
         string memory _animationUrl,
         string memory _description,
         string memory _externalUrl,
+        string memory _contractUri,
         uint256 _backgroundColor,
         uint256 _expansionCooldown,
         uint256[] memory _base // price, mintLimit, maxSupply
@@ -119,6 +121,9 @@ contract OrbsContract is ERC721URIStorage {
         i_animationUrl = _animationUrl;
         i_description = _description;
         i_backgroundColor = _backgroundColor;
+
+        // Contract URI (OpenSea)
+        s_contractUri = _contractUri;
 
         // Set systems
         s_expansionCooldown = _expansionCooldown;
@@ -572,5 +577,16 @@ contract OrbsContract is ERC721URIStorage {
         s_mintLimit = _mintLimit;
 
         emit ORBS__MINT_LIMIT_UPDATED(_mintLimit);
+    }
+
+    /**
+     * OpenSea
+     */
+    function setContractURI(string memory _contractUri) external onlyOwner {
+        s_contractUri = _contractUri;
+    }
+
+    function contractURI() public view returns (string memory) {
+        return s_contractUri;
     }
 }
