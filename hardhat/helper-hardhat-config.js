@@ -53,7 +53,7 @@ const mintLimit = 0;
 // Base metadata
 const description =
   'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';
-const backgroundColor = '0x101010';
+const backgroundColor = 101010;
 const externalUrl = 'https://makesuretofinishwithslash/';
 const animationUrl = 'https://samehere/';
 
