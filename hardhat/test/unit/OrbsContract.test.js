@@ -152,7 +152,7 @@ const { deployments, network, ethers } = require('hardhat');
         describe('Should successfully mint and update all storage states', function() {
           const signature = 'Name of the orb';
           const args = [signature, 0, 0, 0, 0, { value: price }];
-          const chosedAttributes = [
+          const chosenAttributes = [
             attributes[0][args[1]],
             attributes[1][args[2]],
             attributes[2][args[3]],
@@ -188,9 +188,9 @@ const { deployments, network, ethers } = require('hardhat');
             assert.equal(orb.signature, signature);
             assert.equal(
               orb.attributes.toString(),
-              chosedAttributes.toString(),
+              chosenAttributes.toString(),
             );
-            assert.equal(orb.expansionMultiplier.toString(), '1');
+            assert.equal(orb.expansionRate.toString(), '1');
             assert.equal(
               orb.lastExpansionTimestamp.toString(),
               timestamp.toString(),
@@ -211,12 +211,46 @@ const { deployments, network, ethers } = require('hardhat');
             const json = JSON.parse(decoded);
 
             // See at the bottom of the file for the full test
-            testTokenUri(json, 1, chosedAttributes, signature, timestamp);
+            testTokenUri(json, 1, chosenAttributes, signature, timestamp);
           });
           // Should add the orb to the mapping
-          // Should add the signature to the array
-          //
-          // Should emit the correct event
+          it('correct orbs mapping set', async () => {
+            const orb = await orbsContract.getOrb('1');
+
+            assert.equal(orb.tokenId.toString(), '1');
+            assert.equal(orb.owner, user.address);
+            assert.equal(orb.signature, signature);
+            assert.equal(
+              orb.attributes.toString(),
+              chosenAttributes.toString(),
+            );
+            assert.equal(orb.expansionRate.toString(), '1');
+            assert.equal(
+              orb.lastExpansionTimestamp.toString(),
+              timestamp.toString(),
+            );
+            assert.equal(
+              orb.creationTimestamp.toString(),
+              timestamp.toString(),
+            );
+            assert.equal(orb.maxExpanseReached, false);
+          });
+
+          it('correct signature added to the array', async () => {
+            const isAvailable = await orbsContract.isSignatureAvailable(
+              signature,
+            );
+            assert(!isAvailable);
+          });
+
+          it('correct event emitted', async () => {
+            const newSignature = 'Other name';
+            await expect(
+              orbsContractUser.mint(newSignature, 0, 0, 0, 0, { value: price }),
+            )
+              .to.emit(orbsContract, 'ORBS__MINTED')
+              .withArgs(user.address, 2, newSignature);
+          });
         });
       });
 
