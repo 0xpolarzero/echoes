@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // Import formatting functions
 import "./Formats.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @title Orbs contract
  * @notice This contract is used to interact with orbs
@@ -23,9 +25,10 @@ error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
 error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
 error ORBS__SIGNATURE_ALREADY_USED(string signature);
 // Expand
+error ORBS__DOES_NOT_EXIST(uint256 tokenId);
 error ORBS__NOT_OWNER(address owner, address caller);
-error ORBS__MAX_EXPANSE_REACHED(uint256 tokenId);
-error ORBS__EXPANSION_COOLDOWN(
+error ORBS__MAX_EXPANSION_REACHED(uint256 tokenId);
+error ORBS__IN_EXPANSION_COOLDOWN(
     uint256 cooldown,
     uint256 lastExpansionTimestamp
 );
@@ -45,13 +48,13 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         uint256 expansionRate; // will be incremented at each expanse
         uint256 lastExpansionTimestamp;
         uint256 creationTimestamp;
-        bool maxExpanseReached; // if the expanse value is equal to the max expanse
+        bool maxExpansionReached; // if the expanse value is equal to the max expanse
         uint256 tokenId;
     }
 
     /// Constants
     uint256 private constant BASE_EXPANSE = 100;
-    uint256 private constant MAX_EXPANSE = 10_000;
+    uint256 private constant MAX_EXPANSION = 10_000;
 
     /// Variables
     // Base
@@ -74,6 +77,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     /// Mappings
     mapping(uint256 => Orb) private s_orbs; // tokenId => Orb
     mapping(uint256 => string[]) private s_attributes; // typeIndex => attributes
+    mapping(uint256 => uint256) private s_creationBlocks; // tokenId => blockNumber
 
     /// Events
     // Dev functions
@@ -84,6 +88,8 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     event ORBS__CONTRACT_URI_UPDATED(string contractUri);
     // Mint
     event ORBS__MINTED(address owner, uint256 tokenId, string signature);
+    // Expand
+    event ORBS__EXPANDED(address owner, uint256 tokenId, string signature);
 
     /**
      * @notice Constructor
@@ -185,9 +191,9 @@ contract OrbsContract is ERC721URIStorage, Ownable {
             signature: _signature,
             attributes: attributes,
             expansionRate: 1,
-            lastExpansionTimestamp: block.timestamp,
-            creationTimestamp: block.timestamp,
-            maxExpanseReached: false,
+            lastExpansionTimestamp: currentTimestamp(),
+            creationTimestamp: currentTimestamp(),
+            maxExpansionReached: false,
             tokenId: _tokenIds.current()
         });
 
@@ -199,31 +205,32 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         // Update storage
         s_usedSignatures.push(_signature);
         s_orbs[_tokenIds.current()] = orb;
+        s_creationBlocks[_tokenIds.current()] = block.number;
 
         emit ORBS__MINTED(msg.sender, _tokenIds.current(), _signature);
     }
 
     function expand(uint256 _tokenId) public {
-        // TODO write to s_orbs
-        // TODO emit event
+        // Check if the orb exists
+        if (!_exists(_tokenId)) revert ORBS__DOES_NOT_EXIST(_tokenId);
 
         Orb memory orb = s_orbs[_tokenId];
 
         // Check if the caller is the owner
         if (msg.sender != orb.owner)
             revert ORBS__NOT_OWNER(orb.owner, msg.sender);
-        // Check if the orb has not reached the max expansion
-        if (orb.maxExpanseReached)
-            revert ORBS__MAX_EXPANSE_REACHED(orb.tokenId);
         // Check if the expansion cooldown is over
         if (
             currentTimestamp() - orb.lastExpansionTimestamp <
             s_expansionCooldown
         )
-            revert ORBS__EXPANSION_COOLDOWN(
+            revert ORBS__IN_EXPANSION_COOLDOWN(
                 s_expansionCooldown,
                 orb.lastExpansionTimestamp
             );
+        // Check if the orb has not reached the max expansion
+        if (orb.maxExpansionReached)
+            revert ORBS__MAX_EXPANSION_REACHED(orb.tokenId);
 
         // Update the last expansion timestamp
         orb.lastExpansionTimestamp = currentTimestamp();
@@ -231,11 +238,13 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         // Update the expansion rate
         orb.expansionRate = orb.expansionRate + 1;
 
-        // Update the maxExpanseReached if needed
-        if (getExpanse(orb.tokenId) == MAX_EXPANSE)
-            orb.maxExpanseReached = true;
+        // Update the maxExpansionReached if needed
+        if (getExpanse(orb.tokenId) == MAX_EXPANSION)
+            orb.maxExpansionReached = true;
 
         s_orbs[_tokenId] = orb;
+
+        emit ORBS__EXPANDED(orb.owner, orb.tokenId, orb.signature);
     }
 
     /// Getters
@@ -274,8 +283,8 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         );
 
         // Get the expanse (if not maxed)
-        uint256 expanse = orb.maxExpanseReached
-            ? MAX_EXPANSE
+        uint256 expanse = orb.maxExpansionReached
+            ? MAX_EXPANSION
             : getExpanse(orb.tokenId);
 
         // Get the updatable URI
@@ -284,7 +293,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
             indexes,
             expanse,
             orb.lastExpansionTimestamp,
-            orb.maxExpanseReached
+            orb.maxExpansionReached
         );
 
         if (bytes(baseUri).length > 0 && bytes(updatableUri).length > 0) {
@@ -380,18 +389,20 @@ contract OrbsContract is ERC721URIStorage, Ownable {
 
     /**
      * @notice Get the expanse of the orb
-     * @param _tokenId The tokenId uint of the orb
+     * @param _tokenId The tokenId of the orb
+     * @dev It could be adapted to read from the tokenId, but it would force to read from storage
+     * -> This way it could be fetched from outside the contract more easily as well
      */
     function getExpanse(uint256 _tokenId) public view returns (uint256) {
+        // Get the creation block
+        uint256 creationBlock = s_creationBlocks[_tokenId];
         // Calculate the expanse
-        // = base + (base + expansionRate) * hours since creation
         uint256 expanse = BASE_EXPANSE +
-            (BASE_EXPANSE + s_orbs[_tokenId].expansionRate) *
-            ((currentTimestamp() - s_orbs[_tokenId].creationTimestamp) /
-                1 hours);
+            s_orbs[_tokenId].expansionRate *
+            ((currentBlockNumber() - creationBlock) / 100); // (~+66 per day)
 
         // If it reaches the max expanse, return the max expanse
-        return expanse >= MAX_EXPANSE ? MAX_EXPANSE : expanse;
+        return expanse >= MAX_EXPANSION ? MAX_EXPANSION : expanse;
     }
 
     /**
@@ -400,6 +411,15 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      */
     function getOrb(uint256 _tokenId) public view returns (Orb memory) {
         return s_orbs[_tokenId];
+    }
+
+    /**
+     * @notice Get the creation block number of an orb
+     */
+    function getOrbCreationBlock(
+        uint256 _tokenId
+    ) public view returns (uint256) {
+        return s_creationBlocks[_tokenId];
     }
 
     /**
@@ -487,6 +507,13 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     }
 
     /**
+     * @notice Get the current block number
+     */
+    function currentBlockNumber() internal view returns (uint256) {
+        return block.number;
+    }
+
+    /**
      * @notice Get the base expanse
      */
     function getBaseExpanse() public pure returns (uint256) {
@@ -496,8 +523,8 @@ contract OrbsContract is ERC721URIStorage, Ownable {
     /**
      * @notice Get the max expanse
      */
-    function getMaxExpanse() public pure returns (uint256) {
-        return MAX_EXPANSE;
+    function getMaxExpansion() public pure returns (uint256) {
+        return MAX_EXPANSION;
     }
 
     /// Dev functions
