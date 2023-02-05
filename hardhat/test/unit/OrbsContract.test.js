@@ -12,11 +12,12 @@ const {
   animationUrl,
   expansionCooldown,
   BASE_EXPANSE,
-  MAX_EXPANSE,
+  MAX_EXPANSION,
   backgroundColor,
   contractUri,
 } = require('../../helper-hardhat-config');
 const { deployments, network, ethers } = require('hardhat');
+const mineBlocks = require('../../scripts/mineBlocks');
 
 !developmentChains.includes(network.name)
   ? describe.skip
@@ -87,8 +88,8 @@ const { deployments, network, ethers } = require('hardhat');
             BASE_EXPANSE.toString(),
           );
           assert.equal(
-            (await orbsContract.getMaxExpanse()).toString(),
-            MAX_EXPANSE.toString(),
+            (await orbsContract.getMaxExpansion()).toString(),
+            MAX_EXPANSION.toString(),
           );
           assert.equal(
             (await orbsContract.getMaxSupply()).toString(),
@@ -203,7 +204,7 @@ const { deployments, network, ethers } = require('hardhat');
               orb.creationTimestamp.toString(),
               timestamp.toString(),
             );
-            assert.equal(orb.maxExpanseReached, false);
+            assert.equal(orb.maxExpansionReached, false);
             assert.equal(orb.tokenId.toString(), '1');
           });
           it('correct tokenURI set', async () => {
@@ -237,7 +238,7 @@ const { deployments, network, ethers } = require('hardhat');
               orb.creationTimestamp.toString(),
               timestamp.toString(),
             );
-            assert.equal(orb.maxExpanseReached, false);
+            assert.equal(orb.maxExpansionReached, false);
           });
 
           it('correct signature added to the array', async () => {
@@ -261,9 +262,9 @@ const { deployments, network, ethers } = require('hardhat');
       /**
        * @notice Expand
        */
-      describe('Expand', function() {
+      describe.only('Expand', function() {
         beforeEach(async () => {
-          await orbsContract.mint('Name of the orb', 0, 0, 0, 0, {
+          await orbsContractUser.mint('Name of the orb', 0, 0, 0, 0, {
             value: price,
           });
         });
@@ -273,15 +274,50 @@ const { deployments, network, ethers } = require('hardhat');
         // ! In report see what's more efficient
 
         describe('Should revert if any verification fails', function() {
-          // Not owner or token does not exist (same error)
-          // Not enough time has passed
-          // Max expansion reached
+          it("doesn't exist", async () => {
+            await expect(orbsContractUser.expand(2)).to.be.revertedWith(
+              "'ORBS__DOES_NOT_EXIST(2)'",
+            );
+          });
+          it('not owner', async () => {
+            const expectedOwner = await orbsContract.ownerOf(1);
+
+            await expect(orbsContract.expand(1)).to.be.revertedWith(
+              `'ORBS__NOT_OWNER("${expectedOwner}", "${deployer.address}")'`,
+            );
+          });
+          it('in expansion cooldown', async () => {
+            const lastExpansionTimestamp = (await orbsContract.getOrb(1))
+              .lastExpansionTimestamp;
+
+            await expect(orbsContractUser.expand(1)).to.be.revertedWith(
+              `'ORBS__IN_EXPANSION_COOLDOWN(${expansionCooldown}, ${lastExpansionTimestamp})'`,
+            );
+          });
+          it('max expansion reached', async () => {
+            await orbsContract.setExpansionCooldown(0);
+            // Pass two days to get a higher multiplier
+            const twoDaysInBlocks = (2 * 24 * 60 * 60) / 13;
+            await mineBlocks(twoDaysInBlocks);
+
+            let reached;
+            // Expand until max expansion reached
+            while (!reached) {
+              await orbsContractUser.expand(1);
+              reached = (await orbsContract.getOrb(1)).maxExpansionReached;
+            }
+
+            // Try to expand again
+            await expect(orbsContractUser.expand(1)).to.be.revertedWith(
+              `'ORBS__MAX_EXPANSION_REACHED(1)'`,
+            );
+          });
         });
 
         describe('Should successfully expand and update all storage states', function() {
           // Correct expansionRate
           // Correct lastExpansionTimestamp
-          // Correct maxExpanseReached if needed
+          // Correct maxExpansionReached if needed
           // Correct event emitted
           // Correct tokenURI when we get it after expansion
         });
