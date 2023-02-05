@@ -262,7 +262,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
       /**
        * @notice Expand
        */
-      describe.only('Expand', function() {
+      describe('Expand', function() {
         beforeEach(async () => {
           await orbsContractUser.mint('Name of the orb', 0, 0, 0, 0, {
             value: price,
