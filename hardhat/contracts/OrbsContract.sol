@@ -9,8 +9,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // Import formatting functions
 import "./Formats.sol";
 
-import "hardhat/console.sol";
-
 /**
  * @title Orbs contract
  * @notice This contract is used to interact with orbs

@@ -269,10 +269,6 @@ const mineBlocks = require('../../scripts/mineBlocks');
           });
         });
 
-        // ! Test between setting on memory orb then updating state
-        // ! or setting directly on storage
-        // ! In report see what's more efficient
-
         describe('Should revert if any verification fails', function() {
           it("doesn't exist", async () => {
             await expect(orbsContractUser.expand(2)).to.be.revertedWith(
