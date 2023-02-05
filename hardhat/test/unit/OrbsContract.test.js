@@ -315,11 +315,37 @@ const mineBlocks = require('../../scripts/mineBlocks');
         });
 
         describe('Should successfully expand and update all storage states', function() {
-          // Correct expansionRate
-          // Correct lastExpansionTimestamp
-          // Correct maxExpansionReached if needed
+          // maxExpansionReached is correctly set considering the previous test
+          it('correct expansionRate', async () => {
+            await orbsContract.setExpansionCooldown(0);
+            const expansionRate = (await orbsContract.getOrb(1)).expansionRate;
+            await orbsContractUser.expand(1);
+            const newExpansionRate = (await orbsContract.getOrb(1))
+              .expansionRate;
+
+            assert.equal(newExpansionRate.toString(), expansionRate.add(1));
+          });
+          it('correct lastExpansionTimestamp', async () => {
+            await orbsContract.setExpansionCooldown(0);
+            const tx = await orbsContractUser.expand(1);
+            const receipt = await tx.wait(1);
+            const lastExpansionTimestamp = (await orbsContract.getOrb(1))
+              .lastExpansionTimestamp;
+
+            assert.equal(
+              lastExpansionTimestamp.toString(),
+              (await receipt.events[0].getBlock()).timestamp.toString(),
+            );
+          });
           // Correct event emitted
-          // Correct tokenURI when we get it after expansion
+          it('correct event emitted', async () => {
+            await orbsContract.setExpansionCooldown(0);
+            const signature = (await orbsContract.getOrb(1)).signature;
+
+            await expect(orbsContractUser.expand(1))
+              .to.emit(orbsContract, 'ORBS__EXPANDED')
+              .withArgs(user.address, 1, signature);
+          });
         });
       });
 
