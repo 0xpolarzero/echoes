@@ -22,6 +22,13 @@ error ORBS__INVALID_PRICE(uint256 value, uint256 price);
 error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
 error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
 error ORBS__SIGNATURE_ALREADY_USED(string signature);
+// Expand
+error ORBS__NOT_OWNER(address owner, address caller);
+error ORBS__MAX_EXPANSE_REACHED(uint256 tokenId);
+error ORBS__EXPANSION_COOLDOWN(
+    uint256 cooldown,
+    uint256 lastExpansionTimestamp
+);
 
 contract OrbsContract is ERC721URIStorage, Ownable {
     /// Libs
@@ -196,15 +203,39 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         emit ORBS__MINTED(msg.sender, _tokenIds.current(), _signature);
     }
 
-    // TODO enhance/expand
     function expand(uint256 _tokenId) public {
-        // TODO check if the token exists
-        // TODO check if the token is owned by the sender
-        // TODO check if the token has been enhanced since x
-        // TODO check max expansion
         // TODO write to s_orbs
-        // TODO only do setTokenURIUpdatable
-        // TODO emit MetadataUpdate(uint256 _tokenId) (for OpenSea)
+        // TODO emit event
+
+        Orb memory orb = s_orbs[_tokenId];
+
+        // Check if the caller is the owner
+        if (msg.sender != orb.owner)
+            revert ORBS__NOT_OWNER(orb.owner, msg.sender);
+        // Check if the orb has not reached the max expansion
+        if (orb.maxExpanseReached)
+            revert ORBS__MAX_EXPANSE_REACHED(orb.tokenId);
+        // Check if the expansion cooldown is over
+        if (
+            currentTimestamp() - orb.lastExpansionTimestamp <
+            s_expansionCooldown
+        )
+            revert ORBS__EXPANSION_COOLDOWN(
+                s_expansionCooldown,
+                orb.lastExpansionTimestamp
+            );
+
+        // Update the last expansion timestamp
+        orb.lastExpansionTimestamp = currentTimestamp();
+
+        // Update the expansion rate
+        orb.expansionRate = orb.expansionRate + 1;
+
+        // Update the maxExpanseReached if needed
+        if (getExpanse(orb.tokenId) == MAX_EXPANSE)
+            orb.maxExpanseReached = true;
+
+        s_orbs[_tokenId] = orb;
     }
 
     /// Getters

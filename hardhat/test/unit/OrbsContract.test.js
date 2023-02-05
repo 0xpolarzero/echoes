@@ -261,7 +261,31 @@ const { deployments, network, ethers } = require('hardhat');
       /**
        * @notice Expand
        */
-      // describe('Expand', function() {
+      describe('Expand', function() {
+        beforeEach(async () => {
+          await orbsContract.mint('Name of the orb', 0, 0, 0, 0, {
+            value: price,
+          });
+        });
+
+        // ! Test between setting on memory orb then updating state
+        // ! or setting directly on storage
+        // ! In report see what's more efficient
+
+        describe('Should revert if any verification fails', function() {
+          // Not owner or token does not exist (same error)
+          // Not enough time has passed
+          // Max expansion reached
+        });
+
+        describe('Should successfully expand and update all storage states', function() {
+          // Correct expansionRate
+          // Correct lastExpansionTimestamp
+          // Correct maxExpanseReached if needed
+          // Correct event emitted
+          // Correct tokenURI when we get it after expansion
+        });
+      });
 
       /**
        * @notice Dev functions
