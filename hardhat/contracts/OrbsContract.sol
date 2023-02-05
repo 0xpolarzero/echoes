@@ -233,16 +233,14 @@ contract OrbsContract is ERC721URIStorage, Ownable {
             revert ORBS__MAX_EXPANSION_REACHED(orb.tokenId);
 
         // Update the last expansion timestamp
-        orb.lastExpansionTimestamp = currentTimestamp();
+        s_orbs[_tokenId].lastExpansionTimestamp = currentTimestamp();
 
         // Update the expansion rate
-        orb.expansionRate = orb.expansionRate + 1;
+        s_orbs[_tokenId].expansionRate = orb.expansionRate + 1;
 
         // Update the maxExpansionReached if needed
         if (getExpanse(orb.tokenId) == MAX_EXPANSION)
-            orb.maxExpansionReached = true;
-
-        s_orbs[_tokenId] = orb;
+            s_orbs[_tokenId].maxExpansionReached = true;
 
         emit ORBS__EXPANDED(orb.owner, orb.tokenId, orb.signature);
     }
