@@ -85,7 +85,7 @@ library Formats {
         uint256[] memory _attributesIndexes,
         uint256 _expanse,
         uint256 _lastExpansionTimestamp,
-        bool _maxExpanseReached
+        bool _maxExpansionReached
     ) internal pure returns (string memory) {
         // Get the updated animation URL
         string memory animationUrl = string(
@@ -112,7 +112,7 @@ library Formats {
             _lastExpansionTimestamp.toString(),
             '"},',
             '{"trait_type":"Max Expanse","value":"',
-            _maxExpanseReached ? "true" : "false",
+            _maxExpansionReached ? "true" : "false",
             '"}',
             "],",
             '"animation_url":"',
