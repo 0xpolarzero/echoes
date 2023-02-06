@@ -1,66 +1,96 @@
 import { useEffect, useRef, useState } from 'react';
 import { Input, Tooltip } from 'antd';
+import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import {
+  useAccount,
+  useBalance,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from 'wagmi';
+import config from '@/data';
 import stores from '@/stores';
-import { useAccount, useBalance, useNetwork } from 'wagmi';
 
-// let isConnected = false;
-let chain = 'maticmum';
+const { MINT_PRICE_ETH, MINT_PRICE_WEI } = config;
 
 const Mint = ({ count }) => {
   const { traits, getMetadataFromTraits } = stores.useTraits();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: balance } = useBalance({ address });
-  const ref = useRef();
 
-  // Price
-  const [price, setPrice] = useState(0.01);
   const [isBalanceEnough, setIsBalanceEnough] = useState(false);
-  const [missingTraits, setMissingTraits] = useState([]);
-  // const [input, setInput] = useState(0.001);
+  const [missingSignature, setMissingSignature] = useState(true);
+  // Mint
+  const [chainId, setChainId] = useState(config.defaultChainId);
+  const [mintArgs, setMintArgs] = useState([]);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  // const handleInput = (e) => {
-  //   const value = e.target.value;
-  //   if (value < 0.001) {
-  //     setInput(0.001);
-  //     setPrice(0.001);
-  //   } else {
-  //     setInput(value);
-  //     setPrice(value);
-  //   }
-  // };
+  /**
+   * @notice Mint transaction
+   */
+  const onSettled = async (tx) => {
+    const receipt = await tx.wait(1);
 
-  // const handleSelect = (e) => {
-  //   const value = e.target.value;
-  //   setPrice(value);
+    if (receipt.status === 1) {
+      setIsSuccess(true);
+    } else {
+      setIsError(true);
+    }
+  };
+  const { config: mintConfig } = usePrepareContractWrite({
+    address: config.networkMapping[chainId]['Orbs'][0] || '',
+    abi: chainId === 80001 ? config.abiMumbai : config.abiMainnet || '',
+    functionName: 'mint',
+    args: [...mintArgs, chainId === 1 ? { value: MINT_PRICE_WEI } : null],
+    // Only enable if all args are filled & chain is mumbai or ethereum mainnet
+    enabled: mintArgs.length,
+  });
 
-  //   const buttons = ref.current.querySelectorAll('button');
-  //   buttons.forEach((button) => button.classList.remove('selected'));
-  //   ref.current.querySelector('input').classList.remove('selected');
+  const { isLoading, write: mint } = useContractWrite({
+    ...mintConfig,
+    onSettled,
+  });
 
-  //   e.target.classList.add('selected');
-  // };
-
+  // Metadata & mint args
   useEffect(() => {
     const metadata = getMetadataFromTraits(traits);
-    let missing = [];
 
-    if (!metadata.name) missing.push('name');
-    for (const trait of metadata.traits) {
-      if (!trait.value) missing.push(trait.trait_type);
+    // Is the signature missing?
+    if (!metadata[0]) {
+      setMissingSignature(true);
+    } else {
+      setMissingSignature(false);
     }
 
-    setMissingTraits(missing);
-  }, [traits, getMetadataFromTraits]);
+    // Set mint args
+    if (!missingSignature && (chainId === 80001 || chainId === 1))
+      setMintArgs(metadata);
+    // Reset if changing anything
+    setIsSuccess(false);
+    setIsError(false);
+  }, [traits, getMetadataFromTraits, missingSignature, chainId]);
 
+  // Balance
   useEffect(() => {
-    if (balance?.formatted < price) {
+    if (balance?.formatted < MINT_PRICE_ETH) {
       setIsBalanceEnough(false);
     } else {
       setIsBalanceEnough(true);
     }
-  }, [balance, price]);
+  }, [balance]);
+
+  // Chain
+  useEffect(() => {
+    // We need to use this trick because wagmi hook useNetwork sets the chain too late
+    if (chain?.id === 80001) {
+      setChainId(80001);
+    } else if (chain?.id === 1) {
+      setChainId(1);
+    }
+  }, [chain?.id]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -89,104 +119,73 @@ const Mint = ({ count }) => {
       <div className='wallet'>
         <ConnectButton label='Connect your wallet to generate the orb' />
       </div>
-      {/* <div ref={ref} className='price'>
-        <PriceButton
-          value={0.001}
-          balance={balance?.formatted || 0}
-          onClick={handleSelect}
-          selected={true}
-        />
-        <PriceButton
-          value={0.01}
-          balance={balance?.formatted || 0}
-          onClick={handleSelect}
-          selected={false}
-        />
-        <PriceButton
-          value={0.1}
-          balance={balance?.formatted || 0}
-          onClick={handleSelect}
-          selected={false}
-        />
 
-        <Tooltip
-          title={input > balance?.formatted ? 'Insufficient balance.' : ''}>
-          <Input
-            type='number'
-            onClick={handleSelect}
-            placeholder='Custom price (min. 0.001 ETH)'
-            value={input}
-            onChange={handleInput}
-            className={input > balance?.formatted ? 'error' : ''}
-            style={{ maxWidth: '200px' }}
-            suffix='ETH'
-          />
-        </Tooltip>
-      </div> */}
       <div className='mint'>
         <Tooltip
           title={
-            chain?.id !== 80001 ? (
-              'You need to switch chains to Polygon Mumbai.'
-            ) : missingTraits.length ? (
-              <>
-                Missing traits:{' '}
-                <span className='emphasize'>{missingTraits.join(', ')}</span>
-              </>
-            ) : (
-              ''
-            )
+            chainId !== 80001
+              ? 'You need to switch chains to Polygon Mumbai.'
+              : missingSignature
+              ? 'The signature is missing.'
+              : ''
           }>
           <button
-            disabled={
-              chain?.id !== 80001 || !isConnected || missingTraits.length
+            onClick={mint}
+            disabled={chainId !== 80001 || !isConnected || missingSignature}
+            className={
+              chainId === 80001
+                ? isLoading
+                  ? 'loading'
+                  : isSuccess || isError
+                  ? 'has-icon'
+                  : ''
+                : ''
             }>
-            Generate on testnet (free)
+            {chainId === 80001 && isSuccess ? (
+              <AiOutlineCheck color='var(--text-success)' />
+            ) : chainId === 80001 && isError ? (
+              <AiOutlineClose color='var(--text-error)' />
+            ) : null}
+            <span>Generate on testnet (free)</span>
           </button>
         </Tooltip>
         <Tooltip
           title={
-            chain?.id !== 1 ? (
-              'You need to switch chains to Ethereum mainnet.'
-            ) : !isBalanceEnough ? (
-              'Insufficient balance.'
-            ) : missingTraits.length ? (
-              <>
-                Missing traits:{' '}
-                <span className='emphasize'>{missingTraits.join(', ')}</span>
-              </>
-            ) : (
-              ''
-            )
+            chain?.id !== 1
+              ? 'You need to switch chains to Ethereum mainnet.'
+              : !isBalanceEnough
+              ? 'Insufficient balance.'
+              : missingSignature
+              ? 'The signature is missing.'
+              : ''
           }>
           <button
+            onClick={mint}
             disabled={
               chain?.id !== 1 ||
               !isConnected ||
               !isBalanceEnough ||
-              missingTraits.length
+              missingSignature
+            }
+            className={
+              chainId === 1
+                ? isLoading
+                  ? 'loading'
+                  : isSuccess || isError
+                  ? 'has-icon'
+                  : ''
+                : ''
             }>
-            Generate on mainnet ({price} ETH)
+            {chainId === 1 && isSuccess ? (
+              <AiOutlineCheck color='var(--text-success)' />
+            ) : chainId === 1 && isError ? (
+              <AiOutlineClose color='var(--text-error)' />
+            ) : null}
+            <span>Generate on mainnet ({MINT_PRICE_ETH} ETH)</span>
           </button>
         </Tooltip>
       </div>
     </div>
-  );
-};
-
-const PriceButton = ({ value, balance, onClick, selected }) => {
-  const notEnoughBalance = value > balance;
-
-  return (
-    <Tooltip title={notEnoughBalance ? 'Insufficient balance.' : ''}>
-      <button
-        onClick={onClick}
-        value={value}
-        disabled={notEnoughBalance}
-        className={selected ? 'selected' : ''}>
-        {value} ETH
-      </button>
-    </Tooltip>
   );
 };
 
