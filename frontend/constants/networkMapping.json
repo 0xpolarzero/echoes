@@ -1,1 +1,6 @@
-{}
+{
+  "80001": {
+    "OrbsMainnet": ["0x6f93d3bA9E130d40681A0E96cE4f96bF70C11c69"],
+    "OrbsTestnet": ["0x4ff427A5c5e5236Db2e02B87d15da05FD9d957F0"]
+  }
+}
