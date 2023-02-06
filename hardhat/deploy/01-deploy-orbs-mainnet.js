@@ -3,19 +3,18 @@ const {
   developmentChains,
   testnetChains,
   attributes,
+  spectrumColors,
+  sceneryColors,
   expansionCooldown,
   description,
-  backgroundColor,
   externalUrl,
   animationUrl,
-  contractUri,
+  encodedContractUri,
   price,
   mintLimit,
   maxSupply,
   maxSupplyMock,
-  feeRecipient,
 } = require('../helper-hardhat-config');
-const getTraits = require('../scripts/getTraits');
 const { verify } = require('../utils/verify');
 
 module.exports = async function({ getNamedAccounts, deployments }) {
@@ -28,28 +27,13 @@ module.exports = async function({ getNamedAccounts, deployments }) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  // Encode json contract uri in base64 after prepending the data type
-  const encodedContractUri =
-    'data:application/json;base64,' +
-    Buffer.from(
-      JSON.stringify({
-        ...contractUri,
-        fee_recipient: developmentChains.includes(network.name)
-          ? feeRecipient.test
-          : feeRecipient.prod,
-      }),
-    ).toString('base64');
-
-  // Get the colors
-  const { spectrum, scenery } = getTraits();
-
   const args = [
     attributes[0],
     attributes[1],
     attributes[2],
     attributes[3],
-    spectrum,
-    scenery,
+    spectrumColors,
+    sceneryColors,
     [animationUrl, externalUrl, description, encodedContractUri],
     expansionCooldown,
     [
