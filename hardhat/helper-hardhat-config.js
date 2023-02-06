@@ -1,4 +1,5 @@
 const developmentChains = ['hardhat', 'localhost'];
+const testnetChains = ['mumbai', 'goerli'];
 
 // Attributes
 const attributes = [
@@ -80,6 +81,7 @@ const MAX_EXPANSION = 10_000;
 
 module.exports = {
   developmentChains,
+  testnetChains,
   attributes,
   name,
   symbol,
