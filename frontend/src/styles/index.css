@@ -127,7 +127,7 @@ input.selected {
 /* Loading */
 button.loading {
   position: relative;
-  cursor: wait;
+  cursor: not-allowed;
 }
 button span {
   transition: margin-left 0.25s ease;
