@@ -15,6 +15,7 @@ const {
   maxSupplyMock,
   feeRecipient,
 } = require('../helper-hardhat-config');
+const getTraits = require('../scripts/getTraits');
 const { verify } = require('../utils/verify');
 
 module.exports = async function({ getNamedAccounts, deployments }) {
@@ -39,16 +40,17 @@ module.exports = async function({ getNamedAccounts, deployments }) {
       }),
     ).toString('base64');
 
+  // Get the colors
+  const { spectrum, scenery } = getTraits();
+
   const args = [
     attributes[0],
     attributes[1],
     attributes[2],
     attributes[3],
-    animationUrl,
-    description,
-    externalUrl,
-    encodedContractUri,
-    backgroundColor,
+    spectrum,
+    scenery,
+    [animationUrl, externalUrl, description, encodedContractUri],
     expansionCooldown,
     [
       price,
