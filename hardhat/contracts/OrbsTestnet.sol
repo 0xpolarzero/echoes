@@ -81,6 +81,8 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
     event ORBS__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
     event ORBS__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
     event ORBS__CONTRACT_URI_UPDATED(string contractUri);
+    event ORBS__SPECTRUM_COLORS_UPDATED(string[] colors);
+    event ORBS__SCENERY_COLORS_UPDATED(string[] colors);
     // Mint
     event ORBS__MINTED(address owner, uint256 tokenId, string signature);
     // Expand
@@ -458,6 +460,20 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
     }
 
     /**
+     * @notice Get the spectrum colors
+     */
+    function getSpectrumColors() public view returns (string[] memory) {
+        return s_spectrumColors;
+    }
+
+    /**
+     * @notice Get the scenery colors
+     */
+    function getSceneryColors() public view returns (string[] memory) {
+        return s_sceneryColors;
+    }
+
+    /**
      * @notice Get the creation date
      */
     function getCreationTimestamp() external view returns (uint256) {
@@ -528,6 +544,32 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         s_expansionCooldown = _expansionCooldown;
 
         emit ORBS__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
+    }
+
+    /**
+     * @notice Set the spectrum colors
+     * @param _spectrumColors The new spectrum colors (string array)
+     * @dev onlyOwner
+     */
+    function setSpectrumColors(
+        string[] memory _spectrumColors
+    ) external onlyOwner {
+        s_spectrumColors = _spectrumColors;
+
+        emit ORBS__SPECTRUM_COLORS_UPDATED(_spectrumColors);
+    }
+
+    /**
+     * @notice Set the scenery colors
+     * @param _sceneryColors The new scenery colors (string array)
+     * @dev onlyOwner
+     */
+    function setSceneryColors(
+        string[] memory _sceneryColors
+    ) external onlyOwner {
+        s_sceneryColors = _sceneryColors;
+
+        emit ORBS__SCENERY_COLORS_UPDATED(_sceneryColors);
     }
 
     /**
