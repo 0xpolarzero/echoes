@@ -1,7 +1,10 @@
+const { deployments, network, ethers } = require('hardhat');
 const { assert, expect } = require('chai');
 const {
   developmentChains,
   attributes,
+  spectrumColors,
+  sceneryColors,
   name,
   symbol,
   description,
@@ -10,10 +13,8 @@ const {
   expansionCooldown,
   BASE_EXPANSE,
   MAX_EXPANSION,
-  backgroundColor,
-  contractUri,
+  encodedContractUri,
 } = require('../../helper-hardhat-config');
-const { deployments, network, ethers } = require('hardhat');
 const mineBlocks = require('../../scripts/mineBlocks');
 
 /**
@@ -67,9 +68,14 @@ const mineBlocks = require('../../scripts/mineBlocks');
           assert.equal(await orbsContract.getExternalUrl(), externalUrl);
           assert.equal(await orbsContract.getDescription(), description);
           assert.equal(await orbsContract.getAnimationUrl(), animationUrl);
-          assert.equal(
-            await orbsContract.contractURI(),
-            JSON.stringify(contractUri),
+          assert.equal(await orbsContract.contractURI(), encodedContractUri);
+          assert.sameOrderedMembers(
+            await orbsContract.getSpectrumColors(),
+            spectrumColors,
+          );
+          assert.sameOrderedMembers(
+            await orbsContract.getSceneryColors(),
+            sceneryColors,
           );
 
           // Systems
@@ -404,10 +410,14 @@ const testTokenUri = (
   // We can't really test the SVG here, so we just check if it exists
   assert(json.image_data.includes('data:image/svg+xml;base64,'), 'image_data');
   assert.equal(json.external_url, externalUrl + tokenId, 'external_url');
-  assert.equal(json.background_color, backgroundColor, 'background_color');
+  assert.equal(
+    json.background_color,
+    sceneryColors[attributes[1].indexOf(chosenAttributes[1])],
+    'background_color',
+  );
 
   // Animation url
-  const expectedAnimationUrl = `${animationUrl}&0=${attributes[0].indexOf(
+  const expectedAnimationUrl = `${animationUrl}?0=${attributes[0].indexOf(
     chosenAttributes[0],
   )}&1=${attributes[1].indexOf(chosenAttributes[1])}&2=${attributes[2].indexOf(
     chosenAttributes[2],
