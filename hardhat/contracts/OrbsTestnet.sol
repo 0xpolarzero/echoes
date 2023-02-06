@@ -139,7 +139,7 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         uint256 _sceneryIndex,
         uint256 _traceIndex,
         uint256 _atmosphereIndex
-    ) external payable {
+    ) external {
         // Increment the tokenId
         _tokenIds.increment();
 
