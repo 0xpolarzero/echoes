@@ -16,12 +16,19 @@ const { verify } = require('../utils/verify');
 module.exports = async function({ getNamedAccounts, deployments }) {
   if (
     !developmentChains.includes(network.name) &&
-    testnetChains.includes(network.name)
+    !testnetChains.includes(network.name)
   )
     return;
 
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+
+  // Encode json contract uri in base64 after prepending the data type
+  const encodedContractUri =
+    'data:application/json;base64,' +
+    Buffer.from(
+      JSON.stringify({ ...contractUri, fee_recipient: feeRecipient.test }),
+    ).toString('base64');
 
   const args = [
     attributes[0],
@@ -31,10 +38,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     animationUrl,
     description,
     externalUrl,
-    JSON.stringify({
-      ...contractUri,
-      fee_recipient: feeRecipient.test,
-    }),
+    encodedContractUri,
     backgroundColor,
     expansionCooldown,
   ];
