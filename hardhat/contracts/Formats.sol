@@ -91,7 +91,7 @@ library Formats {
         string memory animationUrl = string(
             abi.encodePacked(
                 _animationUrl,
-                "&0=",
+                "?0=",
                 _attributesIndexes[0].toString(),
                 "&1=",
                 _attributesIndexes[1].toString(),
