@@ -50,6 +50,8 @@ library Formats {
             '",',
             '"name":"',
             _signature,
+            " #",
+            _tokenId.toString(),
             '",',
             '"background_color":"',
             _sceneryColor,
