@@ -8,19 +8,24 @@ const Audio = () => {
   const { traits } = stores.useTraits();
   const { sources, update } = stores.useAudio();
 
+  const refs = useRef([]);
+
   useEffect(() => {
     update();
   }, [traits.atmosphere.src, update]);
 
+  useEffect(() => {
+    refs.current = refs.current.slice(0, audio.values.length);
+  }, []);
+
   return (
     <>
       {audio.values.map((value, index) => {
-        const ref = useRef();
-        sources[index] = ref;
+        sources[index] = refs.current[index];
 
         return (
           <audio
-            ref={ref}
+            ref={(ref) => (refs.current[index] = ref)}
             key={index}
             src={value.src}
             loop

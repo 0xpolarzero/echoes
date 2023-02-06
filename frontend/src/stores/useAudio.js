@@ -22,9 +22,9 @@ export default create((set, get) => ({
 
     sources.forEach((ref, index) => {
       // Only play the first one
-      if (ref.current) {
-        if (index !== 0) ref.current.volume = 0;
-        ref.current.play();
+      if (ref) {
+        if (index !== 0) ref.volume = 0;
+        ref.play();
       }
     });
 
@@ -44,10 +44,10 @@ export default create((set, get) => ({
     const index = audio.values.findIndex((v) => v === traits.atmosphere);
     sources.forEach((ref, i) => {
       if (i === index) {
-        ref.current.currentTime = 0;
-        ref.current.volume = 1;
+        ref.currentTime = 0;
+        ref.volume = 1;
       } else {
-        ref.current.volume = 0;
+        ref.volume = 0;
       }
     });
 
@@ -74,9 +74,7 @@ export default create((set, get) => ({
     const { traits } = useTraits.getState();
     const index = audio.values.findIndex((v) => v === traits.atmosphere);
 
-    const source = audioContext.createMediaElementSource(
-      sources[index].current,
-    );
+    const source = audioContext.createMediaElementSource(sources[index]);
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 1024;
 
