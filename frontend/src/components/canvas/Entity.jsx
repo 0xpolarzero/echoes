@@ -75,7 +75,7 @@ const Orb = ({ radius }) => {
         value: 1.0,
       },
     }),
-    [radius, traits.spectrum.vec3.colorA, traits.spectrum.vec3.colorB],
+    [radius],
   );
 
   let vertex;
