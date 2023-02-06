@@ -32,6 +32,8 @@
 
   /* won't change */
   --text-link: #646cff;
+  --text-success: #00d395;
+  --text-error: #ff5f5f;
   --button-shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -103,10 +105,12 @@ input {
   cursor: pointer;
   transition: all 0.25s ease;
 }
+/* Hover */
 button:hover,
 input:hover {
   border-color: var(--text-link);
 }
+/* Focus */
 button:focus,
 button:focus-visible,
 input:focus,
@@ -114,15 +118,46 @@ input:focus-visible {
   /* outline: 4px auto -webkit-focus-ring-color; */
   outline: none;
 }
+/* Selected */
 button.selected,
 input.selected {
   border-color: var(--text-link);
 }
+/* Loading */
+button.loading {
+  position: relative;
+  cursor: wait;
+}
+button span {
+  transition: margin-left 0.25s ease;
+}
+button.loading span {
+  margin-left: 2rem;
+}
+button.loading span::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  border: 2px solid var(--text-link);
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+/* with icon */
+button.has-icon {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+/* Disabled */
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: transparent;
 }
+/* Appearance */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -131,6 +166,7 @@ input::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+/* Error */
 input.error {
   border-color: var(--error);
 }
