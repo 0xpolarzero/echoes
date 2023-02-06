@@ -13,7 +13,8 @@ module.exports = async () => {
 };
 
 async function updateContractAddresses() {
-  const orbsContract = await ethers.getContract('OrbsMainnet');
+  const orbsMainnet = await ethers.getContract('OrbsMainnet');
+  const orbsTestnet = await ethers.getContract('OrbsTestnet');
   const chainId = network.config.chainId;
 
   const contractAddresses = JSON.parse(
@@ -21,13 +22,19 @@ async function updateContractAddresses() {
   );
   if (chainId in contractAddresses) {
     if (
-      !contractAddresses[chainId]['OrbsMainnet'].includes(orbsContract.address)
+      !contractAddresses[chainId]['OrbsMainnet'].includes(orbsMainnet.address)
     ) {
-      contractAddresses[chainId]['OrbsMainnet'].push(orbsContract.address);
+      contractAddresses[chainId]['OrbsMainnet'].push(orbsMainnet.address);
+    }
+    if (
+      !contractAddresses[chainId]['OrbsTestnet'].includes(orbsTestnet.address)
+    ) {
+      contractAddresses[chainId]['OrbsTestnet'].push(orbsTestnet.address);
     }
   } else {
     contractAddresses[chainId] = {
-      OrbsMainnet: [orbsContract.address],
+      OrbsMainnet: [orbsMainnet.address],
+      OrbsTestnet: [orbsTestnet.address],
     };
   }
 
@@ -37,10 +44,16 @@ async function updateContractAddresses() {
 }
 
 async function updateAbi() {
-  const orbsContract = await ethers.getContract('OrbsMainnet');
+  const orbsMainnet = await ethers.getContract('OrbsMainnet');
   fs.writeFileSync(
     `${frontEndAbiFolder}OrbsMainnet.json`,
-    orbsContract.interface.format(ethers.utils.FormatTypes.json),
+    orbsMainnet.interface.format(ethers.utils.FormatTypes.json),
+  );
+
+  const orbsTestnet = await ethers.getContract('OrbsTestnet');
+  fs.writeFileSync(
+    `${frontEndAbiFolder}OrbsTestnet.json`,
+    orbsTestnet.interface.format(ethers.utils.FormatTypes.json),
   );
 }
 
