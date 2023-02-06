@@ -1,8 +1,9 @@
 const { ethers, network } = require('hardhat');
 const fs = require('fs');
+const { testnetChains } = require('../helper-hardhat-config');
 
-const frontEndContractsFile = '../frontend/constants/networkMapping.json';
-const frontEndAbiFolder = '../frontend/constants/';
+const frontEndContractsFile = '../frontend/data/constants/networkMapping.json';
+const frontEndAbiFolder = '../frontend/data/constants/';
 
 module.exports = async () => {
   if (process.env.UPDATE_FRONT_END) {
@@ -20,22 +21,25 @@ async function updateContractAddresses() {
   const contractAddresses = JSON.parse(
     fs.readFileSync(frontEndContractsFile, 'utf8'),
   );
-  if (chainId in contractAddresses) {
-    if (
-      !contractAddresses[chainId]['OrbsMainnet'].includes(orbsMainnet.address)
-    ) {
-      contractAddresses[chainId]['OrbsMainnet'].push(orbsMainnet.address);
-    }
-    if (
-      !contractAddresses[chainId]['OrbsTestnet'].includes(orbsTestnet.address)
-    ) {
-      contractAddresses[chainId]['OrbsTestnet'].push(orbsTestnet.address);
+
+  if (testnetChains.includes(chainId)) {
+    if (chainId in contractAddresses) {
+      if (!contractAddresses[chainId]['Orbs'].includes(orbsTestnet.address))
+        contractAddresses[chainId]['Orbs'].push(orbsTestnet.address);
+    } else {
+      contractAddresses[chainId] = {
+        Orbs: [orbsTestnet.address],
+      };
     }
   } else {
-    contractAddresses[chainId] = {
-      OrbsMainnet: [orbsMainnet.address],
-      OrbsTestnet: [orbsTestnet.address],
-    };
+    if (chainId in contractAddresses) {
+      if (!contractAddresses[chainId]['Orbs'].includes(orbsMainnet.address))
+        contractAddresses[chainId]['Orbs'].push(orbsMainnet.address);
+    } else {
+      contractAddresses[chainId] = {
+        Orbs: [orbsMainnet.address],
+      };
+    }
   }
 
   fs.writeFileSync(frontEndContractsFile, JSON.stringify(contractAddresses));

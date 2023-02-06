@@ -16,7 +16,7 @@ const { verify } = require('../utils/verify');
 module.exports = async function({ getNamedAccounts, deployments }) {
   if (
     !developmentChains.includes(network.name) &&
-    !testnetChains.includes(network.name)
+    !testnetChains.includes(network.config.chainId)
   )
     return;
 
