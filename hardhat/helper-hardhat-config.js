@@ -55,8 +55,8 @@ const mintLimit = 0;
 const description =
   'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';
 const backgroundColor = 101010;
-const externalUrl = 'https://makesuretofinishwithslash/';
-const animationUrl = 'https://nothere';
+const externalUrl = 'https://orbs-nu.vercel.app/';
+const animationUrl = 'https://orbs-4iry.vercel.app';
 
 // OpenSea
 const feeRecipient = {
