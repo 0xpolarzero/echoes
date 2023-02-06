@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Input, Tooltip } from 'antd';
+import { toast } from 'react-toastify';
 import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
@@ -28,16 +29,32 @@ const Mint = ({ count }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const notification = useRef(null);
+
   /**
    * @notice Mint transaction
    */
   const onSettled = async (tx) => {
+    if (!tx) return;
+    notification.current = toast.loading('Generating your orb...');
     const receipt = await tx.wait(1);
 
     if (receipt.status === 1) {
       setIsSuccess(true);
+      toast.update(notification.current, {
+        render: 'Your orb has been generated!',
+        type: 'success',
+        isLoading: false,
+        autoClose: 5000,
+      });
     } else {
       setIsError(true);
+      toast.update(notification.current, {
+        render: 'Something went wrong, please try again.',
+        type: 'error',
+        isLoading: false,
+        autoClose: 5000,
+      });
     }
   };
   const { config: mintConfig } = usePrepareContractWrite({
@@ -130,7 +147,7 @@ const Mint = ({ count }) => {
               : ''
           }>
           <button
-            onClick={mint}
+            onClick={!isLoading ? mint : null}
             disabled={chainId !== 80001 || !isConnected || missingSignature}
             className={
               chainId === 80001
@@ -141,9 +158,9 @@ const Mint = ({ count }) => {
                   : ''
                 : ''
             }>
-            {chainId === 80001 && isSuccess ? (
+            {chainId === 80001 && isSuccess && !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
-            ) : chainId === 80001 && isError ? (
+            ) : chainId === 80001 && isError && !isLoading ? (
               <AiOutlineClose color='var(--text-error)' />
             ) : null}
             <span>Generate on testnet (free)</span>
@@ -160,7 +177,7 @@ const Mint = ({ count }) => {
               : ''
           }>
           <button
-            onClick={mint}
+            onClick={!isLoading ? mint : null}
             disabled={
               chain?.id !== 1 ||
               !isConnected ||
@@ -176,9 +193,9 @@ const Mint = ({ count }) => {
                   : ''
                 : ''
             }>
-            {chainId === 1 && isSuccess ? (
+            {chainId === 1 && isSuccess && !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
-            ) : chainId === 1 && isError ? (
+            ) : chainId === 1 && isError && !isLoading ? (
               <AiOutlineClose color='var(--text-error)' />
             ) : null}
             <span>Generate on mainnet ({MINT_PRICE_ETH} ETH)</span>
