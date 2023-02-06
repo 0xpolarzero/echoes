@@ -85,7 +85,7 @@ export default create((set, get) => ({
           </RainbowKitProvider>
         </WagmiConfig>
         <ToastContainer
-          position='top-right'
+          position='bottom-right'
           autoClose={5000}
           newestOnTop
           theme={theme}
