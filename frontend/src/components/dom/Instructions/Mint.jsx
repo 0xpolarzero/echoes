@@ -52,7 +52,7 @@ const Mint = ({ count }) => {
     }
 
     setMissingTraits(missing);
-  }, [traits]);
+  }, [traits, getMetadataFromTraits]);
 
   useEffect(() => {
     if (balance?.formatted < price) {
@@ -82,8 +82,8 @@ const Mint = ({ count }) => {
           Please be aware that minting an orb is an experimental process and
           there is no guarantee regarding its reliability or value. By
           participating in the mint, you understand that you are doing so at
-          your own risk and that the digital product is provided "as is" without
-          any warranties or guarantees of any kind.
+          your own risk and that the digital product is provided &#34;as is&#34;
+          without any warranties or guarantees of any kind.
         </p>
       </div>
       <div className='wallet'>

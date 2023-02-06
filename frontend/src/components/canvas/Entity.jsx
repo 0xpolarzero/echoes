@@ -52,7 +52,7 @@ const Orb = ({ radius }) => {
     }
 
     return positions;
-  }, [count]);
+  }, [count, radius]);
 
   const uniforms = useMemo(
     () => ({
@@ -75,7 +75,7 @@ const Orb = ({ radius }) => {
         value: 1.0,
       },
     }),
-    [],
+    [radius, traits.spectrum.vec3.colorA, traits.spectrum.vec3.colorB],
   );
 
   let vertex;
@@ -145,7 +145,7 @@ const Background = () => {
 
   useEffect(() => {
     updateTheme(traits.scenery);
-  }, [traits.scenery.rgb]);
+  }, [traits.scenery, updateTheme]);
 
   return null;
 };

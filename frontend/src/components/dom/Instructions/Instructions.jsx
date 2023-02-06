@@ -35,7 +35,7 @@ export default function Instructions() {
 
   useEffect(() => {
     return () => reset();
-  }, []);
+  }, [reset]);
 
   return (
     <div className='instructions'>

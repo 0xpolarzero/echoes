@@ -23,7 +23,7 @@ const Signature = ({ count }) => {
 
   useEffect(() => {
     setTrait('signature', selected);
-  }, [selected]);
+  }, [selected, setTrait]);
 
   useEffect(() => {
     getChoices();
