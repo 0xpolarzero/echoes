@@ -1,3 +1,5 @@
+const getTraits = require('./scripts/getTraits');
+
 const developmentChains = ['hardhat', 'localhost'];
 const testnetChains = ['mumbai', 'goerli'];
 
@@ -54,24 +56,22 @@ const mintLimit = 0;
 // Base metadata
 const description =
   'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';
-const backgroundColor = 101010;
 const externalUrl = 'https://orbs-nu.vercel.app/';
 const animationUrl = 'https://orbs-4iry.vercel.app';
+const { spectrum: spectrumColors, scenery: sceneryColors } = getTraits();
 
 // OpenSea
-const feeRecipient = {
-  prod: '0x8e2c250A85D97c94405471C261BF28feC5D6b0c9',
-  test: '0x8e2c250A85D97c94405471C261BF28feC5D6b0c9',
-};
-
 const contractUri = {
   name,
   description,
   image: '',
   external_link: '',
   seller_fee_basis_points: 1000,
-  fee_recipient: feeRecipient.prod,
+  fee_recipient: process.env.FEE_RECIPIENT,
 };
+const encodedContractUri =
+  'data:application/json;base64,' +
+  Buffer.from(JSON.stringify(contractUri)).toString('base64');
 
 // Systems
 const expansionCooldown = 60 * 60 * 24;
@@ -83,6 +83,8 @@ module.exports = {
   developmentChains,
   testnetChains,
   attributes,
+  spectrumColors,
+  sceneryColors,
   name,
   symbol,
   maxSupply,
@@ -90,12 +92,10 @@ module.exports = {
   price,
   mintLimit,
   description,
-  backgroundColor,
   externalUrl,
   animationUrl,
-  contractUri,
+  encodedContractUri,
   expansionCooldown,
   BASE_EXPANSE,
   MAX_EXPANSION,
-  feeRecipient,
 };
