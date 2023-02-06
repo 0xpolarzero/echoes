@@ -13,6 +13,10 @@ import "./Formats.sol";
  * @title Orbs contract
  * @notice This contract is used to interact with orbs
  * @author polarzero
+ * @dev This contract is the exact same one as OrbsTestnet, except for three exceptions:
+ * - There can be a mint limit per wallet (0 = no limit)
+ * - There is a 1_000 max supply
+ * - The orbs are 0.01 ETH to generate
  */
 
 /// Errors
@@ -31,7 +35,7 @@ error ORBS__IN_EXPANSION_COOLDOWN(
     uint256 lastExpansionTimestamp
 );
 
-contract OrbsContract is ERC721URIStorage, Ownable {
+contract OrbsMainnet is ERC721URIStorage, Ownable {
     /// Libs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -99,6 +103,8 @@ contract OrbsContract is ERC721URIStorage, Ownable {
      * @param _animationUrl The animation URL for the URI (string)
      * @param _externalUrl The external URL for the URI (string)
      * @param _backgroundColor The background color for the URI (uint256)
+     * @param _expansionCooldown The cooldown between each expansion (uint256)
+     * @param _base The price, mintLimit and maxSupply (uint256[])
      * @dev Add each allowed traits to the mapping on deployment ;
      * additionnal traits can be provided later
      */
@@ -113,7 +119,7 @@ contract OrbsContract is ERC721URIStorage, Ownable {
         string memory _contractUri,
         uint256 _backgroundColor,
         uint256 _expansionCooldown,
-        uint256[] memory _base // price, mintLimit, maxSupply
+        uint256[] memory _base
     ) ERC721("Orbs", "ORBS") {
         // Set attributes
         s_attributes[0] = _attributesSpectrum;
