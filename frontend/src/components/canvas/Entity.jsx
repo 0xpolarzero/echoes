@@ -141,7 +141,7 @@ const Orb = ({ radius }) => {
 
 const Background = () => {
   const { traits } = stores.useTraits();
-  const { updateTheme } = stores.useTheme();
+  const { updateTheme } = stores.useConfig();
 
   useEffect(() => {
     updateTheme(traits.scenery);

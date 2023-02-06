@@ -6,7 +6,7 @@ import { RxPlay, RxSpeakerLoud, RxSpeakerOff } from 'react-icons/rx';
 import stores from '@/stores';
 
 const Nav = () => {
-  const { theme, updateTheme } = stores.useTheme();
+  const { theme, updateTheme } = stores.useConfig();
   const { init, started, suspended: audioOff, toggleMute } = stores.useAudio();
   const { generate, setGenerate } = stores.useConfig();
   const router = useRouter();
