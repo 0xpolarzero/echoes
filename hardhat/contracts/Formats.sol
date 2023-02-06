@@ -22,16 +22,18 @@ library Formats {
 
     function metadataBase(
         string[] memory _attributes,
+        string[] memory _spectrumColors,
+        string memory _sceneryColor,
         string memory _signature,
         string memory _description,
         string memory _externalUrl,
-        uint256 _backgroundColor,
         uint256 _creationTimestamp,
         uint256 _tokenId
     ) internal pure returns (string memory) {
         string memory imageData = generateSvg(
             _attributes,
-            _backgroundColor.toString()
+            _spectrumColors,
+            _sceneryColor
         );
 
         // Separate the data into two parts to avoid "Stack too deep"
@@ -50,7 +52,7 @@ library Formats {
             _signature,
             '",',
             '"background_color":"',
-            _backgroundColor.toString(),
+            _sceneryColor,
             '",'
         );
 
@@ -126,7 +128,8 @@ library Formats {
 
     function generateSvg(
         string[] memory _attributes,
-        string memory _backgroundColor
+        string[] memory _spectrumColors,
+        string memory _sceneryColor
     ) internal pure returns (string memory) {
         string
             memory svg = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 500 500">';
@@ -135,7 +138,7 @@ library Formats {
             abi.encodePacked(
                 svg,
                 '<rect width="100%" height="100%" fill="#',
-                _backgroundColor,
+                _sceneryColor,
                 '"/>'
             )
         );
@@ -147,7 +150,9 @@ library Formats {
                     svg,
                     '<text x="50%" y="',
                     y.toString(),
-                    '%" dominant-baseline="middle" text-anchor="middle" font-size="25" font-family="monospace" fill="#fff">',
+                    '%" dominant-baseline="middle" text-anchor="middle" font-size="25" font-family="monospace" fill="#',
+                    _spectrumColors[i % 2],
+                    '">',
                     _attributes[i],
                     "</text>"
                 )
