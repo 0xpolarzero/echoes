@@ -60,7 +60,8 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
     address private immutable i_owner;
     uint256 private immutable i_creationTimestamp;
     // Metadata
-    uint256 private immutable i_backgroundColor;
+    string[] private s_spectrumColors;
+    string[] private s_sceneryColors;
     string private i_description;
     string private i_externalUrl;
     string private i_animationUrl;
@@ -87,14 +88,13 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
 
     /**
      * @notice Constructor
-     * @param _attributesSpectrum An array of strings
-     * @param _attributesScenery An array of strings
-     * @param _attributesTrace An array of strings
-     * @param _attributesAtmosphere An array of strings
-     * @param _description The description for the URI (string)
-     * @param _animationUrl The animation URL for the URI (string)
-     * @param _externalUrl The external URL for the URI (string)
-     * @param _backgroundColor The background color for the URI (uint256)
+     * @param _attributesSpectrum An array of attributes (strings)
+     * @param _attributesScenery An array of attributes (strings)
+     * @param _attributesTrace An array of attributes (strings)
+     * @param _attributesAtmosphere An array of attributes (strings)
+     * @param _spectrumColors An array of colors (strings)
+     * @param _sceneryColors An array of colors (strings)
+     * @param _metadata An array of metadata (strings): animationUrl, externalUrl, description, contractUri
      * @dev Add each allowed traits to the mapping on deployment ;
      * additionnal traits can be provided later
      */
@@ -103,11 +103,9 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         string[] memory _attributesScenery,
         string[] memory _attributesTrace,
         string[] memory _attributesAtmosphere,
-        string memory _animationUrl,
-        string memory _description,
-        string memory _externalUrl,
-        string memory _contractUri,
-        uint256 _backgroundColor,
+        string[] memory _spectrumColors,
+        string[] memory _sceneryColors,
+        string[] memory _metadata,
         uint256 _expansionCooldown
     ) ERC721("Orbs", "ORBS") {
         // Set attributes
@@ -117,13 +115,14 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         s_attributes[3] = _attributesAtmosphere;
 
         // Set metadata for the URI
-        i_externalUrl = _externalUrl;
-        i_animationUrl = _animationUrl;
-        i_description = _description;
-        i_backgroundColor = _backgroundColor;
+        i_animationUrl = _metadata[0];
+        i_externalUrl = _metadata[1];
+        i_description = _metadata[2];
+        s_spectrumColors = _spectrumColors;
+        s_sceneryColors = _sceneryColors;
 
         // Contract URI (OpenSea)
-        s_contractUri = _contractUri;
+        s_contractUri = _metadata[3];
 
         // Set systems
         s_expansionCooldown = _expansionCooldown;
@@ -251,13 +250,20 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         indexes[2] = getAttributeIndex(2, orb.attributes[2]);
         indexes[3] = getAttributeIndex(3, orb.attributes[3]);
 
+        // Get the appropriate colors
+        string[] memory spectrumColors = new string[](2);
+        spectrumColors[0] = s_spectrumColors[indexes[0] * 2];
+        spectrumColors[1] = s_spectrumColors[indexes[0] * 2 + 1];
+        string memory sceneryColor = s_sceneryColors[indexes[1]];
+
         // Get the base URI (non updatable)
         string memory baseUri = Formats.metadataBase(
             orb.attributes,
+            spectrumColors,
+            sceneryColor,
             orb.signature,
             i_description,
             i_externalUrl,
-            i_backgroundColor,
             orb.creationTimestamp,
             orb.tokenId
         );
