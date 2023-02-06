@@ -3,6 +3,7 @@
 
 /* Lib */
 @import '@rainbow-me/rainbowkit/styles.css';
+@import 'react-toastify/dist/ReactToastify.css';
 
 /* Local */
 @import './nav.css';

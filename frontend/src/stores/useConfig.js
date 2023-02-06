@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ToastContainer } from 'react-toastify';
 import {
   getDefaultWallets,
   RainbowKitProvider,
@@ -63,25 +64,33 @@ export default create((set, get) => ({
     const { theme } = get();
 
     return (
-      <WagmiConfig client={wagmiClient}>
-        <RainbowKitProvider
-          chains={chains}
-          theme={
-            theme === 'dark'
-              ? darkTheme({ accentColor: 'var(--text-link)' })
-              : lightTheme({ accentColor: 'var(--text-link)' })
-          }>
-          <ConfigProvider
-            theme={{
-              algorithm:
-                theme === 'dark'
-                  ? antdTheme.darkAlgorithm
-                  : antdTheme.defaultAlgorithm,
-            }}>
-            {children}
-          </ConfigProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
+      <>
+        <WagmiConfig client={wagmiClient}>
+          <RainbowKitProvider
+            chains={chains}
+            theme={
+              theme === 'dark'
+                ? darkTheme({ accentColor: 'var(--text-link)' })
+                : lightTheme({ accentColor: 'var(--text-link)' })
+            }>
+            <ConfigProvider
+              theme={{
+                algorithm:
+                  theme === 'dark'
+                    ? antdTheme.darkAlgorithm
+                    : antdTheme.defaultAlgorithm,
+              }}>
+              {children}
+            </ConfigProvider>
+          </RainbowKitProvider>
+        </WagmiConfig>
+        <ToastContainer
+          position='top-right'
+          autoClose={5000}
+          newestOnTop
+          theme={theme}
+        />
+      </>
     );
   },
 
