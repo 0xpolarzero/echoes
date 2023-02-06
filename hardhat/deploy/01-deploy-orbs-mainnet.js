@@ -1,6 +1,7 @@
 const { network, ethers } = require('hardhat');
 const {
   developmentChains,
+  testnetChains,
   attributes,
   expansionCooldown,
   description,
@@ -17,6 +18,12 @@ const {
 const { verify } = require('../utils/verify');
 
 module.exports = async function({ getNamedAccounts, deployments }) {
+  if (
+    !developmentChains.includes(network.name) &&
+    !testnetChains.includes(network.name)
+  )
+    return;
+
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
@@ -43,7 +50,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     ],
   ];
 
-  const orbs = await deploy('OrbsContract', {
+  const orbs = await deploy('OrbsMainnet', {
     from: deployer,
     args,
     log: true,
@@ -59,4 +66,4 @@ module.exports = async function({ getNamedAccounts, deployments }) {
   }
 };
 
-module.exports.tags = ['all', 'orbs', 'main'];
+module.exports.tags = ['all', 'mainnet', 'main'];
