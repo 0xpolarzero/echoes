@@ -21,30 +21,18 @@ export default create((set) => ({
     });
   },
 
-  // Create a metadata object given traits
+  // Create a metadata object given traits (for minting)
   getMetadataFromTraits: (traits) => {
-    const name = traits.signature;
-
     const traitsFormatted = config.traits.reduce((acc, trait) => {
-      const traitData = trait.values.find(
-        (value) => value.name === traits[trait.type].name,
-      );
-      acc.push({
-        trait_type: trait.type,
-        value: traitData.name,
-      });
+      const index =
+        trait.values.findIndex(
+          (value) => value.name === traits[trait.type].name,
+        ) || 0;
+      acc.push(index);
       return acc;
     }, []);
 
-    traitsFormatted.push({
-      trait_type: 'expansion',
-      value: traits.expansion,
-    });
-
-    return {
-      name,
-      traits: traitsFormatted,
-    };
+    return [traits.signature, ...traitsFormatted];
   },
 
   // Get traits properties given a metadata object
