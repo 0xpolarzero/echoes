@@ -221,13 +221,24 @@ a.emphasize {
   animation: spin 1s linear infinite;
 }
 
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/**
+  * Animations
+  */
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-#loader.hidden {
-  opacity: 0;
-  pointer-events: none;
+/**
+  * Special
+  */
+/* Override RanbowKit button */
+button.iekbcc0.ju367v73 {
+  color: rgba(255, 255, 255, 0.87) !important;
 }
