@@ -74,7 +74,7 @@ const encodedContractUri =
   Buffer.from(JSON.stringify(contractUri)).toString('base64');
 
 // Systems
-const expansionCooldown = 60 * 60 * 24;
+const expansionCooldown = 60 * 10;
 
 const BASE_EXPANSE = 100;
 const MAX_EXPANSION = 10_000;
