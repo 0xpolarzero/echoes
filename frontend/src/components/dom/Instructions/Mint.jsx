@@ -17,7 +17,7 @@ const { MINT_PRICE_ETH, MINT_PRICE_WEI } = config;
 
 const Mint = ({ count }) => {
   const { traits, getMetadataFromTraits } = stores.useTraits();
-  const { chainId, setChainId, filterAvailableSignatures } = stores.useMint();
+  const { chainId, setChainId } = stores.useConfig();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: balance } = useBalance({ address });
@@ -104,12 +104,8 @@ const Mint = ({ count }) => {
   // Chain
   useEffect(() => {
     // We need to use this trick because wagmi hook useNetwork sets the chain too late
-    if (chain?.id) {
-      setChainId(chain.id);
-      // Update the available signatures for this chain
-      filterAvailableSignatures(chain.id);
-    }
-  }, [chain?.id, setChainId, filterAvailableSignatures]);
+    if (chain?.id) setChainId(chain.id);
+  }, [chain?.id, setChainId]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
