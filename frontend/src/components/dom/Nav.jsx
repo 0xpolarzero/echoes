@@ -8,20 +8,17 @@ import stores from '@/stores';
 const Nav = () => {
   const { theme, updateTheme } = stores.useConfig();
   const { init, started, suspended: audioOff, toggleMute } = stores.useAudio();
-  const { generate, setGenerate } = stores.useConfig();
+  const { generate, setGenerate, activePage, setActivePage } =
+    stores.useConfig();
   const router = useRouter();
 
-  const [activePage, setActivePage] = useState('');
-
   const goTo = (page, generate) => {
+    if (page === '/') {
+      generate ? setActivePage('') : setActivePage('experience');
+    }
     setGenerate(generate);
     router.push(page);
-    setActivePage(page.replace('/', ''));
   };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') setActivePage(window.location.pathname);
-  }, []);
 
   return (
     <header className='nav'>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import stores from '@/stores';
 
 // Dynamic import is used to prevent a payload when the website starts, that includes threejs, r3f etc..
 // WARNING ! errors might get obfuscated by using dynamic import.
@@ -11,6 +12,12 @@ import dynamic from 'next/dynamic';
 
 // Dom components go here
 export default function Page(props) {
+  const { setActivePage } = stores.useConfig();
+
+  useEffect(() => {
+    setActivePage('explore');
+  }, [setActivePage]);
+
   return <div />;
 }
 
