@@ -11,7 +11,7 @@ const Layout = forwardRef(({ children, ...props }, ref) => {
 
   useEffect(() => {
     getEchoes();
-  }, []);
+  }, [getEchoes]);
 
   return (
     <Config>
