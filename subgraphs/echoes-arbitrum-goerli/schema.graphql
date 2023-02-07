@@ -1,0 +1,9 @@
+type Echo @entity {
+  id: ID!
+  owner: Bytes!
+  tokenId: BigInt!
+  signature: String!
+  createdAt: BigInt!
+  lastExpandedAt: BigInt!
+  expandedCount: BigInt!
+}

@@ -1,0 +1,7 @@
+{
+  "goerli": {
+    "EchoesTestnet": {
+      "address": "0x2B978538A7088aa2B90fd30dB113Def20EDc479B"
+    }
+  }
+}

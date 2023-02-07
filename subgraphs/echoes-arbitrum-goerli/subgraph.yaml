@@ -1,0 +1,27 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: EchoesTestnet
+    network: arbitrum-goerli
+    source:
+      address: '0xd6098849A3979e303E4D4a84E10DE8A18B08ef37'
+      abi: EchoesTestnet
+      startBlock: 6986197
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ECHOES__EXPANDED
+        - ECHOES__MINTED
+      abis:
+        - name: EchoesTestnet
+          file: ./abis/EchoesTestnet.json
+      eventHandlers:
+        - event: ECHOES__EXPANDED(address,uint256,string)
+          handler: handleExpanded
+        - event: ECHOES__MINTED(address,uint256,string)
+          handler: handleMinted
+      file: ./src/echoes-testnet.ts

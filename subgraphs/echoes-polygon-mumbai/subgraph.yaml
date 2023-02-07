@@ -1,0 +1,27 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: EchoesTestnet
+    network: mumbai
+    source:
+      address: '0xC0954c0336c5bcD10fAa6e5b551203F9f94C52C3'
+      abi: EchoesTestnet
+      startBlock: 31813835
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ECHOES__EXPANDED
+        - ECHOES__MINTED
+      abis:
+        - name: EchoesTestnet
+          file: ./abis/EchoesTestnet.json
+      eventHandlers:
+        - event: ECHOES__EXPANDED(address,uint256,string)
+          handler: handleExpanded
+        - event: ECHOES__MINTED(address,uint256,string)
+          handler: handleMinted
+      file: ./src/echoes-testnet.ts
