@@ -1,9 +1,13 @@
 const { ethers, network } = require('hardhat');
 const fs = require('fs');
-const { testnetChains } = require('../helper-hardhat-config');
+const {
+  developmentChains,
+  testnetChains,
+} = require('../helper-hardhat-config');
 
-const frontEndContractsFile = '../frontend/data/constants/networkMapping.json';
-const frontEndAbiFolder = '../frontend/data/constants/';
+const frontEndContractsFile =
+  '../frontend/src/data/constants/networkMapping.json';
+const frontEndAbiFolder = '../frontend/src/data/constants/';
 
 module.exports = async () => {
   if (process.env.UPDATE_FRONT_END) {
@@ -14,8 +18,8 @@ module.exports = async () => {
 };
 
 async function updateContractAddresses() {
-  const orbsMainnet = await ethers.getContract('EchoesMainnet');
-  const orbsTestnet = await ethers.getContract('EchoesTestnet');
+  const echoesMainnet = await ethers.getContract('EchoesMainnet');
+  const echoesTestnet = await ethers.getContract('EchoesTestnet');
   const chainId = network.config.chainId;
 
   const contractAddresses = JSON.parse(
@@ -24,20 +28,20 @@ async function updateContractAddresses() {
 
   if (testnetChains.includes(chainId)) {
     if (chainId in contractAddresses) {
-      if (!contractAddresses[chainId]['Echoes'].includes(orbsTestnet.address))
-        contractAddresses[chainId]['Echoes'].push(orbsTestnet.address);
+      if (!contractAddresses[chainId]['Echoes'].includes(echoesTestnet.address))
+        contractAddresses[chainId]['Echoes'].push(echoesTestnet.address);
     } else {
       contractAddresses[chainId] = {
-        Echoes: [orbsTestnet.address],
+        Echoes: [echoesTestnet.address],
       };
     }
   } else {
     if (chainId in contractAddresses) {
-      if (!contractAddresses[chainId]['Echoes'].includes(orbsMainnet.address))
-        contractAddresses[chainId]['Echoes'].push(orbsMainnet.address);
+      if (!contractAddresses[chainId]['Echoes'].includes(echoesMainnet.address))
+        contractAddresses[chainId]['Echoes'].push(echoesMainnet.address);
     } else {
       contractAddresses[chainId] = {
-        Echoes: [orbsMainnet.address],
+        Echoes: [echoesMainnet.address],
       };
     }
   }
@@ -48,16 +52,16 @@ async function updateContractAddresses() {
 }
 
 async function updateAbi() {
-  const orbsMainnet = await ethers.getContract('EchoesMainnet');
+  const echoesMainnet = await ethers.getContract('EchoesMainnet');
   fs.writeFileSync(
     `${frontEndAbiFolder}EchoesMainnet.json`,
-    orbsMainnet.interface.format(ethers.utils.FormatTypes.json),
+    echoesMainnet.interface.format(ethers.utils.FormatTypes.json),
   );
 
-  const orbsTestnet = await ethers.getContract('EchoesTestnet');
+  const echoesTestnet = await ethers.getContract('EchoesTestnet');
   fs.writeFileSync(
     `${frontEndAbiFolder}EchoesTestnet.json`,
-    orbsTestnet.interface.format(ethers.utils.FormatTypes.json),
+    echoesTestnet.interface.format(ethers.utils.FormatTypes.json),
   );
 }
 
