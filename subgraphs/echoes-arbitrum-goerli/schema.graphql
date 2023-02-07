@@ -3,8 +3,7 @@ type Echo @entity {
   owner: Bytes!
   tokenId: BigInt!
   signature: String!
-  createdAtTimestamp: BigInt!
-  createdAtBlock: BigInt!
+  createdAt: BigInt!
   lastExpandedAt: BigInt!
   expandedCount: BigInt!
 }

@@ -6,9 +6,9 @@ dataSources:
     name: EchoesTestnet
     network: mumbai
     source:
-      address: '0xC0954c0336c5bcD10fAa6e5b551203F9f94C52C3'
+      address: '0x282E698C88fE4DF1cC9A537389d86F785311DF65'
       abi: EchoesTestnet
-      startBlock: 31813835
+      startBlock: 31817522
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

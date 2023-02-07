@@ -6,9 +6,9 @@ dataSources:
     name: EchoesTestnet
     network: arbitrum-goerli
     source:
-      address: '0xd6098849A3979e303E4D4a84E10DE8A18B08ef37'
+      address: '0xA50B6B62668405857A22b96f515aDf0e60d21a5B'
       abi: EchoesTestnet
-      startBlock: 6986197
+      startBlock: 6999131
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

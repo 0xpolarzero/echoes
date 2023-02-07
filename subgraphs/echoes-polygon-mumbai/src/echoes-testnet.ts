@@ -14,8 +14,7 @@ export function handleMinted(event: ECHOES__MINTED): void {
   echo.owner = event.params.owner;
   echo.tokenId = event.params.tokenId;
   echo.signature = event.params.signature;
-  echo.createdAtTimestamp = event.block.timestamp;
-  echo.createdAtBlock = event.block.number;
+  echo.createdAt = event.block.timestamp;
   echo.lastExpandedAt = event.block.timestamp;
   echo.expandedCount = BigInt.fromI32(0);
   echo.save();

@@ -6,9 +6,9 @@ dataSources:
     name: EchoesTestnet
     network: goerli
     source:
-      address: '0x2B978538A7088aa2B90fd30dB113Def20EDc479B'
+      address: '0x2e719a0CfFe4553f22C14C9643e88568ff8Ad50a'
       abi: EchoesTestnet
-      startBlock: 8449557
+      startBlock: 8450762
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
