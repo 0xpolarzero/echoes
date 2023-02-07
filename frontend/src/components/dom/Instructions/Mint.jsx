@@ -58,7 +58,10 @@ const Mint = ({ count }) => {
     }
   };
   const { config: mintConfig } = usePrepareContractWrite({
-    address: config.networkMapping[chainId]['Echoes'][0] || '',
+    address:
+      chainId === 1 || chainId === 80001
+        ? config.networkMapping[chainId]['Echoes'][0] || ''
+        : '',
     abi: chainId === 80001 ? config.abiMumbai : config.abiMainnet || '',
     functionName: 'mint',
     args: [...mintArgs, chainId === 1 ? { value: MINT_PRICE_WEI } : null],
