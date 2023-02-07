@@ -6,7 +6,7 @@ import Instructions from '@/components/dom/Instructions';
 // WARNING ! errors might get obfuscated by using dynamic import.
 // If something goes wrong go back to a static import to show the error.
 // https://github.com/pmndrs/react-three-next/issues/49
-const Entity = dynamic(() => import('@/components/canvas/Entity'), {
+const Experience = dynamic(() => import('@/components/canvas/Experience'), {
   ssr: false,
 });
 
@@ -17,7 +17,7 @@ export default function Page(props) {
 
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
-Page.canvas = (props) => <Entity />;
+Page.canvas = (props) => <Experience />;
 
 export async function getStaticProps() {
   return { props: { title: 'echoes' } };
