@@ -1,1 +1,5 @@
-{"31337":{"Echoes":["0x5FbDB2315678afecb367f032d93F642f64180aa3"]}}
+{
+  "31337": { "Echoes": ["0x5FbDB2315678afecb367f032d93F642f64180aa3"] },
+  "80001": { "Echoes": ["0xE9D5D30799481D5df85c0bf3A65B7c6A24c23385"] },
+  "1": { "Echoes": ["0xE9D5D30799481D5df85c0bf3A65B7c6A24c23385"] }
+}
