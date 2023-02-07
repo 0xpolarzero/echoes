@@ -175,6 +175,7 @@ contract EchoesMainnet is ERC721URIStorage, Ownable {
             revert ECHOES__SIGNATURE_ALREADY_USED(_signature);
 
         // Get the attributes
+        // It will revert in 'getAttribute' if the index is out of bounds (does not exist)
         string[] memory attributes = new string[](4);
         attributes[0] = getAttribute(0, _spectrumIndex);
         attributes[1] = getAttribute(1, _sceneryIndex);
@@ -185,12 +186,6 @@ contract EchoesMainnet is ERC721URIStorage, Ownable {
         indexes[1] = _sceneryIndex;
         indexes[2] = _traceIndex;
         indexes[3] = _atmosphereIndex;
-
-        // Check if any of the attributes is empty
-        for (uint256 i = 0; i < attributes.length; i++) {
-            if (bytes(attributes[i]).length == 0)
-                revert ECHOES__INVALID_ATTRIBUTE("Wrong attribute provided");
-        }
 
         Echo memory echo = Echo({
             owner: msg.sender,
@@ -366,7 +361,7 @@ contract EchoesMainnet is ERC721URIStorage, Ownable {
     function getAttributeIndex(
         uint256 _type,
         string memory _attribute
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         for (uint256 i = 0; i < s_attributes[_type].length; i++) {
             if (
                 keccak256(abi.encodePacked(s_attributes[_type][i])) ==

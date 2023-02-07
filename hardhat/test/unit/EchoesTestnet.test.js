@@ -322,6 +322,54 @@ const mineBlocks = require('../../scripts/mineBlocks');
       });
 
       /**
+       * @notice Other untested getters
+       */
+      describe('getAttributeIndex', function() {
+        it('Should return the correct index', async () => {
+          for (let i = 0; i < attributes.length; i++) {
+            for (let j = 0; j < attributes[i].length; j++) {
+              const index = await echoesContract.getAttributeIndex(
+                i,
+                attributes[i][j],
+              );
+
+              assert.equal(index, j);
+            }
+          }
+        });
+
+        it('Should return the first one if the attribute does not exist', async () => {
+          const indexNotAttribute = await echoesContract.getAttributeIndex(
+            0,
+            'Not an attribute',
+          );
+          assert.equal(indexNotAttribute, 0);
+
+          const indexNotIndex = await echoesContract.getAttributeIndex(
+            attributes.length,
+            attributes[1][2],
+          );
+          assert.equal(indexNotIndex, 0);
+        });
+      });
+
+      describe('getUsedSignatures', function() {
+        it('Should return the correct array', async () => {
+          const signature1 = 'Signature 1';
+          const signature2 = 'Signature 2';
+
+          await echoesContractUser.mint(signature1, 0, 0, 0, 0);
+          await echoesContractUser.mint(signature2, 0, 0, 0, 0);
+
+          const usedSignatures = await echoesContract.getUsedSignatures();
+
+          assert.equal(usedSignatures.length, 2);
+          assert.equal(usedSignatures[0], signature1);
+          assert.equal(usedSignatures[1], signature2);
+        });
+      });
+
+      /**
        * @notice Dev functions
        */
       const newAttributesIndex = 0;
@@ -390,6 +438,41 @@ const mineBlocks = require('../../scripts/mineBlocks');
         });
       });
 
+      const newColorsArray = [
+        '000000',
+        '1B1B1B',
+        '363636',
+        '4F4F4F',
+        '696969',
+        '828282',
+      ];
+
+      describe('[dev functions] - setSpectrumColors', function() {
+        it('Should successfully set the spectrum colors and emit the correct event', async () => {
+          await expect(await echoesContract.setSpectrumColors(newColorsArray))
+            .to.emit(echoesContract, 'ECHOES__SPECTRUM_COLORS_UPDATED')
+            .withArgs(newColorsArray);
+
+          assert.sameOrderedMembers(
+            await echoesContract.getSpectrumColors(),
+            newColorsArray,
+          );
+        });
+      });
+
+      describe('[dev functions] - setSceneryColors', function() {
+        it('Should successfully set the scenery colors and emit the correct event', async () => {
+          await expect(await echoesContract.setSceneryColors(newColorsArray))
+            .to.emit(echoesContract, 'ECHOES__SCENERY_COLORS_UPDATED')
+            .withArgs(newColorsArray);
+
+          assert.sameOrderedMembers(
+            await echoesContract.getSceneryColors(),
+            newColorsArray,
+          );
+        });
+      });
+
       describe('[dev functions] - setContractURI (OpenSea)', function() {
         it('Should successfully update the contract URI and emit the correct event', async () => {
           await expect(await echoesContract.setContractURI('test'))
@@ -410,7 +493,7 @@ const testTokenUri = (
 ) => {
   // Base
   assert.equal(json.description, description, 'description');
-  assert.equal(json.name, signature, 'name');
+  assert.equal(json.name, signature + ' #1', 'name');
   // We can't really test the SVG here, so we just check if it exists
   assert(json.image_data.includes('data:image/svg+xml;base64,'), 'image_data');
   assert.equal(json.external_url, externalUrl + tokenId, 'external_url');
