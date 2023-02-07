@@ -34,7 +34,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     expansionCooldown,
   ];
 
-  const echoes = await deploy('OrbsTestnet', {
+  const echoes = await deploy('EchoesTestnet', {
     from: deployer,
     args,
     log: true,

@@ -43,7 +43,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     ],
   ];
 
-  const echoes = await deploy('OrbsMainnet', {
+  const echoes = await deploy('EchoesMainnet', {
     from: deployer,
     args,
     log: true,

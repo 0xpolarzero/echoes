@@ -2,8 +2,8 @@ import { ethers } from 'ethers';
 import traits from '@/data/traits.js';
 import names from '@/data/names.json';
 import networkMapping from '@/data/constants/networkMapping.json';
-import abiMainnet from '@/data/constants/OrbsMainnet.json';
-import abiMumbai from '@/data/constants/OrbsTestnet.json';
+import abiMainnet from '@/data/constants/EchoesMainnet.json';
+import abiMumbai from '@/data/constants/EchoesTestnet.json';
 
 const description =
   'An enigma of light, figure, and atmosphere, a singular spectrum frozen in time.';

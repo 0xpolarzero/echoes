@@ -13,15 +13,18 @@ import "./Formats.sol";
  * @title Echoes contract
  * @notice This contract is used to interact with echoes
  * @author polarzero
- * @dev This contract is the exact same one as OrbsMainnet, except for three exceptions:
- * - There is no mint limit per wallet
- * - There is no max supply
- * - The echoes are free to mint
+ * @dev This contract is the exact same one as EchoesTestnet, except for three exceptions:
+ * - There can be a mint limit per wallet (0 = no limit)
+ * - There is a 1_000 max supply
+ * - The echoes are 0.01 ETH to generate
  */
 
 /// Errors
 error ECHOES__INVALID_ATTRIBUTE(string message);
 // Mint
+error ECHOES__INVALID_PRICE(uint256 value, uint256 price);
+error ECHOES__MAX_SUPPLY_REACHED(uint256 tokenId);
+error ECHOES__MINT_LIMIT_REACHED(uint256 mintLimit);
 error ECHOES__SIGNATURE_ALREADY_USED(string signature);
 // Expand
 error ECHOES__DOES_NOT_EXIST(uint256 tokenId);
@@ -32,7 +35,7 @@ error ECHOES__IN_EXPANSION_COOLDOWN(
     uint256 lastExpansionTimestamp
 );
 
-contract OrbsTestnet is ERC721URIStorage, Ownable {
+contract EchoesMainnet is ERC721URIStorage, Ownable {
     /// Libs
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -59,6 +62,9 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
     // Base
     address private immutable i_owner;
     uint256 private immutable i_creationTimestamp;
+    uint256 private immutable i_maxSupply; // 1_000
+    uint256 private s_price;
+    uint256 private s_mintLimit;
     // Metadata
     string[] private s_spectrumColors;
     string[] private s_sceneryColors;
@@ -80,9 +86,11 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
     // Dev functions
     event ECHOES__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
     event ECHOES__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
-    event ECHOES__CONTRACT_URI_UPDATED(string contractUri);
+    event ECHOES__PRICE_UPDATED(uint256 price);
+    event ECHOES__MINT_LIMIT_UPDATED(uint256 mintLimit);
     event ECHOES__SPECTRUM_COLORS_UPDATED(string[] colors);
     event ECHOES__SCENERY_COLORS_UPDATED(string[] colors);
+    event ECHOES__CONTRACT_URI_UPDATED(string contractUri);
     // Mint
     event ECHOES__MINTED(address owner, uint256 tokenId, string signature);
     // Expand
@@ -97,6 +105,8 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
      * @param _spectrumColors An array of colors (strings)
      * @param _sceneryColors An array of colors (strings)
      * @param _metadata An array of metadata (strings): animationUrl, externalUrl, description, contractUri
+     * @param _expansionCooldown The cooldown between each expansion (uint256)
+     * @param _base The price, mintLimit and maxSupply (uint256[])
      * @dev Add each allowed traits to the mapping on deployment ;
      * additionnal traits can be provided later
      */
@@ -108,7 +118,8 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         string[] memory _spectrumColors,
         string[] memory _sceneryColors,
         string[] memory _metadata,
-        uint256 _expansionCooldown
+        uint256 _expansionCooldown,
+        uint256[] memory _base
     ) ERC721("Echoes", "ECHO") {
         // Set attributes
         s_attributes[0] = _attributesSpectrum;
@@ -132,6 +143,9 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         // Set base
         i_owner = msg.sender;
         i_creationTimestamp = block.timestamp;
+        s_price = _base[0];
+        s_mintLimit = _base[1]; // 0 = no limit
+        i_maxSupply = _base[2]; // Easier to set here than constant - for testing purpose
     }
 
     function mint(
@@ -140,10 +154,19 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         uint256 _sceneryIndex,
         uint256 _traceIndex,
         uint256 _atmosphereIndex
-    ) external {
+    ) external payable {
         // Increment the tokenId
         _tokenIds.increment();
 
+        // Check if enough value is sent
+        if (msg.value < s_price)
+            revert ECHOES__INVALID_PRICE(msg.value, s_price);
+        // Check if the user has not reached the mint limit
+        if (s_mintLimit != 0 && balanceOf(msg.sender) >= s_mintLimit)
+            revert ECHOES__MINT_LIMIT_REACHED(s_mintLimit);
+        // Check if max supply is reached
+        if (_tokenIds.current() > i_maxSupply)
+            revert ECHOES__MAX_SUPPLY_REACHED(i_maxSupply);
         // Check if the signature is provided
         if (bytes(_signature).length == 0)
             revert ECHOES__INVALID_ATTRIBUTE("Signature is empty");
@@ -397,7 +420,7 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
      * @notice Get an echo
      * @param _tokenId The tokenId uint of the echo
      */
-    function getOrb(uint256 _tokenId) public view returns (Echo memory) {
+    function getEcho(uint256 _tokenId) public view returns (Echo memory) {
         return s_echoes[_tokenId];
     }
 
@@ -408,6 +431,27 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         uint256 _tokenId
     ) public view returns (uint256) {
         return s_creationBlocks[_tokenId];
+    }
+
+    /**
+     * @notice Get the price of the echo
+     */
+    function getPrice() public view returns (uint256) {
+        return s_price;
+    }
+
+    /**
+     * @notice Get the mint limit
+     */
+    function getMintLimit() public view returns (uint256) {
+        return s_mintLimit;
+    }
+
+    /**
+     * @notice Get the max supply
+     */
+    function getMaxSupply() public view returns (uint256) {
+        return i_maxSupply;
     }
 
     /**
@@ -544,6 +588,28 @@ contract OrbsTestnet is ERC721URIStorage, Ownable {
         s_expansionCooldown = _expansionCooldown;
 
         emit ECHOES__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
+    }
+
+    /**
+     * @notice Set the price
+     * @param _price The new price
+     * @dev onlyOwner
+     */
+    function setPrice(uint256 _price) external onlyOwner {
+        s_price = _price;
+
+        emit ECHOES__PRICE_UPDATED(_price);
+    }
+
+    /**
+     * @notice Set the mint limit
+     * @param _mintLimit The new mint limit
+     * @dev onlyOwner
+     */
+    function setMintLimit(uint256 _mintLimit) external onlyOwner {
+        s_mintLimit = _mintLimit;
+
+        emit ECHOES__MINT_LIMIT_UPDATED(_mintLimit);
     }
 
     /**

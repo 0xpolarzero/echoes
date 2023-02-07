@@ -302,7 +302,7 @@
   },
   {
     "type": "function",
-    "name": "getOrb",
+    "name": "getEcho",
     "constant": true,
     "stateMutability": "view",
     "payable": false,
@@ -325,7 +325,7 @@
   },
   {
     "type": "function",
-    "name": "getOrbCreationBlock",
+    "name": "getEchoCreationBlock",
     "constant": true,
     "stateMutability": "view",
     "payable": false,

@@ -14,8 +14,8 @@ module.exports = async () => {
 };
 
 async function updateContractAddresses() {
-  const orbsMainnet = await ethers.getContract('OrbsMainnet');
-  const orbsTestnet = await ethers.getContract('OrbsTestnet');
+  const orbsMainnet = await ethers.getContract('EchoesMainnet');
+  const orbsTestnet = await ethers.getContract('EchoesTestnet');
   const chainId = network.config.chainId;
 
   const contractAddresses = JSON.parse(
@@ -48,15 +48,15 @@ async function updateContractAddresses() {
 }
 
 async function updateAbi() {
-  const orbsMainnet = await ethers.getContract('OrbsMainnet');
+  const orbsMainnet = await ethers.getContract('EchoesMainnet');
   fs.writeFileSync(
-    `${frontEndAbiFolder}OrbsMainnet.json`,
+    `${frontEndAbiFolder}EchoesMainnet.json`,
     orbsMainnet.interface.format(ethers.utils.FormatTypes.json),
   );
 
-  const orbsTestnet = await ethers.getContract('OrbsTestnet');
+  const orbsTestnet = await ethers.getContract('EchoesTestnet');
   fs.writeFileSync(
-    `${frontEndAbiFolder}OrbsTestnet.json`,
+    `${frontEndAbiFolder}EchoesTestnet.json`,
     orbsTestnet.interface.format(ethers.utils.FormatTypes.json),
   );
 }

@@ -28,11 +28,11 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
 !developmentChains.includes(network.name)
   ? describe.skip
-  : describe('OrbsTestnet unit tests', function() {
+  : describe('EchoesTestnet unit tests', function() {
       let deployer;
       let user;
-      let orbsContract;
-      let orbsContractUser;
+      let echoesContract;
+      let echoesContractUser;
       let deployTx;
 
       beforeEach(async () => {
@@ -40,8 +40,8 @@ const mineBlocks = require('../../scripts/mineBlocks');
         deployer = accounts[0];
         user = accounts[1];
         deployTx = await deployments.fixture(['main']);
-        orbsContract = await ethers.getContract('OrbsTestnet', deployer);
-        orbsContractUser = await ethers.getContract('OrbsTestnet', user);
+        echoesContract = await ethers.getContract('EchoesTestnet', deployer);
+        echoesContractUser = await ethers.getContract('EchoesTestnet', user);
       });
 
       /**
@@ -50,55 +50,55 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('constructor', function() {
         it('Should initialize the variables with the right value', async () => {
           // ERC721
-          assert.equal(await orbsContract.name(), name);
-          assert.equal(await orbsContract.symbol(), symbol);
-          assert.equal(await orbsContract.getCurrentTokenId(), 0);
+          assert.equal(await echoesContract.name(), name);
+          assert.equal(await echoesContract.symbol(), symbol);
+          assert.equal(await echoesContract.getCurrentTokenId(), 0);
 
-          assert.equal(await orbsContract.getOwner(), deployer.address);
+          assert.equal(await echoesContract.getOwner(), deployer.address);
           assert.equal(
-            (await orbsContract.getCreationTimestamp()).toString(),
+            (await echoesContract.getCreationTimestamp()).toString(),
             (
               await ethers.provider.getBlock(
-                deployTx.OrbsTestnet.receipt.blockNumber,
+                deployTx.EchoesTestnet.receipt.blockNumber,
               )
             ).timestamp.toString(),
           );
 
           // Metadata
-          assert.equal(await orbsContract.getExternalUrl(), externalUrl);
-          assert.equal(await orbsContract.getDescription(), description);
-          assert.equal(await orbsContract.getAnimationUrl(), animationUrl);
-          assert.equal(await orbsContract.contractURI(), encodedContractUri);
+          assert.equal(await echoesContract.getExternalUrl(), externalUrl);
+          assert.equal(await echoesContract.getDescription(), description);
+          assert.equal(await echoesContract.getAnimationUrl(), animationUrl);
+          assert.equal(await echoesContract.contractURI(), encodedContractUri);
           assert.sameOrderedMembers(
-            await orbsContract.getSpectrumColors(),
+            await echoesContract.getSpectrumColors(),
             spectrumColors,
           );
           assert.sameOrderedMembers(
-            await orbsContract.getSceneryColors(),
+            await echoesContract.getSceneryColors(),
             sceneryColors,
           );
 
           // Systems
           assert.equal(
-            (await orbsContract.getExpansionCooldown()).toString(),
+            (await echoesContract.getExpansionCooldown()).toString(),
             expansionCooldown.toString(),
           );
 
           // Attributes
           for (let i = 0; i < attributes.length; i++) {
             assert.equal(
-              (await orbsContract.getAttributesOfType(i)).toString(),
+              (await echoesContract.getAttributesOfType(i)).toString(),
               attributes[i].toString(),
             );
           }
 
           // Constants
           assert.equal(
-            (await orbsContract.getBaseExpanse()).toString(),
+            (await echoesContract.getBaseExpanse()).toString(),
             BASE_EXPANSE.toString(),
           );
           assert.equal(
-            (await orbsContract.getMaxExpansion()).toString(),
+            (await echoesContract.getMaxExpansion()).toString(),
             MAX_EXPANSION.toString(),
           );
         });
@@ -113,20 +113,20 @@ const mineBlocks = require('../../scripts/mineBlocks');
         describe('Should revert if any verification fails', function() {
           it('signature not provided', async () => {
             await expect(
-              orbsContractUser.mint('', 0, 0, 0, 0),
+              echoesContractUser.mint('', 0, 0, 0, 0),
             ).to.be.revertedWith(
               `ECHOES__INVALID_ATTRIBUTE("Signature is empty")`,
             );
           });
           it('signature already used', async () => {
-            await orbsContract.mint(...args);
-            await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
+            await echoesContract.mint(...args);
+            await expect(echoesContractUser.mint(...args)).to.be.revertedWith(
               `ECHOES__SIGNATURE_ALREADY_USED("${args[0]}")`,
             );
           });
           it('attribute index out of bounds (does not exist)', async () => {
             await expect(
-              orbsContractUser.mint('Name', attributes[0].length, 0, 0, 0),
+              echoesContractUser.mint('Name', attributes[0].length, 0, 0, 0),
             ).to.be.revertedWith(
               `ECHOES__INVALID_ATTRIBUTE("The attribute does not exist")`,
             );
@@ -145,29 +145,29 @@ const mineBlocks = require('../../scripts/mineBlocks');
           let timestamp;
 
           beforeEach(async () => {
-            const mint = await orbsContractUser.mint(...args);
+            const mint = await echoesContractUser.mint(...args);
             const mintTx = await mint.wait(1);
             timestamp = (await mintTx.events[0].getBlock()).timestamp;
           });
 
           it('correct amount of tokens minted', async () => {
             assert.equal(
-              (await orbsContract.balanceOf(user.address)).toString(),
+              (await echoesContract.balanceOf(user.address)).toString(),
               '1',
             );
           });
           it('current token id incremented', async () => {
             assert.equal(
-              (await orbsContract.getCurrentTokenId()).toString(),
+              (await echoesContract.getCurrentTokenId()).toString(),
               '1',
             );
           });
           it('correct owner set', async () => {
-            assert.equal(await orbsContract.ownerOf(1), user.address);
+            assert.equal(await echoesContract.ownerOf(1), user.address);
           });
 
           it('correct echo created', async () => {
-            const echo = await orbsContract.getOrb(1);
+            const echo = await echoesContract.getEcho(1);
 
             assert.equal(echo.signature, signature);
             assert.equal(
@@ -187,7 +187,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
             assert.equal(echo.tokenId.toString(), '1');
           });
           it('correct tokenURI set', async () => {
-            const tokenURI = await orbsContract.tokenURI(1);
+            const tokenURI = await echoesContract.tokenURI(1);
             const decoded = Buffer.from(
               tokenURI.split(',')[1],
               'base64',
@@ -199,7 +199,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
           });
 
           it('correct echoes mapping set', async () => {
-            const echo = await orbsContract.getOrb('1');
+            const echo = await echoesContract.getEcho('1');
 
             assert.equal(echo.tokenId.toString(), '1');
             assert.equal(echo.owner, user.address);
@@ -221,7 +221,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
           });
 
           it('correct signature added to the array', async () => {
-            const isAvailable = await orbsContract.isSignatureAvailable(
+            const isAvailable = await echoesContract.isSignatureAvailable(
               signature,
             );
             assert(!isAvailable);
@@ -229,8 +229,8 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
           it('correct event emitted', async () => {
             const newSignature = 'Other name';
-            await expect(orbsContractUser.mint(newSignature, 0, 0, 0, 0))
-              .to.emit(orbsContract, 'ECHOES__MINTED')
+            await expect(echoesContractUser.mint(newSignature, 0, 0, 0, 0))
+              .to.emit(echoesContract, 'ECHOES__MINTED')
               .withArgs(user.address, 2, newSignature);
           });
         });
@@ -241,32 +241,32 @@ const mineBlocks = require('../../scripts/mineBlocks');
        */
       describe('expand', function() {
         beforeEach(async () => {
-          await orbsContractUser.mint('Name of the echo', 0, 0, 0, 0);
+          await echoesContractUser.mint('Name of the echo', 0, 0, 0, 0);
         });
 
         describe('Should revert if any verification fails', function() {
           it("doesn't exist", async () => {
-            await expect(orbsContractUser.expand(2)).to.be.revertedWith(
+            await expect(echoesContractUser.expand(2)).to.be.revertedWith(
               "'ECHOES__DOES_NOT_EXIST(2)'",
             );
           });
           it('not owner', async () => {
-            const expectedOwner = await orbsContract.ownerOf(1);
+            const expectedOwner = await echoesContract.ownerOf(1);
 
-            await expect(orbsContract.expand(1)).to.be.revertedWith(
+            await expect(echoesContract.expand(1)).to.be.revertedWith(
               `'ECHOES__NOT_OWNER("${expectedOwner}", "${deployer.address}")'`,
             );
           });
           it('in expansion cooldown', async () => {
-            const lastExpansionTimestamp = (await orbsContract.getOrb(1))
+            const lastExpansionTimestamp = (await echoesContract.getEcho(1))
               .lastExpansionTimestamp;
 
-            await expect(orbsContractUser.expand(1)).to.be.revertedWith(
+            await expect(echoesContractUser.expand(1)).to.be.revertedWith(
               `'ECHOES__IN_EXPANSION_COOLDOWN(${expansionCooldown}, ${lastExpansionTimestamp})'`,
             );
           });
           it('max expansion reached', async () => {
-            await orbsContract.setExpansionCooldown(0);
+            await echoesContract.setExpansionCooldown(0);
             // Pass two days to get a higher multiplier
             const twoDaysInBlocks = (2 * 24 * 60 * 60) / 13;
             await mineBlocks(twoDaysInBlocks);
@@ -274,12 +274,12 @@ const mineBlocks = require('../../scripts/mineBlocks');
             let reached;
             // Expand until max expansion reached
             while (!reached) {
-              await orbsContractUser.expand(1);
-              reached = (await orbsContract.getOrb(1)).maxExpansionReached;
+              await echoesContractUser.expand(1);
+              reached = (await echoesContract.getEcho(1)).maxExpansionReached;
             }
 
             // Try to expand again
-            await expect(orbsContractUser.expand(1)).to.be.revertedWith(
+            await expect(echoesContractUser.expand(1)).to.be.revertedWith(
               `'ECHOES__MAX_EXPANSION_REACHED(1)'`,
             );
           });
@@ -288,19 +288,20 @@ const mineBlocks = require('../../scripts/mineBlocks');
         describe('Should successfully expand and update all storage states', function() {
           // maxExpansionReached is correctly set considering the previous test
           it('correct expansionRate', async () => {
-            await orbsContract.setExpansionCooldown(0);
-            const expansionRate = (await orbsContract.getOrb(1)).expansionRate;
-            await orbsContractUser.expand(1);
-            const newExpansionRate = (await orbsContract.getOrb(1))
+            await echoesContract.setExpansionCooldown(0);
+            const expansionRate = (await echoesContract.getEcho(1))
+              .expansionRate;
+            await echoesContractUser.expand(1);
+            const newExpansionRate = (await echoesContract.getEcho(1))
               .expansionRate;
 
             assert.equal(newExpansionRate.toString(), expansionRate.add(1));
           });
           it('correct lastExpansionTimestamp', async () => {
-            await orbsContract.setExpansionCooldown(0);
-            const tx = await orbsContractUser.expand(1);
+            await echoesContract.setExpansionCooldown(0);
+            const tx = await echoesContractUser.expand(1);
             const receipt = await tx.wait(1);
-            const lastExpansionTimestamp = (await orbsContract.getOrb(1))
+            const lastExpansionTimestamp = (await echoesContract.getEcho(1))
               .lastExpansionTimestamp;
 
             assert.equal(
@@ -310,11 +311,11 @@ const mineBlocks = require('../../scripts/mineBlocks');
           });
           // Correct event emitted
           it('correct event emitted', async () => {
-            await orbsContract.setExpansionCooldown(0);
-            const signature = (await orbsContract.getOrb(1)).signature;
+            await echoesContract.setExpansionCooldown(0);
+            const signature = (await echoesContract.getEcho(1)).signature;
 
-            await expect(orbsContractUser.expand(1))
-              .to.emit(orbsContract, 'ECHOES__EXPANDED')
+            await expect(echoesContractUser.expand(1))
+              .to.emit(echoesContract, 'ECHOES__EXPANDED')
               .withArgs(user.address, 1, signature);
           });
         });
@@ -331,17 +332,17 @@ const mineBlocks = require('../../scripts/mineBlocks');
         it('Should revert if not called by the owner', async () => {
           // addAttributes
           await expect(
-            orbsContract
+            echoesContract
               .connect(user)
               .addAttributes(newAttributesIndex, newAttributes),
           ).to.be.revertedWith('Ownable: caller is not the owner');
           // setExpansionCooldown
           await expect(
-            orbsContract.connect(user).setExpansionCooldown(100),
+            echoesContract.connect(user).setExpansionCooldown(100),
           ).to.be.revertedWith('Ownable: caller is not the owner');
           // setContractURI
           await expect(
-            orbsContract.connect(user).setContractURI('test'),
+            echoesContract.connect(user).setContractURI('test'),
           ).to.be.revertedWith('Ownable: caller is not the owner');
         });
       });
@@ -349,7 +350,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('[dev functions] - addAttributes', function() {
         it('Should revert if the attribute index is out of bounds', async () => {
           await expect(
-            orbsContract.addAttributes(attributes.length, newAttributes),
+            echoesContract.addAttributes(attributes.length, newAttributes),
           ).to.be.revertedWith(
             'ECHOES__INVALID_ATTRIBUTE("The attributes type does not exist")',
           );
@@ -357,14 +358,17 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
         it('Should successfully add new attributes to a type and emit the correct event', async () => {
           await expect(
-            await orbsContract.addAttributes(newAttributesIndex, newAttributes),
+            await echoesContract.addAttributes(
+              newAttributesIndex,
+              newAttributes,
+            ),
           )
-            .to.emit(orbsContract, 'ECHOES__ATTRIBUTES_ADDED')
+            .to.emit(echoesContract, 'ECHOES__ATTRIBUTES_ADDED')
             .withArgs(newAttributesIndex, newAttributes);
 
           assert.equal(
             (
-              await orbsContract.getAttributesOfType(newAttributesIndex)
+              await echoesContract.getAttributesOfType(newAttributesIndex)
             ).toString(),
             [...attributes[newAttributesIndex], ...newAttributes].toString(),
           );
@@ -374,13 +378,13 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('[dev functions] - setExpansionCooldown', function() {
         it('Should successfully set the expansion cooldown and emit the correct event', async () => {
           await expect(
-            await orbsContract.setExpansionCooldown(newExpansionCooldown),
+            await echoesContract.setExpansionCooldown(newExpansionCooldown),
           )
-            .to.emit(orbsContract, 'ECHOES__EXPANSION_COOLDOWN_UPDATED')
+            .to.emit(echoesContract, 'ECHOES__EXPANSION_COOLDOWN_UPDATED')
             .withArgs(newExpansionCooldown);
 
           assert.equal(
-            (await orbsContract.getExpansionCooldown()).toString(),
+            (await echoesContract.getExpansionCooldown()).toString(),
             newExpansionCooldown.toString(),
           );
         });
@@ -388,11 +392,11 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
       describe('[dev functions] - setContractURI (OpenSea)', function() {
         it('Should successfully update the contract URI and emit the correct event', async () => {
-          await expect(await orbsContract.setContractURI('test'))
-            .to.emit(orbsContract, 'ECHOES__CONTRACT_URI_UPDATED')
+          await expect(await echoesContract.setContractURI('test'))
+            .to.emit(echoesContract, 'ECHOES__CONTRACT_URI_UPDATED')
             .withArgs('test');
 
-          assert.equal(await orbsContract.contractURI(), 'test');
+          assert.equal(await echoesContract.contractURI(), 'test');
         });
       });
     });
