@@ -152,8 +152,11 @@ export default create((set, get) => ({
   },
 
   /**
-   * @notice Other configuration (which page is it on)
+   * @notice Page
    */
   generate: false,
   setGenerate: (generate) => set({ generate }),
+
+  activePage: '',
+  setActivePage: (activePage) => set({ activePage }),
 }));
