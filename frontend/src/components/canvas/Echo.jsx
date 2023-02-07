@@ -6,29 +6,6 @@ import vertexShaders from './shaders/echo/vertexShaders';
 import fragmentShader from './shaders/echo/fragmentShader';
 import stores from '@/stores';
 
-const Entity = ({ ...props }) => {
-  const group = useRef(null);
-
-  // const [hovered, hover] = useState(false);
-  // useCursor(hovered);
-
-  const radius = 2;
-
-  useFrame(({ camera }) => {
-    // Make sure the entity is always at the center of the left side of the screen
-    group.current.position.x = -1.5 * (window.innerWidth / window.innerHeight);
-  });
-
-  return (
-    <>
-      <group ref={group} position={[-2, 0, 0]} {...props}>
-        <Background />
-        <Echo radius={radius} />
-      </group>
-    </>
-  );
-};
-
 const Echo = ({ radius }) => {
   const mesh = useRef(null);
   const { traits } = stores.useTraits();
@@ -139,15 +116,4 @@ const Echo = ({ radius }) => {
   );
 };
 
-const Background = () => {
-  const { traits } = stores.useTraits();
-  const { updateTheme } = stores.useConfig();
-
-  useEffect(() => {
-    updateTheme(traits.scenery);
-  }, [traits.scenery, updateTheme]);
-
-  return null;
-};
-
-export default Entity;
+export default Echo;
