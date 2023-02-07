@@ -1,6 +1,6 @@
 import Head from 'next/head';
 
-const titleDefault = 'orbs_experience';
+const titleDefault = 'echoes_experience';
 const url = 'https://react-three-next.vercel.app/';
 const description =
   'The easiest and fastest way to create a 3D website using React Three Fiber and NextJS';

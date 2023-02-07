@@ -10,27 +10,27 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Formats.sol";
 
 /**
- * @title Orbs contract
- * @notice This contract is used to interact with orbs
+ * @title Echoes contract
+ * @notice This contract is used to interact with echoes
  * @author polarzero
  * @dev This contract is the exact same one as OrbsTestnet, except for three exceptions:
  * - There can be a mint limit per wallet (0 = no limit)
  * - There is a 1_000 max supply
- * - The orbs are 0.01 ETH to generate
+ * - The echoes are 0.01 ETH to generate
  */
 
 /// Errors
-error ORBS__INVALID_ATTRIBUTE(string message);
+error ECHOES__INVALID_ATTRIBUTE(string message);
 // Mint
-error ORBS__INVALID_PRICE(uint256 value, uint256 price);
-error ORBS__MAX_SUPPLY_REACHED(uint256 tokenId);
-error ORBS__MINT_LIMIT_REACHED(uint256 mintLimit);
-error ORBS__SIGNATURE_ALREADY_USED(string signature);
+error ECHOES__INVALID_PRICE(uint256 value, uint256 price);
+error ECHOES__MAX_SUPPLY_REACHED(uint256 tokenId);
+error ECHOES__MINT_LIMIT_REACHED(uint256 mintLimit);
+error ECHOES__SIGNATURE_ALREADY_USED(string signature);
 // Expand
-error ORBS__DOES_NOT_EXIST(uint256 tokenId);
-error ORBS__NOT_OWNER(address owner, address caller);
-error ORBS__MAX_EXPANSION_REACHED(uint256 tokenId);
-error ORBS__IN_EXPANSION_COOLDOWN(
+error ECHOES__DOES_NOT_EXIST(uint256 tokenId);
+error ECHOES__NOT_OWNER(address owner, address caller);
+error ECHOES__MAX_EXPANSION_REACHED(uint256 tokenId);
+error ECHOES__IN_EXPANSION_COOLDOWN(
     uint256 cooldown,
     uint256 lastExpansionTimestamp
 );
@@ -41,7 +41,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIds;
 
     /// Structs
-    struct Orb {
+    struct Echo {
         address owner;
         // Base attributes
         string signature;
@@ -78,23 +78,23 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     string[] private s_usedSignatures;
 
     /// Mappings
-    mapping(uint256 => Orb) private s_orbs; // tokenId => Orb
+    mapping(uint256 => Echo) private s_echoes; // tokenId => Echo
     mapping(uint256 => string[]) private s_attributes; // typeIndex => attributes
     mapping(uint256 => uint256) private s_creationBlocks; // tokenId => blockNumber
 
     /// Events
     // Dev functions
-    event ORBS__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
-    event ORBS__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
-    event ORBS__PRICE_UPDATED(uint256 price);
-    event ORBS__MINT_LIMIT_UPDATED(uint256 mintLimit);
-    event ORBS__SPECTRUM_COLORS_UPDATED(string[] colors);
-    event ORBS__SCENERY_COLORS_UPDATED(string[] colors);
-    event ORBS__CONTRACT_URI_UPDATED(string contractUri);
+    event ECHOES__ATTRIBUTES_ADDED(uint256 typeIndex, string[] attributes);
+    event ECHOES__EXPANSION_COOLDOWN_UPDATED(uint256 cooldown);
+    event ECHOES__PRICE_UPDATED(uint256 price);
+    event ECHOES__MINT_LIMIT_UPDATED(uint256 mintLimit);
+    event ECHOES__SPECTRUM_COLORS_UPDATED(string[] colors);
+    event ECHOES__SCENERY_COLORS_UPDATED(string[] colors);
+    event ECHOES__CONTRACT_URI_UPDATED(string contractUri);
     // Mint
-    event ORBS__MINTED(address owner, uint256 tokenId, string signature);
+    event ECHOES__MINTED(address owner, uint256 tokenId, string signature);
     // Expand
-    event ORBS__EXPANDED(address owner, uint256 tokenId, string signature);
+    event ECHOES__EXPANDED(address owner, uint256 tokenId, string signature);
 
     /**
      * @notice Constructor
@@ -120,7 +120,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
         string[] memory _metadata,
         uint256 _expansionCooldown,
         uint256[] memory _base
-    ) ERC721("Orbs", "ORBS") {
+    ) ERC721("Echoes", "ECHO") {
         // Set attributes
         s_attributes[0] = _attributesSpectrum;
         s_attributes[1] = _attributesScenery;
@@ -159,19 +159,20 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
         _tokenIds.increment();
 
         // Check if enough value is sent
-        if (msg.value < s_price) revert ORBS__INVALID_PRICE(msg.value, s_price);
+        if (msg.value < s_price)
+            revert ECHOES__INVALID_PRICE(msg.value, s_price);
         // Check if the user has not reached the mint limit
         if (s_mintLimit != 0 && balanceOf(msg.sender) >= s_mintLimit)
-            revert ORBS__MINT_LIMIT_REACHED(s_mintLimit);
+            revert ECHOES__MINT_LIMIT_REACHED(s_mintLimit);
         // Check if max supply is reached
         if (_tokenIds.current() > i_maxSupply)
-            revert ORBS__MAX_SUPPLY_REACHED(i_maxSupply);
+            revert ECHOES__MAX_SUPPLY_REACHED(i_maxSupply);
         // Check if the signature is provided
         if (bytes(_signature).length == 0)
-            revert ORBS__INVALID_ATTRIBUTE("Signature is empty");
+            revert ECHOES__INVALID_ATTRIBUTE("Signature is empty");
         // Check if the signature is already used
         if (!isSignatureAvailable(_signature))
-            revert ORBS__SIGNATURE_ALREADY_USED(_signature);
+            revert ECHOES__SIGNATURE_ALREADY_USED(_signature);
 
         // Get the attributes
         string[] memory attributes = new string[](4);
@@ -188,10 +189,10 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
         // Check if any of the attributes is empty
         for (uint256 i = 0; i < attributes.length; i++) {
             if (bytes(attributes[i]).length == 0)
-                revert ORBS__INVALID_ATTRIBUTE("Wrong attribute provided");
+                revert ECHOES__INVALID_ATTRIBUTE("Wrong attribute provided");
         }
 
-        Orb memory orb = Orb({
+        Echo memory echo = Echo({
             owner: msg.sender,
             signature: _signature,
             attributes: attributes,
@@ -209,52 +210,52 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
 
         // Update storage
         s_usedSignatures.push(_signature);
-        s_orbs[_tokenIds.current()] = orb;
+        s_echoes[_tokenIds.current()] = echo;
         s_creationBlocks[_tokenIds.current()] = block.number;
 
-        emit ORBS__MINTED(msg.sender, _tokenIds.current(), _signature);
+        emit ECHOES__MINTED(msg.sender, _tokenIds.current(), _signature);
     }
 
     function expand(uint256 _tokenId) public {
-        // Check if the orb exists
-        if (!_exists(_tokenId)) revert ORBS__DOES_NOT_EXIST(_tokenId);
+        // Check if the echo exists
+        if (!_exists(_tokenId)) revert ECHOES__DOES_NOT_EXIST(_tokenId);
 
-        Orb memory orb = s_orbs[_tokenId];
+        Echo memory echo = s_echoes[_tokenId];
 
         // Check if the caller is the owner
-        if (msg.sender != orb.owner)
-            revert ORBS__NOT_OWNER(orb.owner, msg.sender);
+        if (msg.sender != echo.owner)
+            revert ECHOES__NOT_OWNER(echo.owner, msg.sender);
         // Check if the expansion cooldown is over
         if (
-            currentTimestamp() - orb.lastExpansionTimestamp <
+            currentTimestamp() - echo.lastExpansionTimestamp <
             s_expansionCooldown
         )
-            revert ORBS__IN_EXPANSION_COOLDOWN(
+            revert ECHOES__IN_EXPANSION_COOLDOWN(
                 s_expansionCooldown,
-                orb.lastExpansionTimestamp
+                echo.lastExpansionTimestamp
             );
-        // Check if the orb has not reached the max expansion
-        if (orb.maxExpansionReached)
-            revert ORBS__MAX_EXPANSION_REACHED(orb.tokenId);
+        // Check if the echo has not reached the max expansion
+        if (echo.maxExpansionReached)
+            revert ECHOES__MAX_EXPANSION_REACHED(echo.tokenId);
 
         // Update the last expansion timestamp
-        s_orbs[_tokenId].lastExpansionTimestamp = currentTimestamp();
+        s_echoes[_tokenId].lastExpansionTimestamp = currentTimestamp();
 
         // Update the expansion rate
-        s_orbs[_tokenId].expansionRate = orb.expansionRate + 1;
+        s_echoes[_tokenId].expansionRate = echo.expansionRate + 1;
 
         // Update the maxExpansionReached if needed
-        if (getExpanse(orb.tokenId) == MAX_EXPANSION)
-            s_orbs[_tokenId].maxExpansionReached = true;
+        if (getExpanse(echo.tokenId) == MAX_EXPANSION)
+            s_echoes[_tokenId].maxExpansionReached = true;
 
-        emit ORBS__EXPANDED(orb.owner, orb.tokenId, orb.signature);
+        emit ECHOES__EXPANDED(echo.owner, echo.tokenId, echo.signature);
     }
 
     /// Getters
 
     /**
      * @notice Get the token URI for the given tokenId
-     * @param _tokenId The tokenId of the orb
+     * @param _tokenId The tokenId of the echo
      * @dev Override the ERC721 tokenURI function
      * -> This will return the full token URI (concat both strings), with bothe the
      * static and updatable parts
@@ -266,13 +267,13 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     ) public view override returns (string memory) {
         _requireMinted(_tokenId);
 
-        // Get the orb & attributes indexes
-        Orb memory orb = s_orbs[_tokenId];
+        // Get the echo & attributes indexes
+        Echo memory echo = s_echoes[_tokenId];
         uint256[] memory indexes = new uint256[](4);
-        indexes[0] = getAttributeIndex(0, orb.attributes[0]);
-        indexes[1] = getAttributeIndex(1, orb.attributes[1]);
-        indexes[2] = getAttributeIndex(2, orb.attributes[2]);
-        indexes[3] = getAttributeIndex(3, orb.attributes[3]);
+        indexes[0] = getAttributeIndex(0, echo.attributes[0]);
+        indexes[1] = getAttributeIndex(1, echo.attributes[1]);
+        indexes[2] = getAttributeIndex(2, echo.attributes[2]);
+        indexes[3] = getAttributeIndex(3, echo.attributes[3]);
 
         // Get the appropriate colors
         string[] memory spectrumColors = new string[](2);
@@ -282,28 +283,28 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
 
         // Get the base URI (non updatable)
         string memory baseUri = Formats.metadataBase(
-            orb.attributes,
+            echo.attributes,
             spectrumColors,
             sceneryColor,
-            orb.signature,
+            echo.signature,
             i_description,
             i_externalUrl,
-            orb.creationTimestamp,
-            orb.tokenId
+            echo.creationTimestamp,
+            echo.tokenId
         );
 
         // Get the expanse (if not maxed)
-        uint256 expanse = orb.maxExpansionReached
+        uint256 expanse = echo.maxExpansionReached
             ? MAX_EXPANSION
-            : getExpanse(orb.tokenId);
+            : getExpanse(echo.tokenId);
 
         // Get the updatable URI
         string memory updatableUri = Formats.metadataUpdatable(
             i_animationUrl,
             indexes,
             expanse,
-            orb.lastExpansionTimestamp,
-            orb.maxExpansionReached
+            echo.lastExpansionTimestamp,
+            echo.maxExpansionReached
         );
 
         if (bytes(baseUri).length > 0 && bytes(updatableUri).length > 0) {
@@ -349,7 +350,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
 
         // Check if the attribute exists
         if (attributes.length == 0)
-            revert ORBS__INVALID_ATTRIBUTE(
+            revert ECHOES__INVALID_ATTRIBUTE(
                 "The attributes type does not exist"
             );
 
@@ -391,24 +392,24 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
 
         // Check if the attribute exists
         if (_attributeIndex >= attributes.length)
-            revert ORBS__INVALID_ATTRIBUTE("The attribute does not exist");
+            revert ECHOES__INVALID_ATTRIBUTE("The attribute does not exist");
 
         // Return the attribute
         return attributes[_attributeIndex];
     }
 
     /**
-     * @notice Get the expanse of the orb
-     * @param _tokenId The tokenId of the orb
+     * @notice Get the expanse of the echo
+     * @param _tokenId The tokenId of the echo
      * @dev It could be adapted to read from the tokenId, but it would force to read from storage
      * -> This way it could be fetched from outside the contract more easily as well
      */
     function getExpanse(uint256 _tokenId) public view returns (uint256) {
         // Get the creation block
-        uint256 creationBlock = s_creationBlocks[_tokenId];
+        uint256 creationBlock = getEchoCreationBlock(_tokenId);
         // Calculate the expanse
         uint256 expanse = BASE_EXPANSE +
-            s_orbs[_tokenId].expansionRate *
+            s_echoes[_tokenId].expansionRate *
             ((currentBlockNumber() - creationBlock) / 100); // (~+66 per day)
 
         // If it reaches the max expanse, return the max expanse
@@ -416,24 +417,24 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @notice Get an orb
-     * @param _tokenId The tokenId uint of the orb
+     * @notice Get an echo
+     * @param _tokenId The tokenId uint of the echo
      */
-    function getOrb(uint256 _tokenId) public view returns (Orb memory) {
-        return s_orbs[_tokenId];
+    function getOrb(uint256 _tokenId) public view returns (Echo memory) {
+        return s_echoes[_tokenId];
     }
 
     /**
-     * @notice Get the creation block number of an orb
+     * @notice Get the creation block number of an echo
      */
-    function getOrbCreationBlock(
+    function getEchoCreationBlock(
         uint256 _tokenId
     ) public view returns (uint256) {
         return s_creationBlocks[_tokenId];
     }
 
     /**
-     * @notice Get the price of the orb
+     * @notice Get the price of the echo
      */
     function getPrice() public view returns (uint256) {
         return s_price;
@@ -564,7 +565,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
         string[] memory _attributes
     ) external onlyOwner {
         // If the attributes type does not exist, revert (will be done when getting the attributes)
-        // It would be too much of a struggle to add a new type and recursively update all orbs
+        // It would be too much of a struggle to add a new type and recursively update all echoes
         getAttributesOfType(_attributeIndex);
 
         // We won't check if the individual attributes already exist either, it would be too expensive
@@ -573,7 +574,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
             s_attributes[_attributeIndex].push(_attributes[i]);
         }
 
-        emit ORBS__ATTRIBUTES_ADDED(_attributeIndex, _attributes);
+        emit ECHOES__ATTRIBUTES_ADDED(_attributeIndex, _attributes);
     }
 
     /**
@@ -586,7 +587,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     ) external onlyOwner {
         s_expansionCooldown = _expansionCooldown;
 
-        emit ORBS__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
+        emit ECHOES__EXPANSION_COOLDOWN_UPDATED(_expansionCooldown);
     }
 
     /**
@@ -597,7 +598,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     function setPrice(uint256 _price) external onlyOwner {
         s_price = _price;
 
-        emit ORBS__PRICE_UPDATED(_price);
+        emit ECHOES__PRICE_UPDATED(_price);
     }
 
     /**
@@ -608,7 +609,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     function setMintLimit(uint256 _mintLimit) external onlyOwner {
         s_mintLimit = _mintLimit;
 
-        emit ORBS__MINT_LIMIT_UPDATED(_mintLimit);
+        emit ECHOES__MINT_LIMIT_UPDATED(_mintLimit);
     }
 
     /**
@@ -621,7 +622,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     ) external onlyOwner {
         s_spectrumColors = _spectrumColors;
 
-        emit ORBS__SPECTRUM_COLORS_UPDATED(_spectrumColors);
+        emit ECHOES__SPECTRUM_COLORS_UPDATED(_spectrumColors);
     }
 
     /**
@@ -634,7 +635,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     ) external onlyOwner {
         s_sceneryColors = _sceneryColors;
 
-        emit ORBS__SCENERY_COLORS_UPDATED(_sceneryColors);
+        emit ECHOES__SCENERY_COLORS_UPDATED(_sceneryColors);
     }
 
     /**
@@ -643,7 +644,7 @@ contract OrbsMainnet is ERC721URIStorage, Ownable {
     function setContractURI(string memory _contractUri) external onlyOwner {
         s_contractUri = _contractUri;
 
-        emit ORBS__CONTRACT_URI_UPDATED(_contractUri);
+        emit ECHOES__CONTRACT_URI_UPDATED(_contractUri);
     }
 
     /// @dev Notice the uppercased `URI` in the function name (for OpenSea to find it)

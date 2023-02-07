@@ -74,10 +74,10 @@ const Home = ({ count }) => {
         <span className='emphasize'>interactive</span> collectible.
       </h1>
       <p>
-        Each orb is a combination of several creative attributes that shape its
+        Each echo is a combination of several creative attributes that shape its
         perceptible experience. These attributes are{' '}
         <span className='emphasize'>stored on-chain</span>, and some can evolve
-        over time. The code behind the generation and display of the orbs is{' '}
+        over time. The code behind the generation and display of the echoes is{' '}
         <span className='emphasize'>open and transparent</span>, providing full
         visibility to those interested. The attributes include:
       </p>
@@ -95,10 +95,10 @@ const Home = ({ count }) => {
       </p>
       <p>
         <span className='emphasize'>signature_</span> a distinct name that is
-        unique to each orb
+        unique to each echo
       </p>
       <p>
-        <span className='emphasize'>expansion_</span> the growth of the orb,
+        <span className='emphasize'>expansion_</span> the growth of the echo,
         defining the number of particles, which evolves over time and can be
         enhanced by the owner
       </p>

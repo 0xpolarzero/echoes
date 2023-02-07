@@ -20,5 +20,5 @@ export default function Page(props) {
 Page.canvas = (props) => <Entity />;
 
 export async function getStaticProps() {
-  return { props: { title: 'orbs' } };
+  return { props: { title: 'echoes' } };
 }

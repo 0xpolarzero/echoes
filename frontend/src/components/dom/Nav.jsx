@@ -27,7 +27,7 @@ const Nav = () => {
     <header className='nav'>
       <div className='title'>
         <a onClick={() => goTo('/', false)}>
-          orbs
+          echoes
           <span className='emphasize'>
             {activePage === '' && generate
               ? '_experience'
@@ -76,7 +76,7 @@ const Nav = () => {
           <Tooltip
             title={
               generate
-                ? 'Consider playing the soundscape while generating your orb'
+                ? 'Consider playing the soundscape while generating your echo'
                 : ''
             }
             color='var(--text-link)'

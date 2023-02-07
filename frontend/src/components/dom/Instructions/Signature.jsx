@@ -33,7 +33,7 @@ const Signature = ({ count }) => {
     <div className='section' style={{ top: `${count * 200}%` }}>
       <h1>_signature</h1>
       <div className='informations' style={{ marginBottom: '1rem' }}>
-        Choose a unique identifier for your orb from the list.
+        Choose a unique identifier for your echo from the list.
       </div>
       <div className='name-choice'>
         <Select

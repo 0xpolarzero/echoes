@@ -1,6 +1,6 @@
 # Contracts
 
-- Only 1 orb per wallet Maybe supply limit on mainnet and not on mumbai?
+- Only 1 echo per wallet Maybe supply limit on mainnet and not on mumbai?
 
 - Use '\_setTokenURI' to update after enhancement
 

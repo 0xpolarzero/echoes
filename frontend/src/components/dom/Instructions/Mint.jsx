@@ -36,13 +36,13 @@ const Mint = ({ count }) => {
    */
   const onSettled = async (tx) => {
     if (!tx) return;
-    notification.current = toast.loading('Generating your orb...');
+    notification.current = toast.loading('Generating your echo...');
     const receipt = await tx.wait(1);
 
     if (receipt.status === 1) {
       setIsSuccess(true);
       toast.update(notification.current, {
-        render: 'Your orb has been generated!',
+        render: 'Your echo has been generated!',
         type: 'success',
         isLoading: false,
         autoClose: 5000,
@@ -58,7 +58,7 @@ const Mint = ({ count }) => {
     }
   };
   const { config: mintConfig } = usePrepareContractWrite({
-    address: config.networkMapping[chainId]['Orbs'][0] || '',
+    address: config.networkMapping[chainId]['Echoes'][0] || '',
     abi: chainId === 80001 ? config.abiMumbai : config.abiMainnet || '',
     functionName: 'mint',
     args: [...mintArgs, chainId === 1 ? { value: MINT_PRICE_WEI } : null],
@@ -114,11 +114,11 @@ const Mint = ({ count }) => {
       <h1>_generate</h1>
       <div className='informations'>
         <p>
-          You can generate an orb either on a testnet (Polygon Mumbai) or on
+          You can generate an echo either on a testnet (Polygon Mumbai) or on
           mainnet (Ethereum).
         </p>
         <p>
-          The orbs can be generated{' '}
+          The echoes can be generated{' '}
           <span className='emphasize'>for free on testnet</span>, or{' '}
           <span className='emphasize'>for a fixed price on mainnet</span>. Both
           chains provide the{' '}
@@ -126,7 +126,7 @@ const Mint = ({ count }) => {
           are welcome to mint on a testnet if you just want to experiment.
         </p>
         <p style={{ fontSize: '0.9rem' }}>
-          Please be aware that minting an orb is an experimental process and
+          Please be aware that minting an echo is an experimental process and
           there is no guarantee regarding its reliability or value. By
           participating in the mint, you understand that you are doing so at
           your own risk and that the digital product is provided &#34;as is&#34;
@@ -134,7 +134,7 @@ const Mint = ({ count }) => {
         </p>
       </div>
       <div className='wallet'>
-        <ConnectButton label='Connect your wallet to generate the orb' />
+        <ConnectButton label='Connect your wallet to generate the echo' />
       </div>
 
       <div className='mint'>

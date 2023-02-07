@@ -43,7 +43,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     ],
   ];
 
-  const orbs = await deploy('OrbsMainnet', {
+  const echoes = await deploy('OrbsMainnet', {
     from: deployer,
     args,
     log: true,
@@ -55,7 +55,7 @@ module.exports = async function({ getNamedAccounts, deployments }) {
     process.env.ETHERSCAN_API_KEY
   ) {
     console.log('Verifying contract...');
-    await verify(orbs.address, args);
+    await verify(echoes.address, args);
   }
 };
 

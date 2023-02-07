@@ -46,8 +46,8 @@ const attributes = [
 ];
 
 // ERC721
-const name = 'Orbs';
-const symbol = 'ORBS';
+const name = 'Echoes';
+const symbol = 'ECHO';
 const maxSupply = 1_000;
 const maxSupplyMock = 10;
 const price = ethers.utils.parseEther('0.01');

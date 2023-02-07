@@ -6,7 +6,7 @@ import '@/styles/index.css';
 
 const Scene = dynamic(() => import('@/components/canvas/Scene'), { ssr: true });
 
-export default function App({ Component, pageProps = { title: 'orbs' } }) {
+export default function App({ Component, pageProps = { title: 'echoes' } }) {
   const layout = useRef();
   const loader = useRef();
 

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import traits from './data/traits.js';
-import vertexShaders from './shaders/orb/vertexShaders/index.js';
-import fragmentShader from './shaders/orb/fragmentShader.js';
+import vertexShaders from './shaders/echo/vertexShaders/index.js';
+import fragmentShader from './shaders/echo/fragmentShader.js';
 
 const canvas = document.querySelector('canvas.webgl');
 const scene = new THREE.Scene();
@@ -31,7 +31,7 @@ const expanse = params.expanse; // particle count
 // Set the background color
 document.body.style.backgroundColor = scenery;
 
-// Create the orb
+// Create the echo
 const radius = 2;
 // Particles
 const particlesPositions = new Float32Array(expanse * 3);

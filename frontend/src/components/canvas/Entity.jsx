@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import vertexShaders from './shaders/orb/vertexShaders';
-import fragmentShader from './shaders/orb/fragmentShader';
+import vertexShaders from './shaders/echo/vertexShaders';
+import fragmentShader from './shaders/echo/fragmentShader';
 import stores from '@/stores';
 
 const Entity = ({ ...props }) => {
@@ -23,13 +23,13 @@ const Entity = ({ ...props }) => {
     <>
       <group ref={group} position={[-2, 0, 0]} {...props}>
         <Background />
-        <Orb radius={radius} />
+        <Echo radius={radius} />
       </group>
     </>
   );
 };
 
-const Orb = ({ radius }) => {
+const Echo = ({ radius }) => {
   const mesh = useRef(null);
   const { traits } = stores.useTraits();
   const { getAnalyserData } = stores.useAudio();

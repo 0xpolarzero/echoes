@@ -24,20 +24,20 @@ async function updateContractAddresses() {
 
   if (testnetChains.includes(chainId)) {
     if (chainId in contractAddresses) {
-      if (!contractAddresses[chainId]['Orbs'].includes(orbsTestnet.address))
-        contractAddresses[chainId]['Orbs'].push(orbsTestnet.address);
+      if (!contractAddresses[chainId]['Echoes'].includes(orbsTestnet.address))
+        contractAddresses[chainId]['Echoes'].push(orbsTestnet.address);
     } else {
       contractAddresses[chainId] = {
-        Orbs: [orbsTestnet.address],
+        Echoes: [orbsTestnet.address],
       };
     }
   } else {
     if (chainId in contractAddresses) {
-      if (!contractAddresses[chainId]['Orbs'].includes(orbsMainnet.address))
-        contractAddresses[chainId]['Orbs'].push(orbsMainnet.address);
+      if (!contractAddresses[chainId]['Echoes'].includes(orbsMainnet.address))
+        contractAddresses[chainId]['Echoes'].push(orbsMainnet.address);
     } else {
       contractAddresses[chainId] = {
-        Orbs: [orbsMainnet.address],
+        Echoes: [orbsMainnet.address],
       };
     }
   }

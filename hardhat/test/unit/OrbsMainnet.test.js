@@ -108,45 +108,45 @@ const mineBlocks = require('../../scripts/mineBlocks');
        * @notice Mint
        */
       describe('mint', function() {
-        const argsNoPrice = ['Name of the orb', 0, 0, 0, 0]; // signature + attributes indexes
+        const argsNoPrice = ['Name of the echo', 0, 0, 0, 0]; // signature + attributes indexes
         const args = [...argsNoPrice, { value: price }];
 
         describe('Should revert if any verification fails', function() {
           it('price not paid', async () => {
             await expect(
               orbsContractUser.mint(...argsNoPrice),
-            ).to.be.revertedWith(`ORBS__INVALID_PRICE(${0}, ${price})`);
+            ).to.be.revertedWith(`ECHOES__INVALID_PRICE(${0}, ${price})`);
           });
           it('mint limit reached', async () => {
             const newLimit = 1;
             await orbsContract.setMintLimit(newLimit);
             await orbsContractUser.mint(...args);
             await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
-              `ORBS__MINT_LIMIT_REACHED(${newLimit})`,
+              `ECHOES__MINT_LIMIT_REACHED(${newLimit})`,
             );
             await orbsContract.setMintLimit(mintLimit); // during unit tests is set to 10 instead of 1000
           });
           it('max supply reached', async () => {
             for (let i = 0; i < maxSupplyMock; i++) {
-              await orbsContract.mint(`Name of the orb ${i}`, 0, 0, 0, 0, {
+              await orbsContract.mint(`Name of the echo ${i}`, 0, 0, 0, 0, {
                 value: price,
               });
             }
             await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
-              `ORBS__MAX_SUPPLY_REACHED(${maxSupplyMock})`,
+              `ECHOES__MAX_SUPPLY_REACHED(${maxSupplyMock})`,
             );
           });
           it('signature not provided', async () => {
             await expect(
               orbsContractUser.mint('', 0, 0, 0, 0, { value: price }),
             ).to.be.revertedWith(
-              `ORBS__INVALID_ATTRIBUTE("Signature is empty")`,
+              `ECHOES__INVALID_ATTRIBUTE("Signature is empty")`,
             );
           });
           it('signature already used', async () => {
             await orbsContract.mint(...args);
             await expect(orbsContractUser.mint(...args)).to.be.revertedWith(
-              `ORBS__SIGNATURE_ALREADY_USED("${args[0]}")`,
+              `ECHOES__SIGNATURE_ALREADY_USED("${args[0]}")`,
             );
           });
           it('attribute index out of bounds (does not exist)', async () => {
@@ -155,13 +155,13 @@ const mineBlocks = require('../../scripts/mineBlocks');
                 value: price,
               }),
             ).to.be.revertedWith(
-              `ORBS__INVALID_ATTRIBUTE("The attribute does not exist")`,
+              `ECHOES__INVALID_ATTRIBUTE("The attribute does not exist")`,
             );
           });
         });
 
         describe('Should successfully mint and update all storage states', function() {
-          const signature = 'Name of the orb';
+          const signature = 'Name of the echo';
           const args = [signature, 0, 0, 0, 0, { value: price }];
           const chosenAttributes = [
             attributes[0][args[1]],
@@ -193,25 +193,25 @@ const mineBlocks = require('../../scripts/mineBlocks');
             assert.equal(await orbsContract.ownerOf(1), user.address);
           });
 
-          it('correct orb created', async () => {
-            const orb = await orbsContract.getOrb(1);
+          it('correct echo created', async () => {
+            const echo = await orbsContract.getOrb(1);
 
-            assert.equal(orb.signature, signature);
+            assert.equal(echo.signature, signature);
             assert.equal(
-              orb.attributes.toString(),
+              echo.attributes.toString(),
               chosenAttributes.toString(),
             );
-            assert.equal(orb.expansionRate.toString(), '1');
+            assert.equal(echo.expansionRate.toString(), '1');
             assert.equal(
-              orb.lastExpansionTimestamp.toString(),
+              echo.lastExpansionTimestamp.toString(),
               timestamp.toString(),
             );
             assert.equal(
-              orb.creationTimestamp.toString(),
+              echo.creationTimestamp.toString(),
               timestamp.toString(),
             );
-            assert.equal(orb.maxExpansionReached, false);
-            assert.equal(orb.tokenId.toString(), '1');
+            assert.equal(echo.maxExpansionReached, false);
+            assert.equal(echo.tokenId.toString(), '1');
           });
           it('correct tokenURI set', async () => {
             const tokenURI = await orbsContract.tokenURI(1);
@@ -225,26 +225,26 @@ const mineBlocks = require('../../scripts/mineBlocks');
             testTokenUri(json, 1, chosenAttributes, signature, timestamp);
           });
 
-          it('correct orbs mapping set', async () => {
-            const orb = await orbsContract.getOrb('1');
+          it('correct echoes mapping set', async () => {
+            const echo = await orbsContract.getOrb('1');
 
-            assert.equal(orb.tokenId.toString(), '1');
-            assert.equal(orb.owner, user.address);
-            assert.equal(orb.signature, signature);
+            assert.equal(echo.tokenId.toString(), '1');
+            assert.equal(echo.owner, user.address);
+            assert.equal(echo.signature, signature);
             assert.equal(
-              orb.attributes.toString(),
+              echo.attributes.toString(),
               chosenAttributes.toString(),
             );
-            assert.equal(orb.expansionRate.toString(), '1');
+            assert.equal(echo.expansionRate.toString(), '1');
             assert.equal(
-              orb.lastExpansionTimestamp.toString(),
+              echo.lastExpansionTimestamp.toString(),
               timestamp.toString(),
             );
             assert.equal(
-              orb.creationTimestamp.toString(),
+              echo.creationTimestamp.toString(),
               timestamp.toString(),
             );
-            assert.equal(orb.maxExpansionReached, false);
+            assert.equal(echo.maxExpansionReached, false);
           });
 
           it('correct signature added to the array', async () => {
@@ -259,7 +259,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
             await expect(
               orbsContractUser.mint(newSignature, 0, 0, 0, 0, { value: price }),
             )
-              .to.emit(orbsContract, 'ORBS__MINTED')
+              .to.emit(orbsContract, 'ECHOES__MINTED')
               .withArgs(user.address, 2, newSignature);
           });
         });
@@ -270,7 +270,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
        */
       describe('expand', function() {
         beforeEach(async () => {
-          await orbsContractUser.mint('Name of the orb', 0, 0, 0, 0, {
+          await orbsContractUser.mint('Name of the echo', 0, 0, 0, 0, {
             value: price,
           });
         });
@@ -278,14 +278,14 @@ const mineBlocks = require('../../scripts/mineBlocks');
         describe('Should revert if any verification fails', function() {
           it("doesn't exist", async () => {
             await expect(orbsContractUser.expand(2)).to.be.revertedWith(
-              "'ORBS__DOES_NOT_EXIST(2)'",
+              "'ECHOES__DOES_NOT_EXIST(2)'",
             );
           });
           it('not owner', async () => {
             const expectedOwner = await orbsContract.ownerOf(1);
 
             await expect(orbsContract.expand(1)).to.be.revertedWith(
-              `'ORBS__NOT_OWNER("${expectedOwner}", "${deployer.address}")'`,
+              `'ECHOES__NOT_OWNER("${expectedOwner}", "${deployer.address}")'`,
             );
           });
           it('in expansion cooldown', async () => {
@@ -293,7 +293,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
               .lastExpansionTimestamp;
 
             await expect(orbsContractUser.expand(1)).to.be.revertedWith(
-              `'ORBS__IN_EXPANSION_COOLDOWN(${expansionCooldown}, ${lastExpansionTimestamp})'`,
+              `'ECHOES__IN_EXPANSION_COOLDOWN(${expansionCooldown}, ${lastExpansionTimestamp})'`,
             );
           });
           it('max expansion reached', async () => {
@@ -311,7 +311,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
             // Try to expand again
             await expect(orbsContractUser.expand(1)).to.be.revertedWith(
-              `'ORBS__MAX_EXPANSION_REACHED(1)'`,
+              `'ECHOES__MAX_EXPANSION_REACHED(1)'`,
             );
           });
         });
@@ -345,7 +345,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
             const signature = (await orbsContract.getOrb(1)).signature;
 
             await expect(orbsContractUser.expand(1))
-              .to.emit(orbsContract, 'ORBS__EXPANDED')
+              .to.emit(orbsContract, 'ECHOES__EXPANDED')
               .withArgs(user.address, 1, signature);
           });
         });
@@ -392,7 +392,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
           await expect(
             orbsContract.addAttributes(attributes.length, newAttributes),
           ).to.be.revertedWith(
-            'ORBS__INVALID_ATTRIBUTE("The attributes type does not exist")',
+            'ECHOES__INVALID_ATTRIBUTE("The attributes type does not exist")',
           );
         });
 
@@ -400,7 +400,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
           await expect(
             await orbsContract.addAttributes(newAttributesIndex, newAttributes),
           )
-            .to.emit(orbsContract, 'ORBS__ATTRIBUTES_ADDED')
+            .to.emit(orbsContract, 'ECHOES__ATTRIBUTES_ADDED')
             .withArgs(newAttributesIndex, newAttributes);
 
           assert.equal(
@@ -417,7 +417,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
           await expect(
             await orbsContract.setExpansionCooldown(newExpansionCooldown),
           )
-            .to.emit(orbsContract, 'ORBS__EXPANSION_COOLDOWN_UPDATED')
+            .to.emit(orbsContract, 'ECHOES__EXPANSION_COOLDOWN_UPDATED')
             .withArgs(newExpansionCooldown);
 
           assert.equal(
@@ -430,7 +430,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('[dev functions] - setPrice', function() {
         it('Should successfully set the price and emit the correct event', async () => {
           await expect(await orbsContract.setPrice(newPrice))
-            .to.emit(orbsContract, 'ORBS__PRICE_UPDATED')
+            .to.emit(orbsContract, 'ECHOES__PRICE_UPDATED')
             .withArgs(newPrice);
 
           assert.equal(
@@ -443,7 +443,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('[dev functions] - setMintLimit', function() {
         it('Should successfully set the mint limit and emit the correct event', async () => {
           await expect(await orbsContract.setMintLimit(newMintLimit))
-            .to.emit(orbsContract, 'ORBS__MINT_LIMIT_UPDATED')
+            .to.emit(orbsContract, 'ECHOES__MINT_LIMIT_UPDATED')
             .withArgs(newMintLimit);
 
           assert.equal(
@@ -456,7 +456,7 @@ const mineBlocks = require('../../scripts/mineBlocks');
       describe('[dev functions] - setContractURI (OpenSea)', function() {
         it('Should successfully update the contract URI and emit the correct event', async () => {
           await expect(await orbsContract.setContractURI('test'))
-            .to.emit(orbsContract, 'ORBS__CONTRACT_URI_UPDATED')
+            .to.emit(orbsContract, 'ECHOES__CONTRACT_URI_UPDATED')
             .withArgs('test');
 
           assert.equal(await orbsContract.contractURI(), 'test');
