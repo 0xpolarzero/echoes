@@ -141,7 +141,7 @@ export default create((set, get) => ({
   /**
    * @notice Network configuration
    */
-  chainId: config.defaultChainId,
+  chainId: null,
   setChainId: (chainId) => {
     if (!config.deployedChainIds.includes(chainId)) {
       console.log(`Chain ID ${chainId} is not supported`);
