@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Input, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { toast } from 'react-toastify';
 import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -17,6 +17,7 @@ const { MINT_PRICE_ETH, MINT_PRICE_WEI } = config;
 
 const Mint = ({ count }) => {
   const { traits, getMetadataFromTraits } = stores.useTraits();
+  const { chainId, setChainId, filterAvailableSignatures } = stores.useMint();
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: balance } = useBalance({ address });
@@ -24,7 +25,6 @@ const Mint = ({ count }) => {
   const [isBalanceEnough, setIsBalanceEnough] = useState(false);
   const [missingSignature, setMissingSignature] = useState(true);
   // Mint
-  const [chainId, setChainId] = useState(config.defaultChainId);
   const [mintArgs, setMintArgs] = useState([]);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -104,8 +104,12 @@ const Mint = ({ count }) => {
   // Chain
   useEffect(() => {
     // We need to use this trick because wagmi hook useNetwork sets the chain too late
-    if (chain?.id) setChainId(chain.id);
-  }, [chain?.id]);
+    if (chain?.id) {
+      setChainId(chain.id);
+      // Update the available signatures for this chain
+      filterAvailableSignatures(chain.id);
+    }
+  }, [chain?.id, setChainId, filterAvailableSignatures]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
