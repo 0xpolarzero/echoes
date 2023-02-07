@@ -12,21 +12,20 @@ const frontEndAbiFolder = '../frontend/src/data/constants/';
 module.exports = async () => {
   if (process.env.UPDATE_FRONT_END) {
     console.log('Updating front end...');
-    await updateContractAddresses();
-    await updateAbi();
+    const chainId = network.config.chainId;
+    await updateContractAddresses(chainId);
+    await updateAbi(chainId);
   }
 };
 
-async function updateContractAddresses() {
-  const echoesMainnet = await ethers.getContract('EchoesMainnet');
-  const echoesTestnet = await ethers.getContract('EchoesTestnet');
-  const chainId = network.config.chainId;
-
+async function updateContractAddresses(chainId) {
   const contractAddresses = JSON.parse(
     fs.readFileSync(frontEndContractsFile, 'utf8'),
   );
 
   if (testnetChains.includes(chainId)) {
+    const echoesTestnet = await ethers.getContract('EchoesTestnet');
+
     if (chainId in contractAddresses) {
       if (!contractAddresses[chainId]['Echoes'].includes(echoesTestnet.address))
         contractAddresses[chainId]['Echoes'].push(echoesTestnet.address);
@@ -36,6 +35,8 @@ async function updateContractAddresses() {
       };
     }
   } else {
+    const echoesMainnet = await ethers.getContract('EchoesMainnet');
+
     if (chainId in contractAddresses) {
       if (!contractAddresses[chainId]['Echoes'].includes(echoesMainnet.address))
         contractAddresses[chainId]['Echoes'].push(echoesMainnet.address);
@@ -51,18 +52,20 @@ async function updateContractAddresses() {
   console.log('Front end updated!');
 }
 
-async function updateAbi() {
-  const echoesMainnet = await ethers.getContract('EchoesMainnet');
-  fs.writeFileSync(
-    `${frontEndAbiFolder}EchoesMainnet.json`,
-    echoesMainnet.interface.format(ethers.utils.FormatTypes.json),
-  );
-
-  const echoesTestnet = await ethers.getContract('EchoesTestnet');
-  fs.writeFileSync(
-    `${frontEndAbiFolder}EchoesTestnet.json`,
-    echoesTestnet.interface.format(ethers.utils.FormatTypes.json),
-  );
+async function updateAbi(chainId) {
+  if (testnetChains.includes(chainId)) {
+    const echoesTestnet = await ethers.getContract('EchoesTestnet');
+    fs.writeFileSync(
+      `${frontEndAbiFolder}EchoesTestnet.json`,
+      echoesTestnet.interface.format(ethers.utils.FormatTypes.json),
+    );
+  } else {
+    const echoesMainnet = await ethers.getContract('EchoesMainnet');
+    fs.writeFileSync(
+      `${frontEndAbiFolder}EchoesMainnet.json`,
+      echoesMainnet.interface.format(ethers.utils.FormatTypes.json),
+    );
+  }
 }
 
 module.exports.tags = ['all', 'frontend'];
