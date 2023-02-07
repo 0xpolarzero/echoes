@@ -7,8 +7,7 @@ const getEchoes = (apiName) => gql`
       owner
       tokenId
       signature
-      createdAtTimestamp
-      createdAtBlock
+      createdAt
       lastExpandedAt
       expandedCount
     }
