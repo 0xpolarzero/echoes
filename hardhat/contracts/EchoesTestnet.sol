@@ -74,7 +74,6 @@ contract EchoesTestnet is ERC721URIStorage, Ownable {
     /// Mappings
     mapping(uint256 => Echo) private s_echoes; // tokenId => Echo
     mapping(uint256 => string[]) private s_attributes; // typeIndex => attributes
-    mapping(uint256 => uint256) private s_creationBlocks; // tokenId => blockNumber
 
     /// Events
     // Dev functions
@@ -183,7 +182,6 @@ contract EchoesTestnet is ERC721URIStorage, Ownable {
         // Update storage
         s_usedSignatures.push(_signature);
         s_echoes[_tokenIds.current()] = echo;
-        s_creationBlocks[_tokenIds.current()] = block.number;
 
         emit ECHOES__MINTED(msg.sender, _tokenIds.current(), _signature);
     }
@@ -377,12 +375,10 @@ contract EchoesTestnet is ERC721URIStorage, Ownable {
      * -> This way it could be fetched from outside the contract more easily as well
      */
     function getExpanse(uint256 _tokenId) public view returns (uint256) {
-        // Get the creation block
-        uint256 creationBlock = getEchoCreationBlock(_tokenId);
         // Calculate the expanse
         uint256 expanse = BASE_EXPANSE +
             s_echoes[_tokenId].expansionRate *
-            ((currentBlockNumber() - creationBlock) / 100); // (~+66 per day)
+            ((currentTimestamp() - getEchoCreationTimestamp(_tokenId)) / 1000); // (~+86 per day)
 
         // If it reaches the max expanse, return the max expanse
         return expanse >= MAX_EXPANSION ? MAX_EXPANSION : expanse;
@@ -397,12 +393,12 @@ contract EchoesTestnet is ERC721URIStorage, Ownable {
     }
 
     /**
-     * @notice Get the creation block number of an echo
+     * @notice Get the creation timestamp of an echo
      */
-    function getEchoCreationBlock(
+    function getEchoCreationTimestamp(
         uint256 _tokenId
     ) public view returns (uint256) {
-        return s_creationBlocks[_tokenId];
+        return s_echoes[_tokenId].creationTimestamp;
     }
 
     /**
@@ -480,13 +476,6 @@ contract EchoesTestnet is ERC721URIStorage, Ownable {
      */
     function currentTimestamp() internal view returns (uint256) {
         return block.timestamp;
-    }
-
-    /**
-     * @notice Get the current block number
-     */
-    function currentBlockNumber() internal view returns (uint256) {
-        return block.number;
     }
 
     /**
