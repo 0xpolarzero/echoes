@@ -44,9 +44,33 @@ const apolloClient = new ApolloClient({
 
 export default create((set, get) => ({
   echoes: [],
-  getEchoes: () => {
+  getEchoes: async () => {
     // Get all echoes from all subgraphs
+    const { data: ethereumGoerliEchoes } = await apolloClient.query({
+      query: config.subgraphQueries.GET_ECHOS_ETHEREUM_GOERLI,
+    });
+    const { data: polygonMumbaiEchoes } = await apolloClient.query({
+      query: config.subgraphQueries.GET_ECHOS_POLYGON_MUMBAI,
+    });
+    const { data: arbitrumGoerliEchoes } = await apolloClient.query({
+      query: config.subgraphQueries.GET_ECHOS_ARBITRUM_GOERLI,
+    });
     // Add their chainId to each echo
+    const allEchoes = [
+      ...ethereumGoerliEchoes.echos.map((echo) => ({
+        ...echo,
+        chainId: 5,
+      })),
+      ...polygonMumbaiEchoes.echos.map((echo) => ({
+        ...echo,
+        chainId: 80001,
+      })),
+      ...arbitrumGoerliEchoes.echos.map((echo) => ({
+        ...echo,
+        chainId: 42161,
+      })),
+    ];
     // Sort it by particles count
+    // c.f. config.calculateParticlesCount(createdAt, expandedCount)
   },
 }));
