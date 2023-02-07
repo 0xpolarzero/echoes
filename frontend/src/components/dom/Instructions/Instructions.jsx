@@ -6,12 +6,10 @@ import {
 import { getBackground, getGradient } from '@/systems/utils';
 import Signature from './Signature';
 import Mint from './Mint';
-import Audio from './Audio';
 import stores from '@/stores';
 
 export default function Instructions() {
   const { generate } = stores.useConfig();
-  const { reset } = stores.useAudio();
 
   const optionsElem = useRef();
   const { options } = stores.useTraits();
@@ -19,10 +17,6 @@ export default function Instructions() {
   const [current, setCurrent] = useState(0);
   const first = 0;
   const last = options.length + 1;
-
-  const audio = useMemo(() => {
-    return <Audio />;
-  }, []);
 
   useEffect(() => {
     // Get to the right section on button click
@@ -33,13 +27,9 @@ export default function Instructions() {
     }
   }, [current, generate]);
 
-  useEffect(() => {
-    return () => reset();
-  }, [reset]);
-
   return (
     <div className='instructions'>
-      {audio}
+      {/* {audio} */}
       <div ref={optionsElem} className='options'>
         <Home count={first - 1} />
         {options.map((option, index) => {
