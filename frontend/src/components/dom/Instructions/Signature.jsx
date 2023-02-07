@@ -1,33 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import config from '@/data';
 import stores from '@/stores';
 
-const names = config.names;
 const { Option } = Select;
 
 const Signature = ({ count }) => {
-  const { setTrait } = stores.useTraits();
-  const [choices, setChoices] = useState([]);
+  const { setTrait, availableSignatures, getAvailableSignatures } =
+    stores.useTraits();
+  const { chainId } = stores.useConfig();
   const [selected, setSelected] = useState('');
-
-  const getChoices = async () => {
-    // Fetch e.g. Minted event from graph
-    // Scrap names from event
-    // Filter names from data
-    // Set choices
-
-    // Temp
-    setChoices(names);
-  };
 
   useEffect(() => {
     setTrait('signature', selected);
   }, [selected, setTrait]);
 
   useEffect(() => {
-    getChoices();
-  }, []);
+    getAvailableSignatures(chainId);
+  }, [chainId, getAvailableSignatures]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -37,10 +26,10 @@ const Signature = ({ count }) => {
       </div>
       <div className='name-choice'>
         <Select
-          defaultValue={choices[0]}
+          defaultValue={availableSignatures[0]}
           style={{ minWidth: 300 }}
           onChange={setSelected}>
-          {choices.map((choice, index) => (
+          {availableSignatures.map((choice, index) => (
             <Option key={index} value={choice}>
               {choice}
             </Option>
