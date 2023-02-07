@@ -1,16 +1,21 @@
 import { create } from 'zustand';
+// UI
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { ToastContainer } from 'react-toastify';
+// RainbowKit
 import {
   getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
   lightTheme,
 } from '@rainbow-me/rainbowkit';
+// Wagmi
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { mainnet, goerli, polygonMumbai, arbitrumGoerli } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
+
+import config from '@/data';
 
 /**
  * @notice Set up providers
@@ -131,6 +136,19 @@ export default create((set, get) => ({
 
       document.documentElement.style.setProperty(key, value);
     });
+  },
+
+  /**
+   * @notice Network configuration
+   */
+  chainId: config.defaultChainId,
+  setChainId: (chainId) => {
+    if (!config.deployedChainIds.includes(chainId)) {
+      console.log(`Chain ID ${chainId} is not supported`);
+      set({ chainId: null });
+    } else {
+      set({ chainId });
+    }
   },
 
   /**
