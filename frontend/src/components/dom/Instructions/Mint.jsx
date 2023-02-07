@@ -58,11 +58,10 @@ const Mint = ({ count }) => {
     }
   };
   const { config: mintConfig } = usePrepareContractWrite({
-    address:
-      chainId === 1 || chainId === 80001
-        ? config.networkMapping[chainId]['Echoes'][0] || ''
-        : '',
-    abi: chainId === 80001 ? config.abiMumbai : config.abiMainnet || '',
+    address: config.deployedChainIds.includes(chainId)
+      ? config.networkMapping[chainId]['Echoes'][0] || ''
+      : '',
+    abi: chainId !== 1 ? config.Testnet : config.abiMainnet || '',
     functionName: 'mint',
     args: [...mintArgs, chainId === 1 ? { value: MINT_PRICE_WEI } : null],
     // Only enable if all args are filled & chain is mumbai or ethereum mainnet
@@ -86,7 +85,7 @@ const Mint = ({ count }) => {
     }
 
     // Set mint args
-    if (!missingSignature && (chainId === 80001 || chainId === 1))
+    if (!missingSignature && config.deployedChainIds.includes(chainId))
       setMintArgs(metadata);
     // Reset if changing anything
     setIsSuccess(false);
@@ -105,11 +104,7 @@ const Mint = ({ count }) => {
   // Chain
   useEffect(() => {
     // We need to use this trick because wagmi hook useNetwork sets the chain too late
-    if (chain?.id === 80001) {
-      setChainId(80001);
-    } else if (chain?.id === 1) {
-      setChainId(1);
-    }
+    if (chain?.id) setChainId(chain.id);
   }, [chain?.id]);
 
   return (
@@ -143,17 +138,21 @@ const Mint = ({ count }) => {
       <div className='mint'>
         <Tooltip
           title={
-            chainId !== 80001
-              ? 'You need to switch chains to Polygon Mumbai.'
+            !config.deployedChainIds.includes(chainId) && chainId !== 1
+              ? 'You need to switch chains to a testnet (Ethereum Goerli, Polygon Mumbai, Arbitrum Goerli).'
               : missingSignature
               ? 'The signature is missing.'
               : ''
           }>
           <button
             onClick={!isLoading ? mint : null}
-            disabled={chainId !== 80001 || !isConnected || missingSignature}
+            disabled={
+              (!config.deployedChainIds.includes(chainId) && chainId !== 1) ||
+              !isConnected ||
+              missingSignature
+            }
             className={
-              chainId === 80001
+              config.deployedChainIds.includes(chainId) && chainId !== 1
                 ? isLoading
                   ? 'loading'
                   : isSuccess || isError
@@ -161,7 +160,10 @@ const Mint = ({ count }) => {
                   : ''
                 : ''
             }>
-            {chainId === 80001 && isSuccess && !isLoading ? (
+            {config.deployedChainIds.includes(chainId) &&
+            chainId !== 1 &&
+            isSuccess &&
+            !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
             ) : chainId === 80001 && isError && !isLoading ? (
               <AiOutlineClose color='var(--text-error)' />
@@ -171,7 +173,7 @@ const Mint = ({ count }) => {
         </Tooltip>
         <Tooltip
           title={
-            chain?.id !== 1
+            chainId !== 1
               ? 'You need to switch chains to Ethereum mainnet.'
               : !isBalanceEnough
               ? 'Insufficient balance.'
@@ -182,7 +184,7 @@ const Mint = ({ count }) => {
           <button
             onClick={!isLoading ? mint : null}
             disabled={
-              chain?.id !== 1 ||
+              chainId !== 1 ||
               !isConnected ||
               !isBalanceEnough ||
               missingSignature

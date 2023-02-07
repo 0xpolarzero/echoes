@@ -36,9 +36,9 @@ Everything related to the smart contracts, tests and deployments included.
 
 Lightweight page, used for rendering the 3D models on plateforms such as OpenSea ; made with Vite & Three.js.
 
-### `subgraph`
+### `subgraphs`
 
-Everything related to the subgraph, for indexing and querying contracts events on The Graph.
+Everything related to the subgraphs, for indexing and querying contracts events on The Graph (Ethereum Goerli, Polygon Mumbai, Arbitrum Goerli).
 
 ## Notes
 

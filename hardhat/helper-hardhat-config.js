@@ -1,7 +1,7 @@
 const getTraits = require('./scripts/getTraits');
 
 const developmentChains = ['hardhat', 'localhost'];
-const testnetChains = [5, 80001];
+const testnetChains = [5, 80001, 421613];
 
 // Attributes
 const attributes = [
