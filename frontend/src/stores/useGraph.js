@@ -1,76 +1,112 @@
 import { create } from 'zustand';
-// Apollo
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloLink,
-  createHttpLink,
-} from '@apollo/client';
-import { MultiAPILink } from '@habx/apollo-multi-endpoint-link';
-import { onError } from '@apollo/client/link/error';
-
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 import config from '@/data';
 
 /**
  * @notice Set up Apollo
  */
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.map(({ message, locations, path }) =>
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
-      ),
-    );
-  }
-  if (networkError) console.log(`[Network error]: ${networkError}`);
-});
 
-const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  link: ApolloLink.from([
-    errorLink,
-    new MultiAPILink({
-      endpoints: {
-        ethereumGoerli: process.env.NEXT_PUBLIC_SUBGRAPH_ETHEREUM_GOERLI,
-        polygonMumbai: process.env.NEXT_PUBLIC_SUBGRAPH_POLYGON_MUMBAI,
-        arbitrumGoerli: process.env.NEXT_PUBLIC_SUBGRAPH_ARBITRUM_GOERLI,
-      },
-      createHttpLink: () => createHttpLink(),
-      httpSuffix: '',
+let urls = [
+  process.env.NEXT_PUBLIC_SUBGRAPH_ETHEREUM_GOERLI,
+  process.env.NEXT_PUBLIC_SUBGRAPH_POLYGON_MUMBAI,
+  process.env.NEXT_PUBLIC_SUBGRAPH_ARBITRUM_GOERLI,
+];
+let clients = urls.map(
+  (url) =>
+    new ApolloClient({
+      cache: new InMemoryCache(),
+      uri: url,
     }),
-  ]),
-  cachePolicy: 'network-only',
-});
+);
+
+const chains = [
+  { id: 5, name: 'Ethereum Goerli' },
+  { id: 80001, name: 'Polygon Mumbai' },
+  { id: 421613, name: 'Arbitrum Goerli' },
+];
 
 export default create((set, get) => ({
+  /**
+   * @notice Echoes
+   */
   echoes: [],
+  echoesByChain: {},
   getEchoes: async () => {
+    const { fetchSubgraphs, setAvailableSignatures } = get();
     // Get all echoes from all subgraphs
-    const { data: ethereumGoerliEchoes } = await apolloClient.query({
+    const data = await fetchSubgraphs();
+
+    // Add their chain to each echo
+    const allEchoes = data.map((subgraphData, index) => {
+      const chain = chains[index];
+
+      return subgraphData.map((echo) => ({
+        ...echo,
+        chainId: chain.id,
+        chainName: chain.name,
+        particlesCount: config.calculateParticlesCount(
+          echo.createdAt,
+          echo.expandedCount,
+        ),
+      }));
+    });
+
+    const sortedEchoes = allEchoes
+      .flat()
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    set({ echoes: sortedEchoes });
+
+    // Update the available signatures per chain based on the data
+    setAvailableSignatures(data);
+  },
+
+  fetchSubgraphs: async () => {
+    const { data: ethereumGoerliEchoes } = await clients[0].query({
       query: config.subgraphQueries.GET_ECHOS_ETHEREUM_GOERLI,
     });
-    const { data: polygonMumbaiEchoes } = await apolloClient.query({
+    const { data: polygonMumbaiEchoes } = await clients[1].query({
       query: config.subgraphQueries.GET_ECHOS_POLYGON_MUMBAI,
     });
-    const { data: arbitrumGoerliEchoes } = await apolloClient.query({
+    const { data: arbitrumGoerliEchoes } = await clients[2].query({
       query: config.subgraphQueries.GET_ECHOS_ARBITRUM_GOERLI,
     });
-    // Add their chainId to each echo
-    const allEchoes = [
-      ...ethereumGoerliEchoes.echos.map((echo) => ({
-        ...echo,
-        chainId: 5,
-      })),
-      ...polygonMumbaiEchoes.echos.map((echo) => ({
-        ...echo,
-        chainId: 80001,
-      })),
-      ...arbitrumGoerliEchoes.echos.map((echo) => ({
-        ...echo,
-        chainId: 42161,
-      })),
+
+    return [
+      ethereumGoerliEchoes.echos,
+      polygonMumbaiEchoes.echos,
+      arbitrumGoerliEchoes.echos,
     ];
-    // Sort it by particles count
-    // c.f. config.calculateParticlesCount(createdAt, expandedCount)
+  },
+
+  /**
+   * @notice Signatures
+   */
+  availableSignatures: chains.reduce(
+    (acc, chain) => ({ ...acc, [chain.id]: config.names }),
+    {},
+  ),
+  setAvailableSignatures: async (echoes) => {
+    const signaturesByChain = echoes.reduce((acc, chain, index) => {
+      const chainId = chains[index].id;
+      const signatures = chain.map((echo) => echo.signature);
+      acc[chainId] = signatures;
+      return acc;
+    }, {});
+
+    // Now set available signatures per chain
+    const availableSignatures = Object.keys(signaturesByChain).reduce(
+      (acc, chainId) => {
+        const signatures = signaturesByChain[chainId];
+        const availableSignatures = config.names.filter(
+          (name) => !signatures.includes(name),
+        );
+        acc[chainId] = availableSignatures;
+        return acc;
+      },
+      {},
+    );
+
+    set({ availableSignatures });
   },
 }));

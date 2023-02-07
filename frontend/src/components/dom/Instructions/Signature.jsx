@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Select } from 'antd';
 import stores from '@/stores';
+import config from '@/data';
 
 const { Option } = Select;
 
 const Signature = ({ count }) => {
-  const { setTrait, availableSignatures, getAvailableSignatures } =
-    stores.useTraits();
+  const { setTrait } = stores.useTraits();
   const { chainId } = stores.useConfig();
+  const { availableSignatures } = stores.useGraph();
   const [selected, setSelected] = useState('');
 
   useEffect(() => {
     setTrait('signature', selected);
   }, [selected, setTrait]);
-
-  useEffect(() => {
-    getAvailableSignatures(chainId);
-  }, [chainId, getAvailableSignatures]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -26,14 +23,16 @@ const Signature = ({ count }) => {
       </div>
       <div className='name-choice'>
         <Select
-          defaultValue={availableSignatures[0]}
+          defaultValue={null}
           style={{ minWidth: 300 }}
           onChange={setSelected}>
-          {availableSignatures.map((choice, index) => (
-            <Option key={index} value={choice}>
-              {choice}
-            </Option>
-          ))}
+          {availableSignatures[chainId || config.defaultChainId].map(
+            (choice, index) => (
+              <Option key={index} value={choice}>
+                {choice}
+              </Option>
+            ),
+          )}
         </Select>
       </div>
     </div>

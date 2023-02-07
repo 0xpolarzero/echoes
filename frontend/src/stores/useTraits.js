@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { readContract } from '@wagmi/core';
 import config from '@/data';
 
 export default create((set) => ({
@@ -49,22 +48,4 @@ export default create((set) => ({
       },
       { expansion: metadata.expansion, signature: metadata.signature },
     ),
-
-  // Signatures
-  // config.names
-  availableSignatures: [''],
-  getAvailableSignatures: async (chainId) => {
-    if (!chainId) return;
-
-    const data = await readContract({
-      address: config.networkMapping[chainId]['Echoes'][0],
-      abi: chainId === 1 ? config.abiMainnet : config.abiTestnet,
-      functionName: 'getUsedSignatures',
-    });
-
-    const availableSignatures = config.names.filter(
-      (name) => !data.includes(name),
-    );
-    set({ availableSignatures });
-  },
 }));
