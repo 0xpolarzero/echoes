@@ -61,7 +61,7 @@ const Mint = ({ count }) => {
     address: config.deployedChainIds.includes(chainId)
       ? config.networkMapping[chainId]['Echoes'][0] || ''
       : '',
-    abi: chainId !== 1 ? config.Testnet : config.abiMainnet || '',
+    abi: chainId !== 1 ? config.abiTestnet : config.abiMainnet || '',
     functionName: 'mint',
     args: [...mintArgs, chainId === 1 ? { value: MINT_PRICE_WEI } : null],
     // Only enable if all args are filled & chain is mumbai or ethereum mainnet
