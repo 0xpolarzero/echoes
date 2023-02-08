@@ -1,5 +1,8 @@
 .nav {
   font-family: 'Source Code Pro', monospace, var(--font-main);
+}
+
+.nav {
   /* background: rgba(var(--background-main-rgb), 0.4); */
   backdrop-filter: blur(10px);
   position: fixed;

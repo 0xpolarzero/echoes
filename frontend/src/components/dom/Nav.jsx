@@ -36,6 +36,7 @@ const Nav = () => {
           </span>
         </a>
       </div>
+
       <div className='links'>
         {/* Pages */}
         <a
