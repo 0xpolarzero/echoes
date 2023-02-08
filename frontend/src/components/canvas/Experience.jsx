@@ -10,6 +10,7 @@ import fragmentShader from './shaders/echo/fragmentShader';
 const Experience = ({ ...props }) => {
   const { traits } = stores.useTraits();
   const { updateTheme } = stores.useConfig();
+  const { getAnalyserData } = stores.useAudio();
   const group = useRef(null);
   const mesh = useRef(null);
 
@@ -40,8 +41,12 @@ const Experience = ({ ...props }) => {
   );
 
   let vertex;
-  useFrame(() => {
+  useFrame((state) => {
     if (!mesh.current) return;
+
+    // Time
+    const t = state.clock.getElapsedTime();
+    mesh.current.material.uniforms.uTime.value = t;
 
     // Colors
     mesh.current.material.uniforms.uColorA.value = new THREE.Vector3(
@@ -58,6 +63,15 @@ const Experience = ({ ...props }) => {
       mesh.current.material.needsUpdate = true;
       vertex = vertexShaders[traits.trace.id];
     }
+
+    // Modifications based on audio
+    const analyserData = getAnalyserData();
+    const gainMultiplier = 1 + analyserData?.gain * 5 || 1;
+    const freqMultiplier = 1 + analyserData?.frequency / 20000 || 1;
+    // Modify scale based on the gain
+    mesh.current.material.uniforms.uGain.value = gainMultiplier;
+    // as well as the brightness
+    mesh.current.material.uniforms.uBrighten.value = freqMultiplier;
 
     // Make sure the entity is always at the center of the left side of the screen
     group.current.position.x = -1.5 * (window.innerWidth / window.innerHeight);
