@@ -13,12 +13,19 @@ const Nav = () => {
   const router = useRouter();
 
   const goTo = (page, generate) => {
-    if (page === '/') {
-      generate ? setActivePage('') : setActivePage('experience');
-    }
     setGenerate(generate);
     router.push(page);
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (router.pathname === '/') {
+        generate ? setActivePage('') : setActivePage('experience');
+      } else {
+        setActivePage(router.pathname.slice(1));
+      }
+    }, 100);
+  }, [router.pathname, generate, setActivePage]);
 
   return (
     <header className='nav'>
