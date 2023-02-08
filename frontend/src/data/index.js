@@ -7,6 +7,7 @@ import networkMapping from '@/data/constants/networkMapping.json';
 import abiMainnet from '@/data/constants/EchoesMainnet.json';
 import abiTestnet from '@/data/constants/EchoesTestnet.json';
 import queries from './constants/subgraphQueries';
+import coordinates from './constants/coordinates';
 // Systems
 import calculateParticlesCount from './systems/calculateParticlesCount';
 
@@ -39,6 +40,7 @@ const config = {
   abiMainnet,
   abiTestnet,
   subgraphQueries: queries,
+  coordinates,
   calculateParticlesCount,
   MINT_PRICE_ETH,
   MINT_PRICE_WEI,
