@@ -36,16 +36,15 @@ export default create((set) => ({
   },
 
   // Get traits properties given a metadata object
-  getTraitsFromMetadata: (metadata) =>
-    config.traits.reduce(
-      (acc, trait) => {
-        const traitData = trait.values.find(
-          (value) =>
-            value.name.toLowerCase() === metadata[trait.type].toLowerCase(),
-        );
-        acc[trait.type] = traitData;
-        return acc;
-      },
-      { expansion: metadata.expansion, signature: metadata.signature },
-    ),
+  getTraitsFromMetadata: (metadata) => {
+    if (!metadata) return null;
+
+    return config.traits.reduce((acc, trait, index) => {
+      const traitData = trait.values.find(
+        (value) => value.name.toLowerCase() === metadata[index].toLowerCase(),
+      );
+      acc[trait.type] = traitData;
+      return acc;
+    }, {});
+  },
 }));
