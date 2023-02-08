@@ -1,17 +1,18 @@
-.nav {
+.nav,
+.nav-filters {
   font-family: 'Source Code Pro', monospace, var(--font-main);
-}
-
-.nav {
-  /* background: rgba(var(--background-main-rgb), 0.4); */
   backdrop-filter: blur(10px);
   position: fixed;
-  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
   max-width: 1600px;
-  padding: 0.8em 1.2em;
+  padding: 0.8rem 1.2rem;
+}
+
+.nav {
+  /* background: rgba(var(--background-main-rgb), 0.4); */
+  top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -44,8 +45,23 @@
   gap: 2em;
 }
 
+/* Filters */
+.nav-filters {
+  top: 4rem;
+  /* padding: 0.8rem 2.5rem; */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1em;
+}
+
 @media (min-width: 1200px) {
-  .nav {
-    padding: 1em 2em;
+  .nav,
+  .nav-filters {
+    padding: 1rem 2rem;
   }
+}
+
+a[aria-current] {
+  color: red !important;
 }
