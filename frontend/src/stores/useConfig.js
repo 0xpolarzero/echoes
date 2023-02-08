@@ -2,41 +2,25 @@ import { create } from 'zustand';
 // UI
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { ToastContainer } from 'react-toastify';
-// RainbowKit
-import {
-  getDefaultWallets,
-  RainbowKitProvider,
-  darkTheme,
-  lightTheme,
-} from '@rainbow-me/rainbowkit';
+// ConnectKit
+import { ConnectKitProvider, getDefaultClient } from 'connectkit';
 // Wagmi
-import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { createClient, WagmiConfig } from 'wagmi';
 import { mainnet, goerli, polygonMumbai, arbitrumGoerli } from 'wagmi/chains';
-import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { publicProvider } from 'wagmi/providers/public';
 
 import config from '@/data';
 
 /**
  * @notice Set up providers
  */
-const { chains, provider } = configureChains(
-  [mainnet, goerli, polygonMumbai, arbitrumGoerli],
-  [
-    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY }),
-    publicProvider(),
-  ],
+
+const wagmiClient = createClient(
+  getDefaultClient({
+    appName: 'echoes',
+    alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
+    chains: [goerli, polygonMumbai, arbitrumGoerli],
+  }),
 );
-
-const { connectors } = getDefaultWallets({
-  appName: 'celestial_orbs',
-  chains,
-});
-
-const wagmiClient = createClient({
-  connectors,
-  provider,
-});
 
 /**
  * @notice Themes
@@ -71,13 +55,19 @@ export default create((set, get) => ({
     return (
       <>
         <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider
-            chains={chains}
-            theme={
-              theme === 'dark'
-                ? darkTheme({ accentColor: 'var(--text-link)' })
-                : lightTheme({ accentColor: 'var(--text-link)' })
-            }>
+          <ConnectKitProvider
+            client={wagmiClient}
+            theme='default'
+            mode={theme}
+            options={{ embedGoogleFonts: true, showBalance: true }}
+            customTheme={{
+              '--ck-font-family': 'var(--font-main)',
+              '--ck-accent-color': 'var(--text-link)',
+              '--ck-accent-text-color': 'var(--text-main)',
+              // Connect button
+              '--ck-connectbutton-border-radius': '8px',
+              '--ck-connectbutton-background': 'var(--background-button)',
+            }}>
             <ConfigProvider
               theme={{
                 algorithm:
@@ -87,7 +77,7 @@ export default create((set, get) => ({
               }}>
               {children}
             </ConfigProvider>
-          </RainbowKitProvider>
+          </ConnectKitProvider>
         </WagmiConfig>
         <ToastContainer
           position='bottom-right'

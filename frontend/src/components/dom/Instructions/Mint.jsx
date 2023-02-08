@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Tooltip } from 'antd';
 import { toast } from 'react-toastify';
 import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import {
   useAccount,
   useBalance,
@@ -12,6 +11,7 @@ import {
 } from 'wagmi';
 import config from '@/data';
 import stores from '@/stores';
+import { ConnectKitButton } from 'connectkit';
 
 const { MINT_PRICE_ETH, MINT_PRICE_WEI } = config;
 
@@ -132,7 +132,8 @@ const Mint = ({ count }) => {
         </p>
       </div>
       <div className='wallet'>
-        <ConnectButton label='Connect your wallet to generate the echo' />
+        {/* <ConnectButton label='Connect your wallet to generate the echo' /> */}
+        <ConnectKitButton />
       </div>
 
       <div className='mint'>

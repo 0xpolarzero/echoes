@@ -21,8 +21,13 @@ const MINT_PRICE_ETH = 0.01;
 const MINT_PRICE_WEI = ethers.utils.parseEther(MINT_PRICE_ETH.toString());
 
 // Networks
+const chains = [
+  { id: 5, name: 'Ethereum Goerli' },
+  { id: 80001, name: 'Polygon Mumbai' },
+  { id: 421613, name: 'Arbitrum Goerli' },
+];
 const defaultChainId = 5;
-const deployedChainIds = [1, 5, 80001, 421613];
+const deployedChainIds = [5, 80001, 421613];
 
 const config = {
   traits,
@@ -37,6 +42,7 @@ const config = {
   calculateParticlesCount,
   MINT_PRICE_ETH,
   MINT_PRICE_WEI,
+  chains,
   defaultChainId,
   deployedChainIds,
 };
