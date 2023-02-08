@@ -16,31 +16,39 @@ export default function Instructions() {
 
   const [current, setCurrent] = useState(0);
   const first = 0;
-  const last = options.length + 1;
+  const last = options.length + 2; // 2 additional sections
 
   useEffect(() => {
     // Get to the right section on button click
-    if (!generate) {
-      optionsElem.current.style.transform = `translateY(200%)`;
+    // if (!generate) {
+    // optionsElem.current.style.transform = `translateY(200%)`;
+    // } else {
+    optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
+    // }
+  }, [current]);
+
+  useEffect(() => {
+    if (generate) {
+      setCurrent(1);
     } else {
-      optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
+      setCurrent(0);
     }
-  }, [current, generate]);
+  }, [generate]);
 
   return (
     <div className='instructions'>
       {/* {audio} */}
       <div ref={optionsElem} className='options'>
-        <Home count={first - 1} />
+        <Home count={0} />
         {options.map((option, index) => {
-          return <Section key={index} option={option} count={index} />;
+          return <Section key={index} option={option} count={index + 1} />;
         })}
         <Signature count={last - 1} />
         <Mint count={last} />
       </div>
 
       <button
-        className={`controls prev ${current <= 0 || !generate ? 'hidden' : ''}`}
+        className={`controls prev ${current <= 1 || !generate ? 'hidden' : ''}`}
         onClick={() => setCurrent(current === 0 ? 0 : current - 1)}>
         <MdOutlineKeyboardArrowUp size={20} />
       </button>
