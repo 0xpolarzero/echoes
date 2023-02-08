@@ -1,29 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, startTransition } from 'react';
 import dynamic from 'next/dynamic';
-import stores from '@/stores';
+import Explore from '@/components/dom/Explore';
 
-// Dynamic import is used to prevent a payload when the website starts, that includes threejs, r3f etc..
-// WARNING ! errors might get obfuscated by using dynamic import.
-// If something goes wrong go back to a static import to show the error.
-// https://github.com/pmndrs/react-three-next/issues/49
-// const Entity = dynamic(() => import('@/components/canvas/Entity'), {
-//   ssr: false,
-// });
+const LadderGraph = dynamic(() => import('@/components/canvas/LadderGraph'), {
+  ssr: false,
+});
 
 // Dom components go here
 export default function Page(props) {
-  const { setActivePage } = stores.useConfig();
-
-  useEffect(() => {
-    setActivePage('explore');
-  }, [setActivePage]);
-
-  return <div />;
+  return <Explore />;
 }
 
 // Canvas components go here
 // It will receive same props as the Page component (from getStaticProps, etc.)
-// Page.canvas = (props) => <Entity />;
+Page.canvas = (props) => <LadderGraph />;
 
 export async function getStaticProps() {
   return { props: { title: 'explore' } };
