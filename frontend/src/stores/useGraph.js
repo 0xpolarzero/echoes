@@ -19,18 +19,15 @@ let clients = urls.map(
     }),
 );
 
-const chains = [
-  { id: 5, name: 'Ethereum Goerli' },
-  { id: 80001, name: 'Polygon Mumbai' },
-  { id: 421613, name: 'Arbitrum Goerli' },
-];
-
 export default create((set, get) => ({
   /**
    * @notice Echoes
    */
   echoes: [],
+  filteredEchoes: [],
   echoesByChain: {},
+
+  // Get echoes
   getEchoes: async () => {
     const { fetchSubgraphs, setAvailableSignatures } = get();
     // Get all echoes from all subgraphs
@@ -38,7 +35,7 @@ export default create((set, get) => ({
 
     // Add their chain to each echo
     const allEchoes = data.map((subgraphData, index) => {
-      const chain = chains[index];
+      const chain = config.chains[index];
 
       return subgraphData.map((echo) => ({
         ...echo,
@@ -55,12 +52,13 @@ export default create((set, get) => ({
       .flat()
       .sort((a, b) => a.createdAt - b.createdAt);
 
-    set({ echoes: sortedEchoes });
+    set({ echoes: sortedEchoes, filteredEchoes: sortedEchoes });
 
     // Update the available signatures per chain based on the data
     setAvailableSignatures(data);
   },
 
+  // Fetch from subgraphs
   fetchSubgraphs: async () => {
     const { data: ethereumGoerliEchoes } = await clients[0].query({
       query: config.subgraphQueries.GET_ECHOS_ETHEREUM_GOERLI,
@@ -79,16 +77,26 @@ export default create((set, get) => ({
     ];
   },
 
+  // Filter echoes by chain
+  filterEchoes: (chainId) => {
+    const { echoes } = get();
+    if (chainId === 0 || !chainId) return set({ filteredEchoes: echoes });
+
+    const filteredEchoes = echoes.filter((echo) => echo.chainId === chainId);
+    console.log('filteredEchoes', filteredEchoes);
+    set({ filteredEchoes });
+  },
+
   /**
    * @notice Signatures
    */
-  availableSignatures: chains.reduce(
+  availableSignatures: config.chains.reduce(
     (acc, chain) => ({ ...acc, [chain.id]: config.names }),
     {},
   ),
   setAvailableSignatures: async (echoes) => {
     const signaturesByChain = echoes.reduce((acc, chain, index) => {
-      const chainId = chains[index].id;
+      const chainId = config.chains[index].id;
       const signatures = chain.map((echo) => echo.signature);
       acc[chainId] = signatures;
       return acc;
