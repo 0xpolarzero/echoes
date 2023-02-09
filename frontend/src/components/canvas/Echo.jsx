@@ -1,13 +1,33 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+} from 'react';
 import * as THREE from 'three';
 
 const Echo = forwardRef(
   (
-    { radius, uniforms, count, vertexShader, fragmentShader, position },
+    {
+      radius,
+      uniforms,
+      count,
+      vertexShader,
+      fragmentShader,
+      position,
+      userData,
+    },
     ref,
   ) => {
     const localRef = useRef();
     useImperativeHandle(ref, () => localRef.current);
+
+    useEffect(() => {
+      if (!localRef.current) return;
+      console.log(userData);
+    }, [localRef.current]);
 
     const particlesPosition = useMemo(() => {
       const positions = new Float32Array(count * 3);
@@ -28,7 +48,10 @@ const Echo = forwardRef(
     }, [count, radius]);
 
     return (
-      <points ref={localRef} position={position}>
+      <points
+        ref={localRef}
+        position={position}
+        onClick={(e) => console.log(e)}>
         <bufferGeometry>
           <bufferAttribute
             attach='attributes-position'
