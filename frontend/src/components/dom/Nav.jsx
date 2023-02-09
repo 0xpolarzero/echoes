@@ -14,6 +14,8 @@ const Nav = () => {
 
   const goTo = (page, generate) => {
     setGenerate(generate);
+
+    if (router.pathname.slice(1) === page) return;
     router.push(page);
   };
 
