@@ -6,9 +6,11 @@ import config from '@/data';
 const { Option } = Select;
 
 const Signature = ({ count }) => {
-  const { setTrait } = stores.useTraits();
-  const { chainId } = stores.useConfig();
-  const { availableSignatures } = stores.useGraph();
+  const setTrait = stores.useTraits((state) => state.setTrait);
+  const chainId = stores.useConfig((state) => state.chainId);
+  const availableSignatures = stores.useGraph(
+    (state) => state.availableSignatures,
+  );
   const [selected, setSelected] = useState('');
 
   useEffect(() => {

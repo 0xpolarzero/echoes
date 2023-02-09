@@ -3,7 +3,7 @@ import stores from '@/stores';
 import { useState } from 'react';
 
 const NavFilters = () => {
-  const { filterEchoes } = stores.useGraph();
+  const filterEchoes = stores.useGraph((state) => state.filterEchoes);
   const [selected, setSelected] = useState(0);
 
   return (

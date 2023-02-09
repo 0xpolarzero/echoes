@@ -9,10 +9,10 @@ import Mint from './Mint';
 import stores from '@/stores';
 
 export default function Instructions() {
-  const { generate } = stores.useConfig();
+  const generate = stores.useConfig((state) => state.generate);
+  const options = stores.useTraits((state) => state.options);
 
   const optionsElem = useRef();
-  const { options } = stores.useTraits();
 
   const [current, setCurrent] = useState(0);
   const first = 0;
@@ -105,7 +105,10 @@ const Home = ({ count }) => {
 };
 
 const Section = ({ option, count }) => {
-  const { traits, setTrait } = stores.useTraits();
+  const { traits, setTrait } = stores.useTraits((state) => ({
+    traits: state.traits,
+    setTrait: state.setTrait,
+  }));
   const [hovered, hover] = useState('');
 
   return (

@@ -24,10 +24,6 @@ const Echo = forwardRef(
     const localRef = useRef();
     useImperativeHandle(ref, () => localRef.current);
 
-    useEffect(() => {
-      // console.log(localRef?.current);
-    }, [localRef?.current]);
-
     const particlesPosition = useMemo(() => {
       const positions = new Float32Array(count * 3);
 

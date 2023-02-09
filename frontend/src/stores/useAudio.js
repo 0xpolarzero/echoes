@@ -74,7 +74,7 @@ export default create((set, get) => ({
    */
   createAnalyser: () => {
     const { audioContext, sources } = get();
-    const { traits } = useTraits.getState();
+    const traits = useTraits.getState((state) => state.traits);
     const index = audio.values.findIndex((v) => v === traits.atmosphere) || 0;
 
     const source = audioContext.createMediaElementSource(

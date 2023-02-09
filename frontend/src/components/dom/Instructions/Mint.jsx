@@ -16,8 +16,14 @@ import { ConnectKitButton } from 'connectkit';
 const { MINT_PRICE_ETH, MINT_PRICE_WEI } = config;
 
 const Mint = ({ count }) => {
-  const { traits, getMetadataFromTraits } = stores.useTraits();
-  const { chainId, setChainId } = stores.useConfig();
+  const { traits, getMetadataFromTraits } = stores.useTraits((state) => ({
+    traits: state.traits,
+    getMetadataFromTraits: state.getMetadataFromTraits,
+  }));
+  const { chainId, setChainId } = stores.useConfig((state) => ({
+    chainId: state.chainId,
+    setChainId: state.setChainId,
+  }));
   const { address, isConnected } = useAccount();
   const { chain } = useNetwork();
   const { data: balance } = useBalance({ address });

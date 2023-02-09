@@ -8,9 +8,9 @@ import vertexShaders from './shaders/echo/vertexShaders';
 import fragmentShader from './shaders/echo/fragmentShader';
 
 const Experience = ({ ...props }) => {
-  const { traits } = stores.useTraits();
-  const { updateTheme } = stores.useConfig();
-  const { getAnalyserData } = stores.useAudio();
+  const traits = stores.useTraits((state) => state.traits);
+  const updateTheme = stores.useConfig((state) => state.updateTheme);
+  const getAnalyserData = stores.useAudio((state) => state.getAnalyserData);
   const group = useRef(null);
   const mesh = useRef(null);
 
