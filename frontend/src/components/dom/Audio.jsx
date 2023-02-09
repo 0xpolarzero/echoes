@@ -5,23 +5,14 @@ import config from '@/data';
 const audio = config.traits.find((c) => c.type === 'atmosphere');
 
 const Audio = () => {
-  const traits = stores.useTraits((state) => state.traits);
-  const { setSources, update } = stores.useAudio((state) => ({
-    setSources: state.setSources,
-    update: state.update,
-  }));
+  const setSources = stores.useAudio((state) => state.setSources);
 
   const refs = useRef([]);
-
-  useEffect(() => {
-    update();
-  }, [traits.atmosphere.src, update]);
 
   useEffect(() => {
     refs.current = Array(audio.values.length)
       .fill()
       .map((_, i) => refs.current[i] || createRef());
-
     setSources(refs.current);
   }, [setSources]);
 
