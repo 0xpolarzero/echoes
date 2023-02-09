@@ -1,4 +1,5 @@
 import { createRef, useEffect, useMemo, useRef, useState } from 'react';
+import { animated, useSpring } from '@react-spring/three';
 import * as THREE from 'three';
 import Echo from './Echo';
 import stores from '@/stores';
@@ -10,13 +11,38 @@ import { Html, OrbitControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
 const LadderGraph = () => {
-  const { filteredEchoes, setIsDisplayReady } = stores.useGraph();
-  const { getTraitsFromMetadata } = stores.useTraits();
-  const { getAnalyserData } = stores.useAudio();
+  const { filteredEchoes, setIsDisplayReady } = stores.useGraph((state) => ({
+    filteredEchoes: state.filteredEchoes,
+    setIsDisplayReady: state.setIsDisplayReady,
+  }));
+  const getTraitsFromMetadata = stores.useTraits(
+    (state) => state.getTraitsFromMetadata,
+  );
+  const getAnalyserData = stores.useAudio((state) => state.getAnalyserData);
+
+  const [target, setTarget] = useState(null);
+  const [targetPosition, setTargetPosition] = useState([0, 0, 4]);
+  const [info, setInfo] = useState(null);
 
   const refs = useRef([]);
-
   const radius = 2;
+
+  // useSpring to animate the group position
+  const { position: groupPosition } = useSpring({
+    position: target ? targetPosition : [0, 0, -2],
+    config: { mass: 1, tension: 100 /* 200 */, friction: 20 },
+  });
+
+  const onClick = (echo, position, index) => {
+    setTarget(index + 1);
+    setTargetPosition([-position[0], -position[1], 0]);
+  };
+
+  const onMissed = () => {
+    setTarget(null);
+    // setTargetPosition([0, 0, 4]);
+    setInfo(null);
+  };
 
   useFrame((state) => {
     if (!refs.current || !refs.current.length) return;
@@ -44,21 +70,20 @@ const LadderGraph = () => {
     refs.current = Array(filteredEchoes.length)
       .fill()
       .map((_, i) => refs.current[i] || createRef());
-    // But the issue here is that when updating filteredEchoes, refs.current at the
-    // indexes that were previously occupied by the removed echoes are not
-    // updated. So, when the user clicks on an echo, the ref that is used to
-    // access the echo's userData is not the correct one.
+
+    setTarget(null);
+    setInfo(null);
 
     setIsDisplayReady(true);
   }, [filteredEchoes, getTraitsFromMetadata, setIsDisplayReady]);
 
-  return (
-    <>
+  return filteredEchoes.length > 0 ? (
+    <animated.group position={groupPosition}>
       <OrbitControls />
-      {filteredEchoes.length > 0 ? (
-        filteredEchoes.map((echo, i) => {
-          const position = enlargeRadius(i, filteredEchoes.length);
-          return (
+      {filteredEchoes.map((echo, i) => {
+        const position = enlargeRadius(i, filteredEchoes.length);
+        return (
+          <group key={i}>
             <Echo
               // ! It is VERY important to set a key that will change each time echoes are filtered
               // ! Otherwise, it won't update the ref as it was already set with the key before
@@ -83,24 +108,31 @@ const LadderGraph = () => {
               vertexShader={vertexShaders[echo.attributes.trace.id]}
               fragmentShader={fragmentShader}
               position={position}
-              userData={echo}
+              visible={target ? target === i + 1 : true}
             />
-          );
-        })
-      ) : (
-        <mesh>
-          <boxBufferGeometry attach='geometry' args={[1, 1, 1]} />
-          <meshStandardMaterial attach='material' color='hotpink' />
-        </mesh>
-      )}
-    </>
+            <mesh
+              position={position}
+              onClick={() => onClick(echo, position, i)}
+              onPointerMissed={onMissed}>
+              <sphereBufferGeometry attach='geometry' args={[1, 8, 8]} />
+              <meshBasicMaterial attach='material' transparent opacity={0} />
+            </mesh>
+          </group>
+        );
+      })}
+    </animated.group>
+  ) : (
+    <mesh>
+      <boxBufferGeometry attach='geometry' args={[1, 1, 1]} />
+      <meshStandardMaterial attach='material' color='hotpink' />
+    </mesh>
   );
 };
 
 const enlargeRadius = (index, amount) => {
-  const { x, y, z } = config.coordinates[amount][index];
-  const multiplier = 4;
-  return [x * multiplier, y * multiplier, z * multiplier];
+  const { x, y } = config.coordinates[amount][index];
+  const multiplier = 5;
+  return [x * multiplier, y * multiplier, 0];
 };
 
 export default LadderGraph;
