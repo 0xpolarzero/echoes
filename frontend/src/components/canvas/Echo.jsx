@@ -17,7 +17,7 @@ const Echo = forwardRef(
       vertexShader,
       fragmentShader,
       position,
-      userData,
+      visible = true,
     },
     ref,
   ) => {
@@ -25,9 +25,8 @@ const Echo = forwardRef(
     useImperativeHandle(ref, () => localRef.current);
 
     useEffect(() => {
-      if (!localRef.current) return;
-      console.log(userData);
-    }, [localRef.current]);
+      // console.log(localRef?.current);
+    }, [localRef?.current]);
 
     const particlesPosition = useMemo(() => {
       const positions = new Float32Array(count * 3);
@@ -48,10 +47,7 @@ const Echo = forwardRef(
     }, [count, radius]);
 
     return (
-      <points
-        ref={localRef}
-        position={position}
-        onClick={(e) => console.log(e)}>
+      <points ref={localRef} position={position} visible={visible}>
         <bufferGeometry>
           <bufferAttribute
             attach='attributes-position'
