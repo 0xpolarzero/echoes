@@ -1,12 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useRef, useState } from 'react';
 import stores from '@/stores';
 import config from '@/data';
 
 const audio = config.traits.find((c) => c.type === 'atmosphere');
 
 const Audio = () => {
-  const { traits } = stores.useTraits();
-  const { sources, update } = stores.useAudio();
+  const traits = stores.useTraits((state) => state.traits);
+  const { setSources, update } = stores.useAudio((state) => ({
+    setSources: state.setSources,
+    update: state.update,
+  }));
 
   const refs = useRef([]);
 
@@ -15,18 +18,23 @@ const Audio = () => {
   }, [traits.atmosphere.src, update]);
 
   useEffect(() => {
-    refs.current = refs.current.slice(0, audio.values.length);
-  }, []);
+    refs.current = Array(audio.values.length)
+      .fill()
+      .map((_, i) => refs.current[i] || createRef());
+
+    setSources(refs.current);
+  }, [setSources]);
 
   return (
     <>
-      {audio.values.map((value, index) => {
-        sources[index] = refs.current[index];
+      {audio.values.map((value, i) => {
+        // sources[i] = refs.current[i];
+        // console.log(sources)
 
         return (
           <audio
-            ref={(ref) => (refs.current[index] = ref)}
-            key={index}
+            ref={refs.current[i]}
+            key={i}
             src={value.src}
             loop
             preload='none'

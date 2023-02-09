@@ -7,6 +7,7 @@ const audio = config.traits.find((c) => c.type === 'atmosphere');
 export default create((set, get) => ({
   audioContext: null,
   sources: [],
+  setSources: (sources) => set({ sources }),
   analyser: null,
   started: false,
   suspended: true,
@@ -22,9 +23,9 @@ export default create((set, get) => ({
 
     sources.forEach((ref, index) => {
       // Only play the first one
-      if (ref) {
-        if (index !== 0) ref.volume = 0;
-        ref.play();
+      if (ref?.current) {
+        if (index !== 0) ref.current.volume = 0;
+        ref.current.play();
       }
     });
 
@@ -38,16 +39,18 @@ export default create((set, get) => ({
 
   update: () => {
     const { sources, started, createAnalyser } = get();
-    const { traits } = useTraits.getState();
+    const traits = useTraits.getState((state) => state.traits);
     if (!started) return;
 
-    const index = audio.values.findIndex((v) => v === traits.atmosphere);
+    const index = audio.values.findIndex((v) => v === traits.atmosphere) || 0;
     sources.forEach((ref, i) => {
+      if (!ref?.current) return;
+
       if (i === index) {
-        ref.currentTime = 0;
-        ref.volume = 1;
+        ref.current.currentTime = 0;
+        ref.current.volume = 1;
       } else {
-        ref.volume = 0;
+        ref.current.volume = 0;
       }
     });
 
@@ -72,9 +75,11 @@ export default create((set, get) => ({
   createAnalyser: () => {
     const { audioContext, sources } = get();
     const { traits } = useTraits.getState();
-    const index = audio.values.findIndex((v) => v === traits.atmosphere);
+    const index = audio.values.findIndex((v) => v === traits.atmosphere) || 0;
 
-    const source = audioContext.createMediaElementSource(sources[index]);
+    const source = audioContext.createMediaElementSource(
+      sources[index]?.current,
+    );
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 1024;
 
