@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.7",
+    "@react-spring/three": "^9.6.1",
     "@react-three/drei": "^9.56.5",
     "@react-three/fiber": "^8.10.1",
     "antd": "^5.1.6",
