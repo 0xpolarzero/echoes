@@ -11,3 +11,20 @@
   text-align: right;
   gap: 1em;
 }
+
+.controls-horizontal {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+  max-width: 1600px;
+}
+
+.controls-horizontal button.controls.prev:hover svg {
+  transform: translateX(-0.5rem);
+}
+
+.controls-horizontal button.controls.next:hover svg {
+  transform: translateX(0.5rem);
+}
