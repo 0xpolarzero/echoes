@@ -159,7 +159,11 @@ const Mint = ({ count }) => {
               missingSignature
             }
             className={
-              isLoading ? 'loading' : isSuccess || isError ? 'has-icon' : ''
+              isLoading
+                ? 'primary loading'
+                : isSuccess || isError
+                ? 'primary has-icon'
+                : 'primary'
             }>
             {config.deployedChainIds.includes(chainId) &&
             chainId !== 1 &&
@@ -193,11 +197,11 @@ const Mint = ({ count }) => {
             className={
               chainId === 1
                 ? isLoading
-                  ? 'loading'
+                  ? 'primary loading'
                   : isSuccess || isError
-                  ? 'has-icon'
-                  : ''
-                : ''
+                  ? 'primary has-icon'
+                  : 'primary'
+                : 'primary'
             }>
             {chainId === 1 && isSuccess && !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
