@@ -37,18 +37,24 @@ export default create((set, get) => ({
     set({ started: false, suspended: true });
   },
 
-  update: () => {
+  update: (audioObject) => {
     const { sources, started, createAnalyser } = get();
-    const traits = useTraits.getState((state) => state.traits);
     if (!started) return;
 
-    const index = audio.values.findIndex((v) => v === traits.atmosphere) || 0;
+    // Don't start again if it's the same
+    // e.g. returning to _experience from another page
+    const index = audio.values.findIndex((v) => v === audioObject) || 0;
+    const alreadyplayingIndex = sources.findIndex(
+      (ref) => ref?.current?.volume === 1,
+    );
+    if (index === alreadyplayingIndex) return;
+
     sources.forEach((ref, i) => {
       if (!ref?.current) return;
 
       if (i === index) {
-        ref.current.currentTime = 0;
         ref.current.volume = 1;
+        ref.current.currentTime = 0;
       } else {
         ref.current.volume = 0;
       }
@@ -74,8 +80,7 @@ export default create((set, get) => ({
    */
   createAnalyser: () => {
     const { audioContext, sources } = get();
-    const traits = useTraits.getState((state) => state.traits);
-    const index = audio.values.findIndex((v) => v === traits.atmosphere) || 0;
+    const index = sources.findIndex((ref) => ref?.current?.volume === 1) || 0;
 
     const source = audioContext.createMediaElementSource(
       sources[index]?.current,

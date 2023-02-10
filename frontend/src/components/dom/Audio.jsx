@@ -7,21 +7,19 @@ const audio = config.traits.find((c) => c.type === 'atmosphere');
 const Audio = () => {
   const setSources = stores.useAudio((state) => state.setSources);
 
-  const refs = useRef([]);
+  const refs = useRef(
+    Array(audio.values.length)
+      .fill()
+      .map((_, i) => createRef()),
+  );
 
   useEffect(() => {
-    refs.current = Array(audio.values.length)
-      .fill()
-      .map((_, i) => refs.current[i] || createRef());
     setSources(refs.current);
   }, [setSources]);
 
   return (
     <>
       {audio.values.map((value, i) => {
-        // sources[i] = refs.current[i];
-        // console.log(sources)
-
         return (
           <audio
             ref={refs.current[i]}

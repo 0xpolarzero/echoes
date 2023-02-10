@@ -11,6 +11,12 @@ import stores from '@/stores';
 export default function Instructions() {
   const generate = stores.useConfig((state) => state.generate);
   const options = stores.useTraits((state) => state.options);
+  const traits = stores.useTraits((state) => state.traits);
+  const update = stores.useAudio((state) => state.update);
+
+  useEffect(() => {
+    update(traits.atmosphere);
+  }, [traits.atmosphere.src, update]);
 
   const optionsElem = useRef();
 
