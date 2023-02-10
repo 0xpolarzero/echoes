@@ -1,16 +1,22 @@
 import config from '@/data';
 import stores from '@/stores';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const NavFilters = () => {
-  const filterEchoes = stores.useGraph((state) => state.filterEchoes);
+  const filterEchoesByChain = stores.useGraph(
+    (state) => state.filterEchoesByChain,
+  );
   const [selected, setSelected] = useState(0);
+
+  useEffect(() => {
+    filterEchoesByChain(0);
+  }, [filterEchoesByChain]);
 
   return (
     <div className='nav-filters'>
       <button
         onClick={() => {
-          filterEchoes(0);
+          filterEchoesByChain(0);
           setSelected(0);
         }}
         className={selected === 0 ? 'selected' : ''}>
@@ -21,7 +27,7 @@ const NavFilters = () => {
         <button
           key={chain.id}
           onClick={() => {
-            filterEchoes(chain.id);
+            filterEchoesByChain(chain.id);
             setSelected(chain.id);
           }}
           className={selected === chain.id ? 'selected' : ''}>
