@@ -1,0 +1,13 @@
+.infos .interact {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: flex-end;
+}
+
+.infos .interact .actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  gap: 1em;
+}
