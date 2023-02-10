@@ -17,7 +17,7 @@ const Echo = forwardRef(
       vertexShader,
       fragmentShader,
       position,
-      visible = true,
+      // visible = true,
     },
     ref,
   ) => {
@@ -43,7 +43,11 @@ const Echo = forwardRef(
     }, [count, radius]);
 
     return (
-      <points ref={localRef} position={position} visible={visible}>
+      <points
+        ref={localRef}
+        position={position}
+        /* visible={visible} */
+      >
         <bufferGeometry>
           <bufferAttribute
             attach='attributes-position'
