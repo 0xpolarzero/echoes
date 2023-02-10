@@ -11,13 +11,21 @@ import { useFrame } from '@react-three/fiber';
 import LoadingMesh from './LoadingMesh';
 
 const LadderGraph = () => {
-  const { filteredEchoes, setHoveredEcho, setClickedEcho } = stores.useGraph(
-    (state) => ({
-      filteredEchoes: state.filteredEchoes,
-      setHoveredEcho: state.setHoveredEcho,
-      setClickedEcho: state.setClickedEcho,
-    }),
-  );
+  const {
+    filteredEchoes,
+    setHoveredEcho,
+    setClickedEcho,
+    target,
+    setTarget,
+    resetTarget,
+  } = stores.useGraph((state) => ({
+    filteredEchoes: state.filteredEchoes,
+    setHoveredEcho: state.setHoveredEcho,
+    setClickedEcho: state.setClickedEcho,
+    target: state.target,
+    setTarget: state.setTarget,
+    resetTarget: state.resetTarget,
+  }));
   const getTraitsFromMetadata = stores.useTraits(
     (state) => state.getTraitsFromMetadata,
   );
@@ -27,7 +35,6 @@ const LadderGraph = () => {
     updateAudio: state.update,
   }));
 
-  const [target, setTarget] = useState(null);
   const [targetPosition, setTargetPosition] = useState([0, 0, 4]);
   const [isReady, setIsReady] = useState(false);
 
@@ -36,15 +43,9 @@ const LadderGraph = () => {
 
   // useSpring to animate the group position
   const { position: groupPosition } = useSpring({
-    position: target ? targetPosition : [0, 0, -2],
+    position: target ? targetPosition : [0, 0, -3],
     config: { mass: 1, tension: 100 /* 200 */, friction: 20 },
   });
-
-  const onMissed = () => {
-    setTarget(null);
-    // setTargetPosition([0, 0, 4]);
-    setClickedEcho(null);
-  };
 
   const echoes = useMemo(() => {
     const onClick = (echo, position, index) => {
@@ -93,7 +94,6 @@ const LadderGraph = () => {
               <mesh
                 position={position}
                 onClick={() => onClick(echo, position, i)}
-                onPointerMissed={onMissed}
                 onPointerEnter={() => setHoveredEcho(echo)}
                 onPointerLeave={() => setHoveredEcho(null)}>
                 <sphereBufferGeometry attach='geometry' args={[1, 8, 8]} />
@@ -143,7 +143,7 @@ const LadderGraph = () => {
       .fill()
       .map((_, i) => refs.current[i] || createRef());
 
-    setTarget(null);
+    resetTarget();
     setIsReady(true);
   }, [filteredEchoes, getTraitsFromMetadata]);
 
@@ -152,7 +152,7 @@ const LadderGraph = () => {
 
 const enlargeRadius = (index, amount) => {
   const { x, y } = config.coordinates[amount][index];
-  const multiplier = 5;
+  const multiplier = 6;
   return [x * multiplier, y * multiplier, 0];
 };
 
