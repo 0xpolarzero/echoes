@@ -27,10 +27,15 @@ export default create((set, get) => ({
    */
   echoes: [],
   filteredEchoes: [],
+  // Interactions
+  target: null,
+  setTarget: (target) => set({ target }),
   hoveredEcho: null,
   setHoveredEcho: (hoveredEcho) => set({ hoveredEcho }),
   clickedEcho: null,
   setClickedEcho: (clickedEcho) => set({ clickedEcho }),
+  resetTarget: () =>
+    set({ target: null, hoveredEcho: null, clickedEcho: null }),
   // Expand
   ownedEchoes: [],
   setOwnedEchoes: (address) => {
@@ -122,21 +127,8 @@ export default create((set, get) => ({
 
   // Read echoes on multiple chains
   getEchoesAttributes: async (echoes) => {
+    const { getAttributes } = get();
     const { getTraitsFromMetadata } = useTraits.getState();
-
-    const getAttributes = async (echo) => {
-      const chainId = echo.chainId;
-
-      const echoData = await readContract({
-        address: config.networkMapping[chainId]['Echoes'][0],
-        abi: chainId !== 1 ? config.abiTestnet : config.abiMainnet,
-        functionName: 'getEcho',
-        args: [echo.tokenId],
-        chainId,
-      });
-
-      return echoData;
-    };
 
     return await Promise.all(
       echoes.map(async (echo, index) => {
@@ -150,6 +142,21 @@ export default create((set, get) => ({
         return echo;
       }),
     );
+  },
+
+  // Get the attributes of an echo
+  getAttributes: async (echo) => {
+    const chainId = echo.chainId;
+
+    const echoData = await readContract({
+      address: config.networkMapping[chainId]['Echoes'][0],
+      abi: chainId !== 1 ? config.abiTestnet : config.abiMainnet,
+      functionName: 'getEcho',
+      args: [echo.tokenId],
+      chainId,
+    });
+
+    return echoData;
   },
 
   /**
