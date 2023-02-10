@@ -10,7 +10,10 @@ const WalletInfo = () => {
     chainId: state.chainId,
     setChainId: state.setChainId,
   }));
-  const clickedEcho = stores.useGraph((state) => state.clickedEcho);
+  const { clickedEcho, resetTarget } = stores.useGraph((state) => ({
+    clickedEcho: state.clickedEcho,
+    resetTarget: state.resetTarget,
+  }));
 
   const { chain } = useNetwork();
 
@@ -22,7 +25,9 @@ const WalletInfo = () => {
 
   return (
     <div className='nav-filters'>
-      <button className={clickedEcho ? 'close' : 'close hidden'}>
+      <button
+        onClick={resetTarget}
+        className={clickedEcho ? 'primary close' : 'primary close hidden'}>
         <BsArrow90DegLeft />
       </button>
       <div className='filters'>
