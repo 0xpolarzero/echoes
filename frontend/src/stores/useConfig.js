@@ -19,6 +19,7 @@ const wagmiClient = createClient(
     appName: 'echoes',
     alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
     chains: [goerli, polygonMumbai, arbitrumGoerli],
+    autoConnect: true,
   }),
 );
 
@@ -59,7 +60,11 @@ export default create((set, get) => ({
             client={wagmiClient}
             theme='default'
             mode={theme}
-            options={{ embedGoogleFonts: true, showBalance: true }}
+            options={{
+              embedGoogleFonts: true,
+              showBalance: true,
+              initialChainId: 0,
+            }}
             customTheme={{
               '--ck-font-family': 'var(--font-main)',
               '--ck-accent-color': 'var(--text-link)',
