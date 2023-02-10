@@ -108,6 +108,9 @@ button.controls.next:hover svg {
  */
 .home {
   align-items: flex-start;
+}
+
+.home p {
   text-align: justify;
 }
 
