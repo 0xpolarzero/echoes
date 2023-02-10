@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   MdOutlineKeyboardArrowUp,
   MdOutlineKeyboardArrowDown,
@@ -14,23 +15,14 @@ export default function Instructions() {
   const traits = stores.useTraits((state) => state.traits);
   const update = stores.useAudio((state) => state.update);
 
-  useEffect(() => {
-    update(traits.atmosphere);
-  }, [traits.atmosphere.src, update]);
-
-  const optionsElem = useRef();
-
   const [current, setCurrent] = useState(0);
   const first = 0;
   const last = options.length + 2; // 2 additional sections
 
+  const optionsElem = useRef();
+
   useEffect(() => {
-    // Get to the right section on button click
-    // if (!generate) {
-    // optionsElem.current.style.transform = `translateY(200%)`;
-    // } else {
     optionsElem.current.style.transform = `translateY(-${current * 200}%)`;
-    // }
   }, [current]);
 
   useEffect(() => {
@@ -40,6 +32,10 @@ export default function Instructions() {
       setCurrent(0);
     }
   }, [generate]);
+
+  useEffect(() => {
+    update(traits.atmosphere);
+  }, [traits.atmosphere.src, update]);
 
   return (
     <div className='instructions'>
@@ -71,6 +67,9 @@ export default function Instructions() {
 }
 
 const Home = ({ count }) => {
+  const setGenerate = stores.useConfig((state) => state.setGenerate);
+  const router = useRouter();
+
   return (
     <div className='section home' style={{ top: `${count * 200}%` }}>
       <h1>
@@ -106,6 +105,15 @@ const Home = ({ count }) => {
         defining the number of particles, which evolves over time and can be
         enhanced by the owner
       </p>
+      <p>
+        <button
+          className='primary special'
+          onClick={() => {
+            setGenerate(true);
+          }}>
+          Generate an echo
+        </button>
+      </p>
     </div>
   );
 };
@@ -127,7 +135,9 @@ const Section = ({ option, count }) => {
           return (
             <button
               key={index}
-              className={`option-${index} ${selected ? 'selected' : ''}`}
+              className={`primary option-${index} ${
+                selected ? 'selected' : ''
+              }`}
               onPointerEnter={() => hover(value)}
               onPointerLeave={() => hover('')}
               style={{
