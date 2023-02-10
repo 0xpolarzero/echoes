@@ -66,6 +66,8 @@ body,
   height: 100%;
   display: flex;
   justify-content: center;
+
+  transition: background 0.25s ease;
 }
 
 .canvas {

@@ -18,7 +18,11 @@ const LadderGraph = () => {
   const getTraitsFromMetadata = stores.useTraits(
     (state) => state.getTraitsFromMetadata,
   );
-  const getAnalyserData = stores.useAudio((state) => state.getAnalyserData);
+  const updateTheme = stores.useConfig((state) => state.updateTheme);
+  const { getAnalyserData, updateAudio } = stores.useAudio((state) => ({
+    getAnalyserData: state.getAnalyserData,
+    updateAudio: state.update,
+  }));
 
   const [target, setTarget] = useState(null);
   const [targetPosition, setTargetPosition] = useState([0, 0, 4]);
@@ -36,6 +40,8 @@ const LadderGraph = () => {
   const onClick = (echo, position, index) => {
     setTarget(index + 1);
     setTargetPosition([-position[0], -position[1], 0]);
+    updateTheme(echo.attributes.scenery);
+    updateAudio(echo.attributes.atmosphere);
   };
 
   const onMissed = () => {
@@ -82,14 +88,17 @@ const LadderGraph = () => {
       <OrbitControls />
       {filteredEchoes.map((echo, i) => {
         const position = enlargeRadius(i, filteredEchoes.length);
+
+        // ! It is VERY important to set a key that will change each time echoes are filtered
+        // ! Otherwise, it won't update the ref as it was already set with the key before
+        // ! So the Echo won't get its uniforms updated
+        const uniqueKey = i + new Date().getTime(); // This is unique
+        // key={echo.chainId + echo.tokenId} // This won't work because the key won't always change
+
         return (
           <group key={i}>
             <Echo
-              // ! It is VERY important to set a key that will change each time echoes are filtered
-              // ! Otherwise, it won't update the ref as it was already set with the key before
-              // ! So the Echo won't get its uniforms updated
-              // key={echo.chainId + echo.tokenId} // This won't work because the key won't always change
-              key={i + new Date().getTime()} // This is unique
+              key={uniqueKey}
               ref={refs.current[i]}
               radius={radius}
               uniforms={{
