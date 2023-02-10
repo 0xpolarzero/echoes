@@ -27,6 +27,10 @@ export default create((set, get) => ({
    */
   echoes: [],
   filteredEchoes: [],
+  hoveredEcho: null,
+  setHoveredEcho: (hoveredEcho) => set({ hoveredEcho }),
+  clickedEcho: null,
+  setClickedEcho: (clickedEcho) => set({ clickedEcho }),
 
   // Is it ready to display?
   isDisplayReady: false,
