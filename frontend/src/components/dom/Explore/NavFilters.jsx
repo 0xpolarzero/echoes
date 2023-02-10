@@ -4,22 +4,25 @@ import config from '@/data';
 import stores from '@/stores';
 
 const NavFilters = () => {
-  const { echoes, filterEchoesByChain, clickedEcho } = stores.useGraph(
-    (state) => ({
+  const { echoes, filterEchoesByChain, clickedEcho, resetTarget } =
+    stores.useGraph((state) => ({
       filterEchoesByChain: state.filterEchoesByChain,
       echoes: state.echoes,
       clickedEcho: state.clickedEcho,
-    }),
-  );
+      resetTarget: state.resetTarget,
+    }));
   const [selected, setSelected] = useState(0);
 
   useEffect(() => {
     filterEchoesByChain(0);
+    resetTarget();
   }, [echoes, filterEchoesByChain]);
 
   return (
     <div className='nav-filters'>
-      <button className={clickedEcho ? 'close' : 'close hidden'}>
+      <button
+        onClick={resetTarget}
+        className={clickedEcho ? 'primary close' : 'primary close hidden'}>
         <BsArrow90DegLeft />
       </button>
       <div className='filters'>
@@ -28,7 +31,7 @@ const NavFilters = () => {
             filterEchoesByChain(0);
             setSelected(0);
           }}
-          className={selected === 0 ? 'selected' : ''}>
+          className={selected === 0 ? 'primary selected' : 'primary'}>
           All echoes
         </button>
 
@@ -39,7 +42,7 @@ const NavFilters = () => {
               filterEchoesByChain(chain.id);
               setSelected(chain.id);
             }}
-            className={selected === chain.id ? 'selected' : ''}>
+            className={selected === chain.id ? 'primary selected' : 'primary'}>
             {chain.name}
           </button>
         ))}
