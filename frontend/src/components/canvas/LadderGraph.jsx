@@ -11,10 +11,13 @@ import { Html, OrbitControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
 const LadderGraph = () => {
-  const { filteredEchoes, setIsDisplayReady } = stores.useGraph((state) => ({
-    filteredEchoes: state.filteredEchoes,
-    setIsDisplayReady: state.setIsDisplayReady,
-  }));
+  const { filteredEchoes, setIsDisplayReady, setHoveredEcho, setClickedEcho } =
+    stores.useGraph((state) => ({
+      filteredEchoes: state.filteredEchoes,
+      setIsDisplayReady: state.setIsDisplayReady,
+      setHoveredEcho: state.setHoveredEcho,
+      setClickedEcho: state.setClickedEcho,
+    }));
   const getTraitsFromMetadata = stores.useTraits(
     (state) => state.getTraitsFromMetadata,
   );
@@ -26,7 +29,6 @@ const LadderGraph = () => {
 
   const [target, setTarget] = useState(null);
   const [targetPosition, setTargetPosition] = useState([0, 0, 4]);
-  const [info, setInfo] = useState(null);
 
   const refs = useRef([]);
   const radius = 2;
@@ -37,18 +39,80 @@ const LadderGraph = () => {
     config: { mass: 1, tension: 100 /* 200 */, friction: 20 },
   });
 
-  const onClick = (echo, position, index) => {
-    setTarget(index + 1);
-    setTargetPosition([-position[0], -position[1], 0]);
-    updateTheme(echo.attributes.scenery);
-    updateAudio(echo.attributes.atmosphere);
-  };
-
   const onMissed = () => {
     setTarget(null);
     // setTargetPosition([0, 0, 4]);
-    setInfo(null);
+    setClickedEcho(null);
   };
+
+  const echoes = useMemo(() => {
+    const onClick = (echo, position, index) => {
+      setTarget(index + 1);
+      setTargetPosition([-position[0], -position[1], 0]);
+      setClickedEcho(echo);
+      updateTheme(echo.attributes.scenery);
+      updateAudio(echo.attributes.atmosphere);
+    };
+
+    return (
+      <animated.group position={groupPosition}>
+        {filteredEchoes.map((echo, i) => {
+          const position = enlargeRadius(i, filteredEchoes.length);
+
+          // ! It is VERY important to set a key that will change each time echoes are filtered
+          // ! Otherwise, it won't update the ref as it was already set with the key before
+          // ! So the Echo won't get its uniforms updated
+          const uniqueKey = i + new Date().getTime(); // This is unique
+          // key={echo.chainId + echo.tokenId} // This won't work because the key won't always change
+
+          return (
+            <group key={i}>
+              <Echo
+                key={uniqueKey}
+                ref={refs.current[i]}
+                radius={radius}
+                uniforms={{
+                  uTime: { value: 0.0 },
+                  uRadius: { value: radius },
+                  uColorA: new THREE.Uniform(
+                    new THREE.Vector3(...echo.attributes.spectrum.vec3.colorA),
+                  ),
+                  uColorB: new THREE.Uniform(
+                    new THREE.Vector3(...echo.attributes.spectrum.vec3.colorB),
+                  ),
+                  uGain: { value: 1.0 },
+                  uBrighten: { value: 1.0 },
+                }}
+                count={echo.particlesCount.toFixed()}
+                vertexShader={vertexShaders[echo.attributes.trace.id]}
+                fragmentShader={fragmentShader}
+                position={position}
+                // visible={target ? target === i + 1 : true}
+              />
+              <mesh
+                position={position}
+                onClick={() => onClick(echo, position, i)}
+                onPointerMissed={onMissed}
+                onPointerEnter={() => setHoveredEcho(echo)}
+                onPointerLeave={() => setHoveredEcho(null)}>
+                <sphereBufferGeometry attach='geometry' args={[1, 8, 8]} />
+                <meshBasicMaterial attach='material' transparent opacity={0} />
+              </mesh>
+            </group>
+          );
+        })}
+      </animated.group>
+    );
+    // We don't want target & groupPosition here because it would re-render the echoes
+    // therefore resetting the particles positions
+  }, [
+    filteredEchoes,
+    refs.current,
+    updateAudio,
+    updateTheme,
+    setClickedEcho,
+    setHoveredEcho,
+  ]);
 
   useFrame((state) => {
     if (!refs.current || !refs.current.length) return;
@@ -78,58 +142,12 @@ const LadderGraph = () => {
       .map((_, i) => refs.current[i] || createRef());
 
     setTarget(null);
-    setInfo(null);
 
     setIsDisplayReady(true);
   }, [filteredEchoes, getTraitsFromMetadata, setIsDisplayReady]);
 
   return filteredEchoes.length > 0 ? (
-    <animated.group position={groupPosition}>
-      <OrbitControls />
-      {filteredEchoes.map((echo, i) => {
-        const position = enlargeRadius(i, filteredEchoes.length);
-
-        // ! It is VERY important to set a key that will change each time echoes are filtered
-        // ! Otherwise, it won't update the ref as it was already set with the key before
-        // ! So the Echo won't get its uniforms updated
-        const uniqueKey = i + new Date().getTime(); // This is unique
-        // key={echo.chainId + echo.tokenId} // This won't work because the key won't always change
-
-        return (
-          <group key={i}>
-            <Echo
-              key={uniqueKey}
-              ref={refs.current[i]}
-              radius={radius}
-              uniforms={{
-                uTime: { value: 0.0 },
-                uRadius: { value: radius },
-                uColorA: new THREE.Uniform(
-                  new THREE.Vector3(...echo.attributes.spectrum.vec3.colorA),
-                ),
-                uColorB: new THREE.Uniform(
-                  new THREE.Vector3(...echo.attributes.spectrum.vec3.colorB),
-                ),
-                uGain: { value: 1.0 },
-                uBrighten: { value: 1.0 },
-              }}
-              count={echo.particlesCount.toFixed()}
-              vertexShader={vertexShaders[echo.attributes.trace.id]}
-              fragmentShader={fragmentShader}
-              position={position}
-              visible={target ? target === i + 1 : true}
-            />
-            <mesh
-              position={position}
-              onClick={() => onClick(echo, position, i)}
-              onPointerMissed={onMissed}>
-              <sphereBufferGeometry attach='geometry' args={[1, 8, 8]} />
-              <meshBasicMaterial attach='material' transparent opacity={0} />
-            </mesh>
-          </group>
-        );
-      })}
-    </animated.group>
+    echoes
   ) : (
     <mesh>
       <boxBufferGeometry attach='geometry' args={[1, 1, 1]} />
