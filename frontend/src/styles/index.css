@@ -96,7 +96,8 @@ h1 {
 /* 
  * Buttons/Inputs
  */
-button.primary,
+button.button-primary,
+span.button-primary button,
 .controls,
 input {
   background-color: var(--background-button);
@@ -111,35 +112,43 @@ input {
   transition: all 0.25s ease;
 }
 /* Hover */
-button.primary:hover,
+button.button-primary:hover,
+span.button-primary button,
 input:hover {
   border-color: var(--text-link);
 }
 /* Focus */
-button.primary:focus,
-button.primary:focus-visible,
+button.button-primary:focus,
+span.button-primary button:focus,
+button.button-primary:focus-visible,
+span.button-primary button:focus-visible,
 input:focus,
 input:focus-visible {
   /* outline: 4px auto -webkit-focus-ring-color; */
   outline: none;
 }
 /* Selected */
-button.primary.selected,
+button.button-primary.selected,
+span.button-primary button.selected,
 input.selected {
   border-color: var(--text-link);
 }
 /* Loading */
-button.primary.loading {
+button.button-primary.loading,
+span.button-primary button.loading {
   position: relative;
   cursor: not-allowed;
 }
-button.primary span {
+button.button-primary span,
+span.button-primary button span {
   transition: margin-left 0.25s ease;
 }
-button.primary.loading span {
+button.button-primary.loading span,
+span.button-primary button.loading span {
   margin-left: 2rem;
 }
-button.primary.loading span::before {
+button.button-primary.loading span::before,
+span.button-primary button.loading span::before {
   content: '';
   position: absolute;
   left: 1rem;
@@ -151,13 +160,15 @@ button.primary.loading span::before {
   animation: spin 1s linear infinite;
 }
 /* with icon */
-button.primary.has-icon {
+button.button-primary.has-icon,
+span.button-primary button.has-icon {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 /* Disabled */
-button.primary:disabled {
+button.button-primary:disabled,
+span.button-primary button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   border-color: transparent;

@@ -83,10 +83,10 @@ const Interact = () => {
         }
         className={
           isLoading
-            ? 'primary loading'
+            ? 'button-primary loading'
             : isSuccess || isError
-            ? 'primary has-icon'
-            : 'primary'
+            ? 'button-primary has-icon'
+            : 'button-primary'
         }>
         {config.deployedChainIds.includes(chainId) &&
         isSuccess &&

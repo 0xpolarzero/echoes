@@ -107,7 +107,7 @@ const Home = ({ count }) => {
       </p>
       <p>
         <button
-          className='primary special'
+          className='button-primary special'
           onClick={() => {
             setGenerate(true);
           }}>
@@ -135,7 +135,7 @@ const Section = ({ option, count }) => {
           return (
             <button
               key={index}
-              className={`primary option-${index} ${
+              className={`button-primary option-${index} ${
                 selected ? 'selected' : ''
               }`}
               onPointerEnter={() => hover(value)}

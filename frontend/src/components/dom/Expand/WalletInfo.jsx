@@ -27,7 +27,9 @@ const WalletInfo = () => {
     <div className='nav-filters'>
       <button
         onClick={resetTarget}
-        className={clickedEcho ? 'primary close' : 'primary close hidden'}>
+        className={
+          clickedEcho ? 'button-primary close' : 'button-primary close hidden'
+        }>
         <BsArrow90DegLeft />
       </button>
       <div className='filters'>

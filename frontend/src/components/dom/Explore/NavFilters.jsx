@@ -22,7 +22,9 @@ const NavFilters = () => {
     <div className='nav-filters'>
       <button
         onClick={resetTarget}
-        className={clickedEcho ? 'primary close' : 'primary close hidden'}>
+        className={
+          clickedEcho ? 'button-primary close' : 'button-primary close hidden'
+        }>
         <BsArrow90DegLeft />
       </button>
       <div className='filters'>
@@ -31,7 +33,9 @@ const NavFilters = () => {
             filterEchoesByChain(0);
             setSelected(0);
           }}
-          className={selected === 0 ? 'primary selected' : 'primary'}>
+          className={
+            selected === 0 ? 'button-primary selected' : 'button-primary'
+          }>
           All echoes
         </button>
 
@@ -42,7 +46,11 @@ const NavFilters = () => {
               filterEchoesByChain(chain.id);
               setSelected(chain.id);
             }}
-            className={selected === chain.id ? 'primary selected' : 'primary'}>
+            className={
+              selected === chain.id
+                ? 'button-primary selected'
+                : 'button-primary'
+            }>
             {chain.name}
           </button>
         ))}

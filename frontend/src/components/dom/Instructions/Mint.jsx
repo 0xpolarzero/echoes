@@ -160,10 +160,10 @@ const Mint = ({ count }) => {
             }
             className={
               isLoading
-                ? 'primary loading'
+                ? 'button-primary loading'
                 : isSuccess || isError
-                ? 'primary has-icon'
-                : 'primary'
+                ? 'button-primary has-icon'
+                : 'button-primary'
             }>
             {config.deployedChainIds.includes(chainId) &&
             chainId !== 1 &&
@@ -176,7 +176,7 @@ const Mint = ({ count }) => {
             <span>Generate on testnet (free)</span>
           </button>
         </Tooltip>
-        <Tooltip
+        {/* <Tooltip
           title={
             chainId !== 1
               ? 'You need to switch chains to Ethereum mainnet.'
@@ -197,11 +197,11 @@ const Mint = ({ count }) => {
             className={
               chainId === 1
                 ? isLoading
-                  ? 'primary loading'
+                  ? 'button-primary loading'
                   : isSuccess || isError
-                  ? 'primary has-icon'
-                  : 'primary'
-                : 'primary'
+                  ? 'button-primary has-icon'
+                  : 'button-primary'
+                : 'button-primary'
             }>
             {chainId === 1 && isSuccess && !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
@@ -210,7 +210,7 @@ const Mint = ({ count }) => {
             ) : null}
             <span>Generate on mainnet ({MINT_PRICE_ETH} ETH)</span>
           </button>
-        </Tooltip>
+        </Tooltip> */}
       </div>
     </div>
   );
