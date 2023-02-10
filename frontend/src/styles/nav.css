@@ -1,6 +1,6 @@
 .nav,
 .nav-filters {
-  font-family: 'Source Code Pro', monospace, var(--font-main);
+  font-family: var(--font-main);
   backdrop-filter: blur(10px);
   position: fixed;
   left: 50%;
