@@ -11,7 +11,7 @@ import stores from '@/stores';
 
 const Layout = forwardRef(({ children, ...props }, ref) => {
   const localRef = useRef();
-  const Config = stores.useConfig((state) => state.Config);
+  const { Config } = stores.useConfig(/* (state) => state.Config */);
   const getEchoes = stores.useGraph((state) => state.getEchoes);
 
   useImperativeHandle(ref, () => localRef.current);
