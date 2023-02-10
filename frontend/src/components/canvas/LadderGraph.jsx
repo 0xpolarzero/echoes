@@ -12,13 +12,13 @@ import { useFrame } from '@react-three/fiber';
 import LoadingMesh from './LoadingMesh';
 
 const LadderGraph = () => {
-  const { filteredEchoes, setIsDisplayReady, setHoveredEcho, setClickedEcho } =
-    stores.useGraph((state) => ({
+  const { filteredEchoes, setHoveredEcho, setClickedEcho } = stores.useGraph(
+    (state) => ({
       filteredEchoes: state.filteredEchoes,
-      setIsDisplayReady: state.setIsDisplayReady,
       setHoveredEcho: state.setHoveredEcho,
       setClickedEcho: state.setClickedEcho,
-    }));
+    }),
+  );
   const getTraitsFromMetadata = stores.useTraits(
     (state) => state.getTraitsFromMetadata,
   );
@@ -143,9 +143,7 @@ const LadderGraph = () => {
       .map((_, i) => refs.current[i] || createRef());
 
     setTarget(null);
-
-    setIsDisplayReady(true);
-  }, [filteredEchoes, getTraitsFromMetadata, setIsDisplayReady]);
+  }, [filteredEchoes, getTraitsFromMetadata]);
 
   return filteredEchoes.length > 0 ? echoes : <LoadingMesh />;
 };

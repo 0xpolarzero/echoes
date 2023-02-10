@@ -32,10 +32,6 @@ export default create((set, get) => ({
   clickedEcho: null,
   setClickedEcho: (clickedEcho) => set({ clickedEcho }),
 
-  // Is it ready to display?
-  isDisplayReady: false,
-  setIsDisplayReady: (isDisplayReady) => set({ isDisplayReady }),
-
   // Get echoes
   getEchoes: async () => {
     const { fetchSubgraphs, getEchoAttributes, setAvailableSignatures } = get();
@@ -104,12 +100,11 @@ export default create((set, get) => ({
   },
 
   // Filter echoes by chain
-  filterEchoes: (chainId) => {
+  filterEchoesByChain: (chainId) => {
     const { echoes } = get();
     if (chainId === 0 || !chainId) return set({ filteredEchoes: echoes });
 
     const filteredEchoes = echoes.filter((echo) => echo.chainId === chainId);
-    console.log('filteredEchoes', filteredEchoes);
     set({ filteredEchoes });
   },
 
