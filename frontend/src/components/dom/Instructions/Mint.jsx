@@ -111,7 +111,7 @@ const Mint = ({ count }) => {
   useEffect(() => {
     // We need to use this trick because wagmi hook useNetwork sets the chain too late
     if (chain?.id) setChainId(chain.id);
-  }, [chain?.id, setChainId]);
+  }, [chain, setChainId]);
 
   return (
     <div className='section' style={{ top: `${count * 200}%` }}>
@@ -159,20 +159,14 @@ const Mint = ({ count }) => {
               missingSignature
             }
             className={
-              config.deployedChainIds.includes(chainId) && chainId !== 1
-                ? isLoading
-                  ? 'loading'
-                  : isSuccess || isError
-                  ? 'has-icon'
-                  : ''
-                : ''
+              isLoading ? 'loading' : isSuccess || isError ? 'has-icon' : ''
             }>
             {config.deployedChainIds.includes(chainId) &&
             chainId !== 1 &&
             isSuccess &&
             !isLoading ? (
               <AiOutlineCheck color='var(--text-success)' />
-            ) : chainId === 80001 && isError && !isLoading ? (
+            ) : chainId !== 1 && isError && !isLoading ? (
               <AiOutlineClose color='var(--text-error)' />
             ) : null}
             <span>Generate on testnet (free)</span>
