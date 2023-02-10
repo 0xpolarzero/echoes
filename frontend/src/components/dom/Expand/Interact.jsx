@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
+import { fetchBl } from '@wagmi/core';
 import { toast } from 'react-toastify';
 import config from '@/data';
 import stores from '@/stores';
@@ -13,6 +14,7 @@ const Interact = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isError, setIsError] = useState(false);
   const notification = useRef(null);
+  // Remember the echo to update it after the transaction, in case the user 'un-clicks' it
 
   /**
    * @notice Expand transaction
@@ -27,7 +29,7 @@ const Interact = () => {
     if (receipt.status === 1) {
       setIsSuccess(true);
       toast.update(notification.current, {
-        render: `${clickedEcho.signature} has been expanded!`,
+        render: `${clickedEcho.signature} has been expanded! Please refresh the page to see the changes.`,
         type: 'success',
         isLoading: false,
         autoClose: 5000,
@@ -51,9 +53,9 @@ const Interact = () => {
     args: [Number(clickedEcho?.tokenId)],
     enabled:
       clickedEcho &&
-      !clickedEcho?.maxExpanded &&
+      clickedEcho?.particlesCount < 10_000 &&
       // Not in cooldown
-      Date.now() - Number(clickedEcho?.lastExpandedAt) < 10 * 60 * 1000,
+      Date.now() - Number(clickedEcho?.lastExpandedAt) * 1000 > 10 * 60 * 1000,
   });
 
   const { isLoading, write: expand } = useContractWrite({
@@ -61,27 +63,30 @@ const Interact = () => {
     onSettled,
   });
 
+  useEffect(() => {
+    // Reset state
+    setIsSuccess(false);
+    setIsError(false);
+  }, [clickedEcho]);
+
   if (!clickedEcho) return null;
 
   return (
     <div className='actions'>
       <button
-        onClick={
-          !isLoading
-            ? (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                expand();
-              }
-            : null
-        }
+        onClick={!isLoading ? expand : null}
         disabled={
           !config.deployedChainIds.includes(chainId) ||
-          clickedEcho.maxExpanded ||
-          Date.now() - Number(clickedEcho.lastExpandedAt) < 10 * 60 * 1000
+          clickedEcho?.particlesCount >= 10_000 ||
+          Date.now() - Number(clickedEcho.lastExpandedAt) * 1000 <
+            10 * 60 * 1000
         }
         className={
-          isLoading ? 'loading' : isSuccess || isError ? 'has-icon' : ''
+          isLoading
+            ? 'primary loading'
+            : isSuccess || isError
+            ? 'primary has-icon'
+            : 'primary'
         }>
         {config.deployedChainIds.includes(chainId) &&
         isSuccess &&
@@ -90,12 +95,12 @@ const Interact = () => {
         ) : chainId === 80001 && isError && !isLoading ? (
           <AiOutlineClose color='var(--text-error)' />
         ) : null}
-        <span>Generate on testnet (free)</span>
+        <span>Expand</span>
       </button>
-      {clickedEcho && clickedEcho.maxExpanded ? (
+      {clickedEcho.particlesCount >= 10_000 ? (
         <span className='emphasize'>_max expansion reached</span>
       ) : (
-        <Countdown timestamp={clickedEcho.lastExpandedAt} />
+        <Countdown timestamp={Number(clickedEcho.lastExpandedAt) * 1000} />
       )}
     </div>
   );
@@ -109,7 +114,7 @@ const Countdown = ({ timestamp }) => {
   useEffect(() => {
     const count = () => {
       const now = Date.now();
-      const diff = now - Number(timestamp);
+      const diff = now - timestamp;
       if (diff >= max) {
         setCountdown(0);
         setIsCooldown(false);
