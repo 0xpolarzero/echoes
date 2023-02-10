@@ -50,10 +50,29 @@
   font-size: 0.9rem;
   top: 4rem;
   /* padding: 0.8rem 2.5rem; */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.nav-filters .filters {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 1em;
+}
+
+.nav-filters .close {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  width: min-content;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.nav-filters .close.hidden {
+  opacity: 0;
 }
 
 @media (min-width: 1200px) {
