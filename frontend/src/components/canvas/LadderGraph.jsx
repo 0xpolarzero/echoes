@@ -7,7 +7,6 @@ import config from '@/data';
 
 import vertexShaders from './shaders/echo/vertexShaders';
 import fragmentShader from './shaders/echo/fragmentShader';
-import { Html, OrbitControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import LoadingMesh from './LoadingMesh';
 
@@ -30,6 +29,7 @@ const LadderGraph = () => {
 
   const [target, setTarget] = useState(null);
   const [targetPosition, setTargetPosition] = useState([0, 0, 4]);
+  const [isReady, setIsReady] = useState(false);
 
   const refs = useRef([]);
   const radius = 2;
@@ -109,6 +109,7 @@ const LadderGraph = () => {
   }, [
     filteredEchoes,
     refs.current,
+    isReady,
     updateAudio,
     updateTheme,
     setClickedEcho,
@@ -143,6 +144,7 @@ const LadderGraph = () => {
       .map((_, i) => refs.current[i] || createRef());
 
     setTarget(null);
+    setIsReady(true);
   }, [filteredEchoes, getTraitsFromMetadata]);
 
   return filteredEchoes.length > 0 ? echoes : <LoadingMesh />;
