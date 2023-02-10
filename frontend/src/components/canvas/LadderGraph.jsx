@@ -9,6 +9,7 @@ import vertexShaders from './shaders/echo/vertexShaders';
 import fragmentShader from './shaders/echo/fragmentShader';
 import { Html, OrbitControls } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
+import LoadingMesh from './LoadingMesh';
 
 const LadderGraph = () => {
   const { filteredEchoes, setIsDisplayReady, setHoveredEcho, setClickedEcho } =
@@ -146,14 +147,7 @@ const LadderGraph = () => {
     setIsDisplayReady(true);
   }, [filteredEchoes, getTraitsFromMetadata, setIsDisplayReady]);
 
-  return filteredEchoes.length > 0 ? (
-    echoes
-  ) : (
-    <mesh>
-      <boxBufferGeometry attach='geometry' args={[1, 1, 1]} />
-      <meshStandardMaterial attach='material' color='hotpink' />
-    </mesh>
-  );
+  return filteredEchoes.length > 0 ? echoes : <LoadingMesh />;
 };
 
 const enlargeRadius = (index, amount) => {
