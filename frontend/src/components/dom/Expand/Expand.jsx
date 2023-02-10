@@ -4,26 +4,22 @@ import stores from '@/stores';
 import WalletInfo from './WalletInfo';
 import config from '@/data';
 import Infos from '../Infos';
+import Controls from './Controls';
 
 const Expand = () => {
   // filtered show 10 first
   // ownersEchoes
   // navigate increments/decrements index set here
   // set filtered based on index in ownersEchoes
-  const {
-    echoes,
-    ownedEchoes,
-    filteredEchoes,
-    setOwnedEchoes,
-    filterEchoesByChain,
-  } = stores.useGraph((state) => ({
-    echoes: state.echoes,
-    ownedEchoes: state.ownedEchoes,
-    filteredEchoes: state.filteredEchoes,
-    setOwnedEchoes: state.setOwnedEchoes,
-    filterEchoesByChain: state.filterEchoesByChain,
-  }));
+  const { echoes, ownedEchoes, setOwnedEchoes, filterEchoesByChain } =
+    stores.useGraph((state) => ({
+      echoes: state.echoes,
+      ownedEchoes: state.ownedEchoes,
+      setOwnedEchoes: state.setOwnedEchoes,
+      filterEchoesByChain: state.filterEchoesByChain,
+    }));
   const chainId = stores.useConfig((state) => state.chainId);
+  const resetTarget = stores.useGraph((state) => state.resetTarget);
   const { address } = useAccount();
 
   const [page, setPage] = useState(0);
@@ -36,15 +32,18 @@ const Expand = () => {
   // Filter echoes for the chain
   useEffect(() => {
     if (config.deployedChainIds.includes(chainId)) {
-      filterEchoesByChain(chainId, true, 0); // true = use owned echoes, 0 = page
-      setPage(0);
+      filterEchoesByChain(chainId, true, page); // true = use owned echoes
     }
-  }, [chainId, ownedEchoes, filterEchoesByChain]);
+    resetTarget();
+  }, [chainId, ownedEchoes, page, filterEchoesByChain, resetTarget]);
 
   return (
     <>
       <WalletInfo />
       <Infos actions={true} />
+      {ownedEchoes.length > 10 && (
+        <Controls page={page} setPage={setPage} amount={ownedEchoes.length} />
+      )}
     </>
   );
 };
