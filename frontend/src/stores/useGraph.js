@@ -31,12 +31,23 @@ export default create((set, get) => ({
   setHoveredEcho: (hoveredEcho) => set({ hoveredEcho }),
   clickedEcho: null,
   setClickedEcho: (clickedEcho) => set({ clickedEcho }),
+  // Expand
+  ownedEchoes: [],
+  setOwnedEchoes: (address) => {
+    const { echoes } = get();
+
+    const ownedEchoes = address
+      ? echoes.filter(
+          (echo) => echo.owner.toLowerCase() === address.toLowerCase(),
+        )
+      : [];
+
+    set({ ownedEchoes, filteredEchoes: [] });
+  },
 
   // Get echoes
   getEchoes: async () => {
-    const { fetchSubgraphs, getEchoAttributes, setAvailableSignatures } = get();
-    const { getTraitsFromMetadata } = useTraits.getState();
-    // Use function from useTraits
+    const { fetchSubgraphs, setAvailableSignatures } = get();
 
     // Get all echoes from all subgraphs
     const data = await fetchSubgraphs();
@@ -60,21 +71,7 @@ export default create((set, get) => ({
       .flat()
       .sort((a, b) => a.createdAt - b.createdAt);
 
-    // We want a top 10 for all chain + for each chain
-    // e.g. for 3 chains, we need max 30 echoes
-    await Promise.all(
-      sortedEchoes.map(async (echo, index) => {
-        if (index > config.deployedChainIds.length * 10) return;
-
-        const data = await getEchoAttributes(echo);
-        const appropriateData = getTraitsFromMetadata(data.attributes);
-        echo.attributes = appropriateData;
-
-        return echo;
-      }),
-    );
-
-    set({ echoes: sortedEchoes, filteredEchoes: sortedEchoes });
+    set({ echoes: sortedEchoes });
 
     // Update the available signatures per chain based on the data
     setAvailableSignatures(data);
@@ -100,26 +97,59 @@ export default create((set, get) => ({
   },
 
   // Filter echoes by chain
-  filterEchoesByChain: (chainId) => {
-    const { echoes } = get();
-    if (chainId === 0 || !chainId) return set({ filteredEchoes: echoes });
+  filterEchoesByChain: async (chainId, owned = false, page = 0) => {
+    const { echoes, ownedEchoes, getEchoesAttributes } = get();
+    // Set loading while fetching data
+    set({ filteredEchoes: [] });
 
-    const filteredEchoes = echoes.filter((echo) => echo.chainId === chainId);
-    set({ filteredEchoes });
+    // Are we filtering in explore (all echoes) or expand (owned echoes)?
+    const toFilter = owned ? ownedEchoes : echoes;
+
+    const filtered =
+      chainId === 0 || !chainId
+        ? // Just return the top 10 if no chain is selected
+          toFilter.slice(0, 10)
+        : // Otherwise filter by chain
+          toFilter
+            .filter((echo) => echo.chainId === chainId)
+            .slice(page, page + 10);
+
+    // Fetch data for the filtered echoes
+    const filteredWithAttributes = await getEchoesAttributes(filtered);
+
+    set({ filteredEchoes: filteredWithAttributes });
   },
 
-  // Read echoes on chain on multiple chains
-  getEchoAttributes: async (echo) => {
-    const chainId = echo.chainId;
-    const echoData = await readContract({
-      address: config.networkMapping[chainId]['Echoes'][0],
-      abi: chainId !== 1 ? config.abiTestnet : config.abiMainnet,
-      functionName: 'getEcho',
-      args: [echo.tokenId],
-      chainId,
-    });
+  // Read echoes on multiple chains
+  getEchoesAttributes: async (echoes) => {
+    const { getTraitsFromMetadata } = useTraits.getState();
 
-    return echoData;
+    const getAttributes = async (echo) => {
+      const chainId = echo.chainId;
+
+      const echoData = await readContract({
+        address: config.networkMapping[chainId]['Echoes'][0],
+        abi: chainId !== 1 ? config.abiTestnet : config.abiMainnet,
+        functionName: 'getEcho',
+        args: [echo.tokenId],
+        chainId,
+      });
+
+      return echoData;
+    };
+
+    return await Promise.all(
+      echoes.map(async (echo, index) => {
+        // Don't fetch it again if it's already there
+        if (!echo.attributes) {
+          const data = await getAttributes(echo);
+          const appropriateData = getTraitsFromMetadata(data.attributes);
+          echo.attributes = appropriateData;
+        }
+
+        return echo;
+      }),
+    );
   },
 
   /**
