@@ -1,11 +1,11 @@
-import audio1 from '@/assets/audio/celestial_orbs_sfx-001.mp3';
-import audio2 from '@/assets/audio/celestial_orbs_sfx-002.mp3';
-import audio3 from '@/assets/audio/celestial_orbs_sfx-003.mp3';
-import audio4 from '@/assets/audio/celestial_orbs_sfx-004.mp3';
-import audio5 from '@/assets/audio/celestial_orbs_sfx-005.mp3';
-import audio6 from '@/assets/audio/celestial_orbs_sfx-006.mp3';
-import audio7 from '@/assets/audio/celestial_orbs_sfx-007.mp3';
-import audio8 from '@/assets/audio/celestial_orbs_sfx-008.mp3';
+import audio1 from '@/assets/audio/echoes_sfx_001.mp3';
+import audio2 from '@/assets/audio/echoes_sfx_002.mp3';
+import audio3 from '@/assets/audio/echoes_sfx_003.mp3';
+import audio4 from '@/assets/audio/echoes_sfx_004.mp3';
+import audio5 from '@/assets/audio/echoes_sfx_005.mp3';
+import audio6 from '@/assets/audio/echoes_sfx_006.mp3';
+import audio7 from '@/assets/audio/echoes_sfx_007.mp3';
+import audio8 from '@/assets/audio/echoes_sfx_008.mp3';
 
 const traits = [
   {
