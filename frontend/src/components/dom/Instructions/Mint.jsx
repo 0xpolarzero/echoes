@@ -138,7 +138,6 @@ const Mint = ({ count }) => {
         </p>
       </div>
       <div className='wallet'>
-        {/* <ConnectButton label='Connect your wallet to generate the echo' /> */}
         <ConnectKitButton />
       </div>
 
@@ -176,41 +175,6 @@ const Mint = ({ count }) => {
             <span>Generate on testnet (free)</span>
           </button>
         </Tooltip>
-        {/* <Tooltip
-          title={
-            chainId !== 1
-              ? 'You need to switch chains to Ethereum mainnet.'
-              : !isBalanceEnough
-              ? 'Insufficient balance.'
-              : missingSignature
-              ? 'The signature is missing.'
-              : ''
-          }>
-          <button
-            onClick={!isLoading ? mint : null}
-            disabled={
-              chainId !== 1 ||
-              !isConnected ||
-              !isBalanceEnough ||
-              missingSignature
-            }
-            className={
-              chainId === 1
-                ? isLoading
-                  ? 'button-primary loading'
-                  : isSuccess || isError
-                  ? 'button-primary has-icon'
-                  : 'button-primary'
-                : 'button-primary'
-            }>
-            {chainId === 1 && isSuccess && !isLoading ? (
-              <AiOutlineCheck color='var(--text-success)' />
-            ) : chainId === 1 && isError && !isLoading ? (
-              <AiOutlineClose color='var(--text-error)' />
-            ) : null}
-            <span>Generate on mainnet ({MINT_PRICE_ETH} ETH)</span>
-          </button>
-        </Tooltip> */}
       </div>
     </div>
   );

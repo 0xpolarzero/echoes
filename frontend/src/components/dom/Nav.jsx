@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Divider, Tooltip } from 'antd';
 import { CiLight, CiDark } from 'react-icons/ci';

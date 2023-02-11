@@ -7,10 +7,6 @@ import Infos from '../Infos';
 import Controls from './Controls';
 
 const Expand = () => {
-  // filtered show 10 first
-  // ownersEchoes
-  // navigate increments/decrements index set here
-  // set filtered based on index in ownersEchoes
   const { echoes, ownedEchoes, setOwnedEchoes, filterEchoesByChain } =
     stores.useGraph((state) => ({
       echoes: state.echoes,

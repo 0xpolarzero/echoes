@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { getProvider, readContract } from '@wagmi/core';
+import { readContract } from '@wagmi/core';
 import config from '@/data';
 import useTraits from './useTraits';
 

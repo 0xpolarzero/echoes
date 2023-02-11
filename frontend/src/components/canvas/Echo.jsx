@@ -1,24 +1,9 @@
-import { useFrame } from '@react-three/fiber';
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-} from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
 const Echo = forwardRef(
   (
-    {
-      radius,
-      uniforms,
-      count,
-      vertexShader,
-      fragmentShader,
-      position,
-      // visible = true,
-    },
+    { radius, uniforms, count, vertexShader, fragmentShader, position },
     ref,
   ) => {
     const localRef = useRef();
@@ -43,11 +28,7 @@ const Echo = forwardRef(
     }, [count, radius]);
 
     return (
-      <points
-        ref={localRef}
-        position={position}
-        /* visible={visible} */
-      >
+      <points ref={localRef} position={position}>
         <bufferGeometry>
           <bufferAttribute
             attach='attributes-position'

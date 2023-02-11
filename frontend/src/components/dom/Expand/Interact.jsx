@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { useContractWrite, usePrepareContractWrite } from 'wagmi';
-import { fetchBl } from '@wagmi/core';
 import { toast } from 'react-toastify';
 import config from '@/data';
 import stores from '@/stores';

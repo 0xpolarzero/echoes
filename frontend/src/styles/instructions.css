@@ -90,12 +90,10 @@ button.controls.next:hover svg {
   box-shadow: 0 4px 30px var(--button-shadow);
   backdrop-filter: blur(1.2px);
   -webkit-backdrop-filter: blur(1.2px);
-  /* border: 1px solid var(--button-border); */
   border: none;
 }
 
 .option-picker button:hover {
-  /* border: 1px solid var(--button-border); */
   border: none;
 }
 

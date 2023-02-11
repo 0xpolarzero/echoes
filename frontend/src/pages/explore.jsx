@@ -1,4 +1,3 @@
-import React, { useState, useEffect, startTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Explore from '@/components/dom/Explore';
 

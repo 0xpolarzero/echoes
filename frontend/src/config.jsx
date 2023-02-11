@@ -1,7 +1,7 @@
 import Head from 'next/head';
 
 const titleDefault = 'echoes';
-const url = 'https://react-three-next.vercel.app/';
+const url = 'https://echoes.polarzero.xyz/';
 const description = 'A contemplative yet interactive digital collectible';
 const author = 'polarzero';
 

@@ -1,4 +1,4 @@
-import { createRef, useEffect, useRef, useState } from 'react';
+import { createRef, useEffect, useRef } from 'react';
 import stores from '@/stores';
 import config from '@/data';
 

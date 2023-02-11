@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Expand from '@/components/dom/Expand';
 

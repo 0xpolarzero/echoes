@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
 } from 'react-icons/md';
 
 const Controls = ({ page, setPage, amount }) => {
-  // Each page has 10 echoes
-  const [pagesAmount, setPagesAmount] = useState(Math.ceil(amount / 10));
-
   return (
     <div className='controls-horizontal'>
       <button
@@ -16,7 +12,9 @@ const Controls = ({ page, setPage, amount }) => {
         <MdOutlineKeyboardArrowLeft size={20} />
       </button>
       <button
-        className={`controls next ${page === pagesAmount - 1 ? 'hidden' : ''}`}
+        className={`controls next ${
+          page === Math.ceil(amount / 10) - 1 ? 'hidden' : ''
+        }`}
         onClick={() => setPage(page + 1)}>
         <MdOutlineKeyboardArrowRight size={20} />
       </button>
