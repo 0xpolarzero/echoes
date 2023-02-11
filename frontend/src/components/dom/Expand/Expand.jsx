@@ -30,7 +30,7 @@ const Expand = () => {
     if (config.deployedChainIds.includes(chainId)) {
       filterEchoesByChain(chainId, true, page); // true = use owned echoes
     }
-    resetTarget();
+    resetTarget(null);
   }, [chainId, ownedEchoes, page, filterEchoesByChain, resetTarget]);
 
   return (

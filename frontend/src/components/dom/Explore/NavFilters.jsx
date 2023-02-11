@@ -15,7 +15,7 @@ const NavFilters = () => {
 
   useEffect(() => {
     filterEchoesByChain(0);
-    resetTarget();
+    resetTarget(null);
   }, [echoes, filterEchoesByChain]);
 
   return (

@@ -143,7 +143,7 @@ const LadderGraph = () => {
       .fill()
       .map((_, i) => refs.current[i] || createRef());
 
-    resetTarget();
+    resetTarget(null);
     setIsReady(true);
   }, [filteredEchoes, getTraitsFromMetadata]);
 

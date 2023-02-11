@@ -34,8 +34,10 @@ export default create((set, get) => ({
   setHoveredEcho: (hoveredEcho) => set({ hoveredEcho }),
   clickedEcho: null,
   setClickedEcho: (clickedEcho) => set({ clickedEcho }),
-  resetTarget: () =>
-    set({ target: null, hoveredEcho: null, clickedEcho: null }),
+  resetTarget: (e) => {
+    if (e) e.stopPropagation();
+    set({ target: null, hoveredEcho: null, clickedEcho: null });
+  },
   // Expand
   ownedEchoes: [],
   setOwnedEchoes: (address) => {
