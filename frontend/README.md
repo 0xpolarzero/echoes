@@ -1,67 +1,23 @@
-# 3D spheres collection
+# Echoes - frontend
 
-- Choose traints on the website, sphere/form on one side and options on the other side.
-- On click on an option, change it, and let the user go to another option on click/scroll
-- In the end, "Mint" generates a 3D sphere with the chosen options
-- It actually mints a NFT with the metadata of the chosen options (make it a nice object with the values shown)
-  -> Maybe do something original with that (a card on the color of the nft, maybe prompt to get some kind of name based on the options, a poetic color, ...?)
-- Maybe draw a random number on mint (chainlink VRF) that decides whether or not a trait would be "enhanced" (more rare)?
-- Based on the number of votes, improve the NFT like enhance it -> more rare -> needs to be written on the NFT as well
-  -> Votes/rarity improved (VRF) = glow for instance
-  -> Each vote gives a chance to get an enhancement (VRF)
-  -> Votes are tracked so users can see who voted for their NFT and maybe give it back
-- Mint at a free price (but give other options to pay, but tell it won't change anything)
+Everything can be cloned and run locally, though the easiest way to get started is to visit the [website](https://echoes.polarzero.xyz).
 
-Custom smart contract that keeps track of the rarity of each trait
-Events with traits so it can be catched to display on the website
+Echoes can be generated on testnet (Goerli, Polygon Mumbai, Arbitrum Goerli) and on mainnet (Polygon). The functionnalities are exactly the same, so you can think of the testnets as a playground, and the mainnet as as way to support my work.
 
-- On the website, display the creations by fetching the NFTs to get their values
-- Latest creations
-- Best rated (let the users rate the creations)
-- Rarest: rarity of traits based on the number of NFTs minted with the same combination of traits
+## How to run locally
 
-All in the canva, but need to figure out how to display grid with nfts and their informations in a frame around? On click, display it closer and left to show informations right
+```bash
+# Clone the repository
+git clone git@github.com:polar0/echoes.git
 
-Which blockchain? Ethereum = more impact but expensive
--> How to make it that it's cheap to interact (vote, etc)
+# Install dependencies
+cd echoes/frontend
+yarn
 
-How to implement something more interesting than just votes, e.g. some daily question that based on the response will improve the NFT in different ways, e.g. good/evil, etc
+# Copy the .env.local file and populate it (see .env.example)
+cp .env.example .env.local
+# The subgraphs URLs are provided in the .env.example file, but you can replace them with your own, if you want to use your own subgraphs.
 
-## What will improve on daily quest
-
-- particles count (e.g. 100 -> 10 000 max)
-
-In the contract
-originTime = block.timestamp (in constructor)
-minted(mapping id => mintTimestamp)
--> Calculate e.g. canEnhance = (block.timestamp - minted[id] > 1 day)
--> Maybe count improved by n per day, so to getCount = baseCount (the base + enhanced) + additionnalCount (currentTime - mintedTimestamp)
-
-# Features
-
-## Creative features
-
-## Technical
-
-### Backend
-
-- Basic minting contract (ERC721)
-- Custom verifications (name, traits, ...)
-- Metadata modifications based on traits "enhancements"
-- Time-based enhancements
-- Indexing events on The Graph
-- ! Limited tokenURI modifications (only modifies the necessary attributes) for cheaper and more efficient
-- ! Modification of ERC721 tokenURI implementation to dynamically get the URI based on constantly changing metadata (e.g. timestamp)
-  -> + animation url returns always updated traits to display the Three.js scene
-
-### Frontend
-
-- Minting page (with traits options)
-- Fetching, sorting and displaying NFTs (The Graph)
-- Interacting with the contract (enhancing)
-
-- Displaying a procedural image based on the changing metadata
-
-# Domains
-
-orbsgen
+# Run the development server
+yarn dev
+```

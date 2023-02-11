@@ -1,38 +1,49 @@
-# Contracts
+### Echoes - hardhat
 
-- Only 1 echo per wallet Maybe supply limit on mainnet and not on mumbai?
+Everything can be cloned and run locally, though the easiest way to get started is to visit the [website](https://echoes.polarzero.xyz).
 
-- Use '\_setTokenURI' to update after enhancement
+## Features
 
-```solidity
-function train(uint256 tokenId) public {
-    require(_exists(tokenId), "Please use an existing token");
-    require(ownerOf(tokenId) == msg.sender, "You must own this token to train it");
-    uint256 currentLevel = tokenIdToLevels[tokenId];
-    tokenIdToLevels[tokenId] = currentLevel + 1;
-    _setTokenURI(tokenId, getTokenURI(tokenId));
-}
+- Basic minting contract (ERC721)
+- Custom verifications (name, traits, ...)
+- Metadata modifications based on traits enhancements (`expansion`)
+- Time-based enhancements
+- Indexing events on The Graph
+- **Limited tokenURI modifications (only modifies the necessary attributes) for cheaper and more efficient metadata updates**
+- **Modification of ERC721 tokenURI implementation to dynamically get the URI based on constantly changing metadata (e.g. timestamp)**
+  -> + the animation url always returns updated traits to display the Three.js scene
+
+## How to deploy your own
+
+### Clone & install
+
+```bash
+# Clone the repository
+git clone git@github.com:polar0/echoes.git
+
+# Install dependencies
+cd echoes/hardhat
+yarn
+
+# Copy the .env file and populate it (see .env.example)
+cp .env.example .env.local
 ```
 
-- Verify the metadata in the contract (if belongs to existing names)
+### Run tests
 
-- How to check that a name was not taken when minting? Where to put that array of names?
-  -> Faire une array usedNames, dans laquelle c'est push à chaque fois, et qui verifie que le nom n'est pas dedans avant de mint
+```bash
+# Run all unit tests
+yarn hardhat test
 
-https://levelup.gitconnected.com/how-to-create-an-interactive-nft-4aeeed979138
+# Test coverage
+yarn hardhat coverage
+```
 
-! Emit event when metadata updated to refresh OpenSea (end https://docs.opensea.io/docs/metadata-standards)
-event MetadataUpdate(uint256 \_tokenId)
+### Deploy the contracts
 
-# Updatable tokenURI
+```bash
+yarn hardhat deploy
 
-- Write all metadata (except what can be changed) in the usual tokenURI (\_setTokenURI)
-- Write the updatable metadata to a different tokenURI:
-  - Mapping tokenId => tokenURIUpdatable
-  - \_setTokenURIUpdatable
-- Override tokenURI (ERC721URIStorage) such as:
-  ```solidity
-  string memory _tokenURI = _tokenURIs[tokenId];
-  // ->
-  string memory _tokenURI = string(abi.encodePacked(_tokenURIs[tokenId], tokenURIsUpdatable[tokenId]))
-  ```
+# Or if you want to deploy to a specific network
+yarn hardhat deploy --network <network>
+```
