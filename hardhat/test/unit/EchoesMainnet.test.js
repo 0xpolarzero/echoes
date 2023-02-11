@@ -349,7 +349,9 @@ const mineBlocks = require('../../scripts/mineBlocks');
 
             await expect(echoesContractUser.expand(1))
               .to.emit(echoesContract, 'ECHOES__EXPANDED')
-              .withArgs(user.address, 1, signature);
+              .withArgs(user.address, 1, signature)
+              .and.to.emit(echoesContract, 'MetadataUpdate')
+              .withArgs(1);
           });
         });
       });

@@ -94,6 +94,8 @@ contract EchoesMainnet is ERC721URIStorage, Ownable {
     event ECHOES__MINTED(address owner, uint256 tokenId, string signature);
     // Expand
     event ECHOES__EXPANDED(address owner, uint256 tokenId, string signature);
+    // OpenSea cache
+    event MetadataUpdate(uint256 tokenId);
 
     /**
      * @notice Constructor
@@ -242,6 +244,7 @@ contract EchoesMainnet is ERC721URIStorage, Ownable {
             s_echoes[_tokenId].maxExpansionReached = true;
 
         emit ECHOES__EXPANDED(echo.owner, echo.tokenId, echo.signature);
+        emit MetadataUpdate(echo.tokenId);
     }
 
     /// Getters
