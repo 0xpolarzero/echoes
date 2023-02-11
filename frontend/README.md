@@ -2,7 +2,7 @@
 
 Everything can be cloned and run locally, though the easiest way to get started is to visit the [website](https://echoes.polarzero.xyz).
 
-Echoes can be generated on testnet (Goerli, Polygon Mumbai, Arbitrum Goerli) and on mainnet (Polygon). The functionnalities are exactly the same, so you can think of the testnets as a playground, and the mainnet as as way to support my work.
+Echoes can be generated on testnets (Goerli, Polygon Mumbai, Arbitrum Goerli). The functionalities are exactly the same, so you can choose your playground based on your network of choice.
 
 ## How to run locally
 

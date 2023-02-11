@@ -118,16 +118,13 @@ const Mint = ({ count }) => {
       <h1>_generate</h1>
       <div className='informations'>
         <p>
-          You can generate an echo either on a testnet (Polygon Mumbai) or on
-          mainnet (Ethereum).
+          You can generate an echo for free on a testnet (Ethereum Goerli,
+          Polygon Mumbai, Arbitrum Goerli).
         </p>
         <p>
-          The echoes can be generated{' '}
-          <span className='emphasize'>for free on testnet</span>, or{' '}
-          <span className='emphasize'>for a fixed price on mainnet</span>. Both
-          chains provide the{' '}
+          All chains provide the{' '}
           <span className='emphasize'>exact same functionalities</span>, so you
-          are welcome to mint on a testnet if you just want to experiment.
+          are welcome to choose any of them if you would like to experiment.
         </p>
         <p style={{ fontSize: '0.9rem' }}>
           Please be aware that minting an echo is an experimental process and

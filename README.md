@@ -6,7 +6,7 @@ Each can take one of 3072 unique combinations, even though the purpose might jus
 
 ## Motivation
 
-Everything is available both on testnet and mainnet, as it should be for anything that is part of a learning process - if not for anything that includes a gamified or interactive aspect.
+Everything is available on testnets (Goerli, Mumbai, Arbitrum Goerli), as it should be for anything that is part of a learning process - if not for anything that includes a gamified or interactive aspect.
 
 While this demonstrates only basic interactions between the echoes and their very minimalistic soundscape, as well as with the user, it is a good starting point for more complex interactions. Some ideas include:
 
