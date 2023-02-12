@@ -4,7 +4,6 @@ const traits = [
     label: 'Spectrum',
     values: [
       {
-        // Soothing Skies and Warm Sands
         name: 'Oceanic Blaze, Sunset Haze',
         id: 'oceanicBlazeSunsetHaze',
         vec3: {
