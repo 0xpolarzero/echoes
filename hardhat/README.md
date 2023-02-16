@@ -19,7 +19,7 @@ Everything can be cloned and run locally, though the easiest way to get started 
 
 ```bash
 # Clone the repository
-git clone git@github.com:polar0/echoes.git
+git clone git@github.com:0xpolarzero/echoes.git
 
 # Install dependencies
 cd echoes/hardhat

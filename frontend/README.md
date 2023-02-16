@@ -8,7 +8,7 @@ Echoes can be generated on testnets (Goerli, Polygon Mumbai, Arbitrum Goerli). T
 
 ```bash
 # Clone the repository
-git clone git@github.com:polar0/echoes.git
+git clone git@github.com:0xpolarzero/echoes.git
 
 # Install dependencies
 cd echoes/frontend
