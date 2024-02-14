@@ -10,8 +10,8 @@ import useTraits from './useTraits';
 
 let urls = [
   process.env.NEXT_PUBLIC_SUBGRAPH_ETHEREUM_GOERLI,
-  process.env.NEXT_PUBLIC_SUBGRAPH_POLYGON_MUMBAI,
   process.env.NEXT_PUBLIC_SUBGRAPH_ARBITRUM_GOERLI,
+  // process.env.NEXT_PUBLIC_SUBGRAPH_POLYGON_MUMBAI,
 ];
 let clients = urls.map(
   (url) =>
@@ -89,17 +89,17 @@ export default create((set, get) => ({
     const { data: ethereumGoerliEchoes } = await clients[0].query({
       query: config.subgraphQueries.GET_ECHOS_ETHEREUM_GOERLI,
     });
-    const { data: polygonMumbaiEchoes } = await clients[1].query({
-      query: config.subgraphQueries.GET_ECHOS_POLYGON_MUMBAI,
-    });
-    const { data: arbitrumGoerliEchoes } = await clients[2].query({
+    const { data: arbitrumGoerliEchoes } = await clients[1].query({
       query: config.subgraphQueries.GET_ECHOS_ARBITRUM_GOERLI,
     });
+    // const { data: polygonMumbaiEchoes } = await clients[2].query({
+    //   query: config.subgraphQueries.GET_ECHOS_POLYGON_MUMBAI,
+    // });
 
     return [
       ethereumGoerliEchoes.echos,
-      polygonMumbaiEchoes.echos,
-      arbitrumGoerliEchoes.echos,
+      // polygonMumbaiEchoes.echos,
+      // arbitrumGoerliEchoes.echos,
     ];
   },
 

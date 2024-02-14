@@ -28,13 +28,15 @@ const Signature = ({ count }) => {
           defaultValue={null}
           style={{ minWidth: 300 }}
           onChange={setSelected}>
-          {availableSignatures[chainId || config.defaultChainId].map(
-            (choice, index) => (
-              <Option key={index} value={choice}>
-                {choice}
-              </Option>
-            ),
-          )}
+          {(
+            availableSignatures[chainId] ||
+            availableSignatures[config.defaultChainId] ||
+            []
+          ).map((choice, index) => (
+            <Option key={index} value={choice}>
+              {choice}
+            </Option>
+          ))}
         </Select>
       </div>
     </div>

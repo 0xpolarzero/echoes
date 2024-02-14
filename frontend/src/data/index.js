@@ -24,7 +24,7 @@ const MINT_PRICE_WEI = ethers.utils.parseEther(MINT_PRICE_ETH.toString());
 // Networks
 const chains = [
   { id: 5, name: 'Ethereum Goerli' },
-  { id: 80001, name: 'Polygon Mumbai' },
+  // { id: 80001, name: 'Polygon Mumbai' },
   { id: 421613, name: 'Arbitrum Goerli' },
 ];
 const defaultChainId = 5;

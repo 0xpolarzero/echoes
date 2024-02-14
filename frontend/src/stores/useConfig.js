@@ -18,7 +18,7 @@ const wagmiClient = createClient(
   getDefaultClient({
     appName: 'echoes',
     alchemyId: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-    chains: [goerli, polygonMumbai, arbitrumGoerli],
+    chains: [goerli, /*  polygonMumbai, */ arbitrumGoerli],
     autoConnect: true,
   }),
 );
